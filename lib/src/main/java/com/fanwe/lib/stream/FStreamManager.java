@@ -47,6 +47,11 @@ public class FStreamManager
         mIsDebug = debug;
     }
 
+    private String getLogTag()
+    {
+        return FStreamManager.class.getSimpleName();
+    }
+
     public <T extends FStream> T newStream(Class<T> clazz)
     {
         return newStream(clazz, null);
@@ -89,7 +94,7 @@ public class FStreamManager
         {
             if (mIsDebug)
             {
-                Log.i(FStreamManager.class.getSimpleName(), "register:" + stream + " (" + clazz.getName() + ") tag(" + stream.getTag() + ") " + (holder.size()));
+                Log.i(getLogTag(), "register:" + stream + " (" + clazz.getName() + ") tag(" + stream.getTag() + ") " + (holder.size()));
             }
         }
     }
@@ -112,7 +117,7 @@ public class FStreamManager
         {
             if (mIsDebug)
             {
-                Log.e(FStreamManager.class.getSimpleName(), "unregister:" + stream + " (" + clazz.getName() + ") tag(" + stream.getTag() + ") " + (holder.size()));
+                Log.e(getLogTag(), "unregister:" + stream + " (" + clazz.getName() + ") tag(" + stream.getTag() + ") " + (holder.size()));
             }
         }
 
@@ -183,7 +188,7 @@ public class FStreamManager
 
                 if (mIsDebug)
                 {
-                    Log.i(FStreamManager.class.getSimpleName(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
+                    Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
                 }
 
                 Object result = null;
@@ -204,13 +209,13 @@ public class FStreamManager
 
                         if (mIsDebug)
                         {
-                            Log.i(FStreamManager.class.getSimpleName(), "notify " + notifyCount + " " + stream);
+                            Log.i(getLogTag(), "notify " + notifyCount + " " + stream);
                         }
                     }
                 }
                 if (mIsDebug)
                 {
-                    Log.i(FStreamManager.class.getSimpleName(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
+                    Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
                 }
 
                 final FStream requestAsResultStream = session.getRequestAsResultStream();
@@ -228,14 +233,14 @@ public class FStreamManager
                 {
                     if (mIsDebug)
                     {
-                        Log.e(FStreamManager.class.getSimpleName(), "return type:" + returnTypeName + " but result:" + result);
+                        Log.e(getLogTag(), "return type:" + returnTypeName + " but result:" + result);
                     }
                     result = 0;
                 }
 
                 if (mIsDebug)
                 {
-                    Log.i(FStreamManager.class.getSimpleName(), "notify result " + result);
+                    Log.i(getLogTag(), "notify result " + result);
                 }
 
                 session.reset();
