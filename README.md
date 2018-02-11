@@ -11,7 +11,7 @@ public class TestTextView extends AppCompatTextView
     /**
      * 回调代理对象
      */
-    private Callback mCallback = FStreamManager.getInstance().newPublisher(Callback.class);
+    private Callback mCallback = FStreamManager.getInstance().newProxy(Callback.class);
 
     public TestTextView(Context context, AttributeSet attrs)
     {
