@@ -218,10 +218,10 @@ public class FStreamManager
                     Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
                 }
 
-                final FStream requestAsResultStream = session.getRequestAsResultStream();
-                if (requestAsResultStream != null)
+                final FStream stream = session.getRequestAsResultStream();
+                if (stream != null)
                 {
-                    result = session.MAP_RESULT.get(requestAsResultStream);
+                    result = session.MAP_RESULT.get(stream);
                 } else
                 {
                     result = tempResult;
