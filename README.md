@@ -8,12 +8,10 @@
 ```java
 public class TestTextView extends AppCompatTextView
 {
-    public static final String TAG = TestTextView.class.getSimpleName();
-
     /**
      * 回调代理对象
      */
-    private Callback mCallback = FStreamManager.getInstance().newStream(Callback.class);
+    private Callback mCallback = FStreamManager.getInstance().newPublisher(Callback.class);
 
     public TestTextView(Context context, AttributeSet attrs)
     {

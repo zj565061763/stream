@@ -52,12 +52,12 @@ public class FStreamManager
         return FStreamManager.class.getSimpleName();
     }
 
-    public <T extends FStream> T newStream(Class<T> clazz)
+    public <T extends FStream> T newPublisher(Class<T> clazz)
     {
-        return newStream(clazz, null);
+        return newPublisher(clazz, null);
     }
 
-    public <T extends FStream> T newStream(Class<T> clazz, String tag)
+    public <T extends FStream> T newPublisher(Class<T> clazz, String tag)
     {
         if (!clazz.isInterface())
         {
