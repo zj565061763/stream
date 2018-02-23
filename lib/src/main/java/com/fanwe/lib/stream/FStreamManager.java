@@ -180,51 +180,50 @@ public class FStreamManager
                 {
                     throw new RuntimeException(name + " method can not be called on proxy instance");
                 }
-                final List<FStream> holder = MAP_STREAM.get(nClass);
-                if (holder == null)
-                {
-                    return null;
-                }
-
-                if (mIsDebug)
-                {
-                    Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
-                }
 
                 Object result = null;
 
-                final FNotifySession session = getNotifySession(nClass);
-                session.reset();
-
-                int notifyCount = 0;
-                Object tempResult = null;
-                for (Object item : holder)
+                final List<FStream> holder = MAP_STREAM.get(nClass);
+                if (holder != null)
                 {
-                    final FStream stream = (FStream) item;
-                    if (nTag == stream.getTag())
+                    if (mIsDebug)
                     {
-                        tempResult = method.invoke(item, args);
-                        session.MAP_RESULT.put(stream, tempResult);
-                        notifyCount++;
+                        Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
+                    }
+                    final FNotifySession session = getNotifySession(nClass);
+                    session.reset();
 
-                        if (mIsDebug)
+                    int notifyCount = 0;
+                    Object tempResult = null;
+                    for (Object item : holder)
+                    {
+                        final FStream stream = (FStream) item;
+                        if (nTag == stream.getTag())
                         {
-                            Log.i(getLogTag(), "notify " + notifyCount + " " + stream);
+                            tempResult = method.invoke(item, args);
+                            session.MAP_RESULT.put(stream, tempResult);
+                            notifyCount++;
+
+                            if (mIsDebug)
+                            {
+                                Log.i(getLogTag(), "notify " + notifyCount + " " + stream);
+                            }
                         }
                     }
-                }
-                if (mIsDebug)
-                {
-                    Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
-                }
+                    if (mIsDebug)
+                    {
+                        Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
+                    }
 
-                final FStream stream = session.getRequestAsResultStream();
-                if (stream != null)
-                {
-                    result = session.MAP_RESULT.get(stream);
-                } else
-                {
-                    result = tempResult;
+                    final FStream stream = session.getRequestAsResultStream();
+                    if (stream != null)
+                    {
+                        result = session.MAP_RESULT.get(stream);
+                    } else
+                    {
+                        result = tempResult;
+                    }
+                    session.reset();
                 }
 
                 final Class returnType = method.getReturnType();
@@ -243,7 +242,6 @@ public class FStreamManager
                     Log.i(getLogTag(), "notify result " + result);
                 }
 
-                session.reset();
                 return result;
             }
         }
