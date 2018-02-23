@@ -172,13 +172,13 @@ public class FStreamManager
         {
             synchronized (FStreamManager.this)
             {
-                final String name = method.getName();
-                if ("register".equals(name)
-                        || "unregister".equals(name)
-                        || "getNotifySession".equals(name)
-                        || "getTag".equals(name))
+                final String methodName = method.getName();
+                if ("register".equals(methodName)
+                        || "unregister".equals(methodName)
+                        || "getNotifySession".equals(methodName)
+                        || "getTag".equals(methodName))
                 {
-                    throw new RuntimeException(name + " method can not be called on proxy instance");
+                    throw new RuntimeException(methodName + " method can not be called on proxy instance");
                 }
 
                 Object result = null;
@@ -218,6 +218,10 @@ public class FStreamManager
                     final FStream stream = session.getRequestAsResultStream();
                     if (stream != null)
                     {
+                        if (mIsDebug)
+                        {
+                            Log.e(getLogTag(), stream + " request as result");
+                        }
                         result = session.getResult(stream);
                     } else
                     {
