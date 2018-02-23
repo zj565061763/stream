@@ -234,7 +234,10 @@ public class FStreamManager
 
                 final Class returnType = method.getReturnType();
                 final String returnTypeName = returnType.getName();
-                if (returnType.isPrimitive() && !"void".equals(returnTypeName) && result == null)
+                if ("void".equals(returnTypeName))
+                {
+                    result = null;
+                } else if (returnType.isPrimitive() && result == null)
                 {
                     if (mIsDebug)
                     {
