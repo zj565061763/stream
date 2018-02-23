@@ -28,7 +28,6 @@ public class TestTextView extends AppCompatTextView
             @Override
             public void onClick(View v)
             {
-                mCallback.onTextViewClicked();
                 setText(String.valueOf(mCallback.getTextViewContent()));
             }
         });
@@ -36,8 +35,6 @@ public class TestTextView extends AppCompatTextView
 
     public interface Callback extends FStream
     {
-        void onTextViewClicked();
-
         int getTextViewContent();
     }
 }
