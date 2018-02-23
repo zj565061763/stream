@@ -17,8 +17,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class FStreamManager
 {
     private static FStreamManager sInstance;
-    private final Map<Class, List<FStream>> MAP_STREAM = new HashMap<>();
 
+    private final Map<Class, List<FStream>> MAP_STREAM = new HashMap<>();
     private final Map<Class, FNotifySession> MAP_NOTIFY_SESSION = new HashMap<>();
 
     private boolean mIsDebug;
