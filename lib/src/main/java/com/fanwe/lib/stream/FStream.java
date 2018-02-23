@@ -21,7 +21,7 @@ public interface FStream
         return FStreamManager.getInstance().getNotifySession(clazz);
     }
 
-    default Object getTag()
+    default String getTag()
     {
         return null;
     }

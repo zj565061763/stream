@@ -164,12 +164,29 @@ public class FStreamManager
     private final class ProxyInvocationHandler implements InvocationHandler
     {
         private final Class nClass;
-        private final Object nTag;
+        private final String nTag;
 
-        public ProxyInvocationHandler(Class clazz, Object tag)
+        public ProxyInvocationHandler(Class clazz, String tag)
         {
             nClass = clazz;
             nTag = tag;
+        }
+
+        private boolean checkTag(FStream stream)
+        {
+            final String tag = stream.getTag();
+            if (nTag == tag)
+            {
+                return true;
+            }
+
+            if (nTag != null && tag != null)
+            {
+                return nTag.equals(tag);
+            } else
+            {
+                return false;
+            }
         }
 
         @Override
@@ -204,7 +221,7 @@ public class FStreamManager
                     for (Object item : holder)
                     {
                         final FStream stream = (FStream) item;
-                        if (nTag == stream.getTag())
+                        if (checkTag(stream))
                         {
                             tempResult = method.invoke(item, args);
                             session.saveResult(stream, tempResult);
