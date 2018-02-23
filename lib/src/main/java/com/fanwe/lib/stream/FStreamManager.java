@@ -218,18 +218,17 @@ public class FStreamManager
 
                     int notifyCount = 0;
                     Object tempResult = null;
-                    for (Object item : holder)
+                    for (FStream item : holder)
                     {
-                        final FStream stream = (FStream) item;
-                        if (checkTag(stream))
+                        if (checkTag(item))
                         {
                             tempResult = method.invoke(item, args);
-                            session.saveResult(stream, tempResult);
+                            session.saveResult(item, tempResult);
                             notifyCount++;
 
                             if (mIsDebug)
                             {
-                                Log.i(getLogTag(), "notify " + notifyCount + " " + stream);
+                                Log.i(getLogTag(), "notify " + notifyCount + " " + item);
                             }
                         }
                     }
