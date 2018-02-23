@@ -219,7 +219,7 @@ public class FStreamManager
 
                             if (mIsDebug)
                             {
-                                Log.i(getLogTag(), "notify " + notifyCount + " " + item);
+                                Log.i(getLogTag(), "notify index:" + notifyCount + " item:" + item + " result:" + tempResult);
                             }
                         }
                     }
