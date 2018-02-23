@@ -7,7 +7,7 @@ import java.util.WeakHashMap;
 /**
  * Created by zhengjun on 2018/2/10.
  */
-public final class FNotifySession
+public final class NotifySession
 {
     private WeakReference<FStream> mStream;
     private final Map<FStream, Object> MAP_RESULT = new WeakHashMap<>();

@@ -15,7 +15,7 @@ public interface FStream
         FStreamManager.getInstance().unregister(this);
     }
 
-    default FNotifySession getNotifySession()
+    default NotifySession getNotifySession()
     {
         final Class clazz = FStreamManager.getInstance().getStreamClass(this);
         return FStreamManager.getInstance().getNotifySession(clazz);

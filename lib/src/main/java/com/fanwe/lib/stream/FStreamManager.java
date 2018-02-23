@@ -19,7 +19,7 @@ public class FStreamManager
     private static FStreamManager sInstance;
 
     private final Map<Class, List<FStream>> MAP_STREAM = new HashMap<>();
-    private final Map<Class, FNotifySession> MAP_NOTIFY_SESSION = new HashMap<>();
+    private final Map<Class, NotifySession> MAP_NOTIFY_SESSION = new HashMap<>();
 
     private boolean mIsDebug;
 
@@ -128,17 +128,17 @@ public class FStreamManager
         }
     }
 
-    synchronized FNotifySession getNotifySession(Class clazz)
+    synchronized NotifySession getNotifySession(Class clazz)
     {
         if (!MAP_STREAM.containsKey(clazz))
         {
             throw new RuntimeException("can not call getNotifySession() before stream is register");
         }
 
-        FNotifySession session = MAP_NOTIFY_SESSION.get(clazz);
+        NotifySession session = MAP_NOTIFY_SESSION.get(clazz);
         if (session == null)
         {
-            session = new FNotifySession();
+            session = new NotifySession();
             MAP_NOTIFY_SESSION.put(clazz, session);
         }
         return session;
@@ -190,7 +190,7 @@ public class FStreamManager
                     {
                         Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
                     }
-                    final FNotifySession session = getNotifySession(nClass);
+                    final NotifySession session = getNotifySession(nClass);
                     session.reset();
 
                     int notifyCount = 0;
