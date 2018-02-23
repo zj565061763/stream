@@ -68,7 +68,12 @@ public class FStreamManager
             throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
         }
 
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag));
+        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag));
+        if (mIsDebug)
+        {
+            Log.i(getLogTag(), "proxy created:" + clazz.getName() + " tag(" + tag + ")");
+        }
+        return proxy;
     }
 
     synchronized void register(FStream stream)
