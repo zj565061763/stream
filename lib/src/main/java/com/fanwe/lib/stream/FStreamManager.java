@@ -5,6 +5,7 @@ import android.util.Log;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,11 @@ public class FStreamManager
 
     public <T extends FStream> T newProxy(Class<T> clazz, String tag)
     {
+        return newProxy(clazz, tag, null);
+    }
+
+    public <T extends FStream> T newProxy(Class<T> clazz, String tag, MethodResultFilter methodResultFilter)
+    {
         if (!clazz.isInterface())
         {
             throw new IllegalArgumentException("clazz must be an interface");
@@ -66,7 +72,7 @@ public class FStreamManager
             throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
         }
 
-        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag));
+        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag, methodResultFilter));
         if (mIsDebug)
         {
             Log.i(getLogTag(), "proxy created:" + clazz.getName() + " tag(" + tag + ")");
@@ -146,11 +152,18 @@ public class FStreamManager
     {
         private final Class nClass;
         private final String nTag;
+        private final MethodResultFilter nMethodResultFilter;
+        private final List<Object> nListResult = new ArrayList<>();
 
-        public ProxyInvocationHandler(Class clazz, String tag)
+        public ProxyInvocationHandler(Class clazz, String tag, MethodResultFilter methodResultFilter)
         {
             nClass = clazz;
             nTag = tag;
+            if (methodResultFilter == null)
+            {
+                methodResultFilter = new MethodResultFilter();
+            }
+            nMethodResultFilter = methodResultFilter;
         }
 
         private boolean checkTag(FStream stream)
@@ -183,6 +196,7 @@ public class FStreamManager
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
                 }
 
+                nListResult.clear();
                 Object result = null;
 
                 //---------- main logic start ----------
@@ -195,12 +209,12 @@ public class FStreamManager
                     }
 
                     int notifyCount = 0;
-                    Object tempResult = null;
                     for (FStream item : holder)
                     {
                         if (checkTag(item))
                         {
-                            tempResult = method.invoke(item, args);
+                            Object tempResult = method.invoke(item, args);
+                            nListResult.add(tempResult);
                             notifyCount++;
 
                             if (mIsDebug)
@@ -214,7 +228,7 @@ public class FStreamManager
                         Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
                     }
 
-                    result = tempResult;
+                    result = nMethodResultFilter.filterResult(method, args, nListResult);
                 }
                 //---------- main logic end ----------
 
@@ -234,6 +248,7 @@ public class FStreamManager
                     Log.i(getLogTag(), "notify result " + result);
                 }
 
+                nListResult.clear();
                 return result;
             }
         }
