@@ -57,7 +57,7 @@ public class FStreamManager
         return newProxy(clazz, null);
     }
 
-    public <T extends FStream> T newProxy(Class<T> clazz, Object tag)
+    public <T extends FStream> T newProxy(Class<T> clazz, String tag)
     {
         if (!clazz.isInterface())
         {
@@ -164,9 +164,9 @@ public class FStreamManager
     private final class ProxyInvocationHandler implements InvocationHandler
     {
         private final Class nClass;
-        private final Object nTag;
+        private final String nTag;
 
-        public ProxyInvocationHandler(Class clazz, Object tag)
+        public ProxyInvocationHandler(Class clazz, String tag)
         {
             nClass = clazz;
             nTag = tag;
@@ -174,8 +174,19 @@ public class FStreamManager
 
         private boolean checkTag(FStream stream)
         {
-            final Object tag = stream.getTag();
-            return nTag == tag;
+            final String tag = stream.getTag();
+            if (nTag == tag)
+            {
+                return true;
+            }
+
+            if (nTag != null && tag != null)
+            {
+                return nTag.equals(tag);
+            } else
+            {
+                return false;
+            }
         }
 
         @Override
