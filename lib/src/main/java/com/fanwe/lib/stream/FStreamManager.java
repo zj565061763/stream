@@ -19,8 +19,6 @@ public class FStreamManager
     private static FStreamManager sInstance;
 
     private final Map<Class, List<FStream>> MAP_STREAM = new HashMap<>();
-    private final Map<Class, NotifySession> MAP_NOTIFY_SESSION = new HashMap<>();
-
     private boolean mIsDebug;
 
     private FStreamManager()
@@ -129,24 +127,7 @@ public class FStreamManager
         if (holder.isEmpty())
         {
             MAP_STREAM.remove(clazz);
-            MAP_NOTIFY_SESSION.remove(clazz);
         }
-    }
-
-    synchronized NotifySession getNotifySession(Class clazz)
-    {
-        if (!MAP_STREAM.containsKey(clazz))
-        {
-            throw new RuntimeException("can not call getNotifySession() before stream is register");
-        }
-
-        NotifySession session = MAP_NOTIFY_SESSION.get(clazz);
-        if (session == null)
-        {
-            session = new NotifySession();
-            MAP_NOTIFY_SESSION.put(clazz, session);
-        }
-        return session;
     }
 
     Class getStreamClass(FStream stream)
@@ -197,7 +178,6 @@ public class FStreamManager
                 final String methodName = method.getName();
                 if ("register".equals(methodName)
                         || "unregister".equals(methodName)
-                        || "getNotifySession".equals(methodName)
                         || "getTag".equals(methodName))
                 {
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
@@ -213,8 +193,6 @@ public class FStreamManager
                     {
                         Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
                     }
-                    final NotifySession session = getNotifySession(nClass);
-                    session.reset();
 
                     int notifyCount = 0;
                     Object tempResult = null;
@@ -223,7 +201,6 @@ public class FStreamManager
                         if (checkTag(item))
                         {
                             tempResult = method.invoke(item, args);
-                            session.saveResult(item, tempResult);
                             notifyCount++;
 
                             if (mIsDebug)
@@ -237,19 +214,7 @@ public class FStreamManager
                         Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
                     }
 
-                    final FStream stream = session.getRequestAsResultStream();
-                    if (stream != null)
-                    {
-                        if (mIsDebug)
-                        {
-                            Log.e(getLogTag(), stream + " request as result");
-                        }
-                        result = session.getResult(stream);
-                    } else
-                    {
-                        result = tempResult;
-                    }
-                    session.reset();
+                    result = tempResult;
                 }
                 //---------- main logic end ----------
 
