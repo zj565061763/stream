@@ -2,9 +2,12 @@ package com.fanwe.stream;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity
 {
+    public static final String TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -21,6 +24,12 @@ public class MainActivity extends AppCompatActivity
     private TestTextView.Callback mCallback1 = new TestTextView.Callback()
     {
         @Override
+        public void onTextViewClicked()
+        {
+            Log.i(TAG, "mCallback1 onTextViewClicked");
+        }
+
+        @Override
         public int getTextViewContent()
         {
             return 1;
@@ -32,6 +41,12 @@ public class MainActivity extends AppCompatActivity
      */
     private TestTextView.Callback mCallback2 = new TestTextView.Callback()
     {
+        @Override
+        public void onTextViewClicked()
+        {
+            Log.i(TAG, "mCallback2 onTextViewClicked");
+        }
+
         @Override
         public int getTextViewContent()
         {
