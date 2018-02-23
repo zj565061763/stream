@@ -158,8 +158,8 @@ public class FStreamManager
 
     private final class ProxyInvocationHandler implements InvocationHandler
     {
-        private Class nClass;
-        private Object nTag;
+        private final Class nClass;
+        private final Object nTag;
 
         public ProxyInvocationHandler(Class clazz, Object tag)
         {
