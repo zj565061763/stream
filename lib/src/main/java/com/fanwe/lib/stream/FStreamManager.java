@@ -183,6 +183,7 @@ public class FStreamManager
 
                 Object result = null;
 
+                //---------- main logic start ----------
                 final List<FStream> holder = MAP_STREAM.get(nClass);
                 if (holder != null)
                 {
@@ -229,6 +230,7 @@ public class FStreamManager
                     }
                     session.reset();
                 }
+                //---------- main logic end ----------
 
                 final Class returnType = method.getReturnType();
                 final String returnTypeName = returnType.getName();
