@@ -201,7 +201,7 @@ public class FStreamManager
                         if (nTag == stream.getTag())
                         {
                             tempResult = method.invoke(item, args);
-                            session.MAP_RESULT.put(stream, tempResult);
+                            session.saveResult(stream, tempResult);
                             notifyCount++;
 
                             if (mIsDebug)
@@ -218,7 +218,7 @@ public class FStreamManager
                     final FStream stream = session.getRequestAsResultStream();
                     if (stream != null)
                     {
-                        result = session.MAP_RESULT.get(stream);
+                        result = session.getResult(stream);
                     } else
                     {
                         result = tempResult;

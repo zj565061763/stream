@@ -10,12 +10,22 @@ import java.util.WeakHashMap;
 public final class FNotifySession
 {
     private WeakReference<FStream> mStream;
-    final Map<FStream, Object> MAP_RESULT = new WeakHashMap<>();
+    private final Map<FStream, Object> MAP_RESULT = new WeakHashMap<>();
 
     void reset()
     {
         MAP_RESULT.clear();
         mStream = null;
+    }
+
+    void saveResult(FStream stream, Object result)
+    {
+        MAP_RESULT.put(stream, result);
+    }
+
+    Object getResult(FStream stream)
+    {
+        return MAP_RESULT.get(stream);
     }
 
     FStream getRequestAsResultStream()
