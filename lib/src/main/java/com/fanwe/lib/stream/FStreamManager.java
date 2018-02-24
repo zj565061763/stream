@@ -136,7 +136,7 @@ public class FStreamManager
         }
     }
 
-    Class getStreamClass(FStream stream)
+    private Class getStreamClass(FStream stream)
     {
         final Class[] arrInterface = stream.getClass().getInterfaces();
         if (arrInterface.length != 1)
