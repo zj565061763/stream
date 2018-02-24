@@ -37,6 +37,7 @@ public class TestTextView extends AppCompatTextView
 ```java
 public class MainActivity extends AppCompatActivity
 {
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -55,10 +56,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public int getTextViewContent()
         {
-            /**
-             * 如果调用此方法，则会用当前方法的返回值，如果不调用则用最后一个注册的callback的返回值
-             */
-            getNotifySession().requestAsResult(this);
             return 1;
         }
     };

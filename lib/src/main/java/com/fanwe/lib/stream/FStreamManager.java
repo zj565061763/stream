@@ -196,7 +196,6 @@ public class FStreamManager
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
                 }
 
-                nListResult.clear();
                 Object result = null;
 
                 //---------- main logic start ----------
@@ -229,6 +228,7 @@ public class FStreamManager
                     }
 
                     result = nMethodResultFilter.filterResult(method, args, nListResult);
+                    nListResult.clear();
                 }
                 //---------- main logic end ----------
 
@@ -251,7 +251,6 @@ public class FStreamManager
                     Log.i(getLogTag(), "notify result " + result);
                 }
 
-                nListResult.clear();
                 return result;
             }
         }
