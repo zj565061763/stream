@@ -161,7 +161,7 @@ public class FStreamManager
             nTag = tag;
             if (methodResultFilter == null)
             {
-                methodResultFilter = new MethodResultFilter();
+                methodResultFilter = MethodResultFilter.DEFAULT;
             }
             nMethodResultFilter = methodResultFilter;
         }
