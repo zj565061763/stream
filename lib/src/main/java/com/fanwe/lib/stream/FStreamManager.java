@@ -159,10 +159,6 @@ public class FStreamManager
         {
             nClass = clazz;
             nTag = tag;
-            if (methodResultFilter == null)
-            {
-                methodResultFilter = MethodResultFilter.DEFAULT;
-            }
             nMethodResultFilter = methodResultFilter;
         }
 
@@ -227,7 +223,17 @@ public class FStreamManager
                         Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
                     }
 
-                    result = nMethodResultFilter.filterResult(method, args, nListResult);
+                    if (!nListResult.isEmpty())
+                    {
+                        if (nMethodResultFilter != null)
+                        {
+                            result = nMethodResultFilter.filterResult(method, args, nListResult);
+                        } else
+                        {
+                            result = nListResult.get(nListResult.size() - 1);
+                        }
+                    }
+
                     nListResult.clear();
                 }
                 //---------- main logic end ----------
