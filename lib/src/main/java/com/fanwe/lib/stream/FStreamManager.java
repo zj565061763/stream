@@ -56,12 +56,12 @@ public class FStreamManager
         return newProxy(clazz, null);
     }
 
-    public <T extends FStream> T newProxy(Class<T> clazz, String tag)
+    public <T extends FStream> T newProxy(Class<T> clazz, Object tag)
     {
         return newProxy(clazz, tag, null);
     }
 
-    public <T extends FStream> T newProxy(Class<T> clazz, String tag, MethodResultFilter methodResultFilter)
+    public <T extends FStream> T newProxy(Class<T> clazz, Object tag, MethodResultFilter methodResultFilter)
     {
         if (!clazz.isInterface())
         {
@@ -151,28 +151,28 @@ public class FStreamManager
     private final class ProxyInvocationHandler implements InvocationHandler
     {
         private final Class nClass;
-        private final String nTag;
+        private final Object nProxyTag;
         private final MethodResultFilter nMethodResultFilter;
         private final List<Object> nListResult = new ArrayList<>();
 
-        public ProxyInvocationHandler(Class clazz, String tag, MethodResultFilter methodResultFilter)
+        public ProxyInvocationHandler(Class clazz, Object tag, MethodResultFilter methodResultFilter)
         {
             nClass = clazz;
-            nTag = tag;
+            nProxyTag = tag;
             nMethodResultFilter = methodResultFilter;
         }
 
         private boolean checkTag(FStream stream)
         {
-            final String tag = stream.getTag();
-            if (nTag == tag)
+            final Object tag = stream.getTag();
+            if (nProxyTag == tag)
             {
                 return true;
             }
 
-            if (nTag != null && tag != null)
+            if (nProxyTag != null && tag != null)
             {
-                return nTag.equals(tag);
+                return nProxyTag.equals(tag);
             } else
             {
                 return false;
@@ -200,7 +200,7 @@ public class FStreamManager
                 {
                     if (mIsDebug)
                     {
-                        Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
+                        Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nProxyTag + ")");
                     }
 
                     int notifyCount = 0;

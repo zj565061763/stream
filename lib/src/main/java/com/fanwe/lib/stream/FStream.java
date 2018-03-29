@@ -15,7 +15,7 @@ public interface FStream
         FStreamManager.getInstance().unregister(this);
     }
 
-    default String getTag()
+    default Object getTag()
     {
         return null;
     }
