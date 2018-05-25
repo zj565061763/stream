@@ -49,16 +49,31 @@ public class FStreamManager
         return FStreamManager.class.getSimpleName();
     }
 
+    /**
+     * {@link #newProxy(Class, Object, MethodResultFilter)}
+     */
     public <T extends FStream> T newProxy(Class<T> clazz)
     {
         return newProxy(clazz, null);
     }
 
+    /**
+     * {@link #newProxy(Class, Object, MethodResultFilter)}
+     */
     public <T extends FStream> T newProxy(Class<T> clazz, Object tag)
     {
         return newProxy(clazz, tag, null);
     }
 
+    /**
+     * 创建一个代理对象
+     *
+     * @param clazz              要创建的class
+     * @param tag                代理对象的tag
+     * @param methodResultFilter 方法返回值过滤对象，默认返回最后一个流对象的返回值
+     * @param <T>
+     * @return
+     */
     public <T extends FStream> T newProxy(Class<T> clazz, Object tag, MethodResultFilter methodResultFilter)
     {
         if (clazz == null)
@@ -79,7 +94,7 @@ public class FStreamManager
     }
 
     /**
-     * 注册
+     * 注册流对象
      *
      * @param stream
      */
@@ -107,7 +122,7 @@ public class FStreamManager
     }
 
     /**
-     * 取消注册
+     * 取消注册流对象
      *
      * @param stream
      */
