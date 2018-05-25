@@ -215,7 +215,7 @@ public class FStreamManager
                 }
 
                 final Class returnType = method.getReturnType();
-                final boolean isVoid = "void".equals(returnType.getName());
+                final boolean isVoid = returnType == void.class;
 
                 Object result = null;
 
