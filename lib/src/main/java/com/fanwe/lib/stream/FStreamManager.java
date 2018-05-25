@@ -271,7 +271,7 @@ public class FStreamManager
          * @param <T>
          * @return
          */
-        public <T> T build(Class<T> clazz)
+        public <T extends FStream> T build(Class<T> clazz)
         {
             if (clazz == null)
                 throw new NullPointerException("clazz is null");
@@ -279,8 +279,6 @@ public class FStreamManager
                 throw new IllegalArgumentException("clazz must be an interface");
             if (clazz == FStream.class)
                 throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
-            if (!FStream.class.isAssignableFrom(clazz))
-                throw new IllegalArgumentException("clazz must extends " + FStream.class.getName());
 
             this.clazz = clazz;
 
