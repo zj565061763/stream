@@ -249,7 +249,7 @@ public class FStreamManager
                 }
 
                 if (mIsDebug)
-                    Log.i(getLogTag(), "notify final return " + result);
+                    Log.i(getLogTag(), "notify final return:" + result);
 
                 return result;
             }
