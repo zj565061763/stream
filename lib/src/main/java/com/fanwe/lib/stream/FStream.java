@@ -5,18 +5,10 @@ package com.fanwe.lib.stream;
  */
 public interface FStream
 {
-    default void register()
-    {
-        FStreamManager.getInstance().register(this);
-    }
-
-    default void unregister()
-    {
-        FStreamManager.getInstance().unregister(this);
-    }
-
-    default Object getTag()
-    {
-        return null;
-    }
+    /**
+     * 返回当前对象的标识
+     *
+     * @return
+     */
+    Object getTag();
 }

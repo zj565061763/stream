@@ -33,9 +33,7 @@ public class FStreamManager
             synchronized (FStreamManager.class)
             {
                 if (sInstance == null)
-                {
                     sInstance = new FStreamManager();
-                }
             }
         }
         return sInstance;
@@ -51,41 +49,44 @@ public class FStreamManager
         return FStreamManager.class.getSimpleName();
     }
 
-    public <T extends FStream> T newProxy(Class<T> clazz)
+    public <T extends FStream> T newStream(Class<T> clazz)
     {
-        return newProxy(clazz, null);
+        return newStream(clazz, null);
     }
 
-    public <T extends FStream> T newProxy(Class<T> clazz, Object tag)
+    public <T extends FStream> T newStream(Class<T> clazz, Object tag)
     {
-        return newProxy(clazz, tag, null);
+        return newStream(clazz, tag, null);
     }
 
-    public <T extends FStream> T newProxy(Class<T> clazz, Object tag, MethodResultFilter methodResultFilter)
+    public <T extends FStream> T newStream(Class<T> clazz, Object tag, MethodResultFilter methodResultFilter)
     {
+        if (clazz == null)
+            throw new NullPointerException("clazz is null");
         if (!clazz.isInterface())
-        {
             throw new IllegalArgumentException("clazz must be an interface");
-        }
         if (clazz == FStream.class)
-        {
             throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
-        }
+        if (!FStream.class.isAssignableFrom(clazz))
+            throw new IllegalArgumentException("clazz must extends " + FStream.class.getName());
 
-        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag, methodResultFilter));
+        final T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag, methodResultFilter));
+
         if (mIsDebug)
-        {
-            Log.i(getLogTag(), "proxy created:" + clazz.getName() + " tag(" + tag + ")");
-        }
+            Log.i(getLogTag(), "Stream created:" + clazz.getName() + " tag(" + tag + ")");
+
         return proxy;
     }
 
-    synchronized void register(FStream stream)
+    /**
+     * 注册
+     *
+     * @param stream
+     */
+    public synchronized void register(FStream stream)
     {
         if (stream == null)
-        {
             return;
-        }
 
         final Class clazz = getStreamClass(stream);
         List<FStream> holder = MAP_STREAM.get(clazz);
@@ -96,44 +97,38 @@ public class FStreamManager
         }
 
         if (holder.contains(stream))
-        {
             return;
-        }
+
         if (holder.add(stream))
         {
             if (mIsDebug)
-            {
-                Log.i(getLogTag(), "register:" + stream + " (" + clazz.getName() + ") tag(" + stream.getTag() + ") " + (holder.size()));
-            }
+                Log.i(getLogTag(), "register:" + stream + " tag(" + stream.getTag() + ") " + (holder.size()));
         }
     }
 
-    synchronized void unregister(FStream stream)
+    /**
+     * 取消注册
+     *
+     * @param stream
+     */
+    public synchronized void unregister(FStream stream)
     {
         if (stream == null)
-        {
             return;
-        }
 
         final Class clazz = getStreamClass(stream);
         final List<FStream> holder = MAP_STREAM.get(clazz);
         if (holder == null)
-        {
             return;
-        }
 
         if (holder.remove(stream))
         {
             if (mIsDebug)
-            {
-                Log.e(getLogTag(), "unregister:" + stream + " (" + clazz.getName() + ") tag(" + stream.getTag() + ") " + (holder.size()));
-            }
+                Log.e(getLogTag(), "unregister:" + stream + " tag(" + stream.getTag() + ") " + (holder.size()));
         }
 
         if (holder.isEmpty())
-        {
             MAP_STREAM.remove(clazz);
-        }
     }
 
     private Class getStreamClass(FStream stream)
@@ -141,7 +136,7 @@ public class FStreamManager
         final Class[] arrInterface = stream.getClass().getInterfaces();
         if (arrInterface.length != 1)
         {
-            throw new IllegalArgumentException("stream can only implements one interface");
+            throw new IllegalArgumentException("Stream can only implements one interface:" + FStream.class.getSimpleName());
         } else
         {
             return arrInterface[0];
@@ -185,12 +180,8 @@ public class FStreamManager
             synchronized (FStreamManager.this)
             {
                 final String methodName = method.getName();
-                if ("register".equals(methodName)
-                        || "unregister".equals(methodName)
-                        || "getTag".equals(methodName))
-                {
+                if ("getTag".equals(methodName))
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
-                }
 
                 Object result = null;
 
