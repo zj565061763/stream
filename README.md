@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
 
 # 调试模式
 
-设置调试模式后，内部会输出流对象注册和取消注册，已经代理对象方法触发的日志，demo中的日志如下
+设置调试模式后，内部会输出流对象注册和取消注册，以及代理对象方法触发的日志，demo中的日志如下
 
 ```java
 
