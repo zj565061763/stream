@@ -84,21 +84,24 @@ public class FStreamManager
         if (stream == null)
             return;
 
-        final Class clazz = getStreamClass(stream);
-        List<FStream> holder = MAP_STREAM.get(clazz);
-        if (holder == null)
+        final List<Class> list = findStreamClass(stream.getClass());
+        for (Class item : list)
         {
-            holder = new CopyOnWriteArrayList<>();
-            MAP_STREAM.put(clazz, holder);
-        }
+            List<FStream> holder = MAP_STREAM.get(item);
+            if (holder == null)
+            {
+                holder = new CopyOnWriteArrayList<>();
+                MAP_STREAM.put(item, holder);
+            }
 
-        if (holder.contains(stream))
-            return;
-
-        if (holder.add(stream))
-        {
-            if (mIsDebug)
-                Log.i(getLogTag(), "register:" + stream + " tag(" + stream.getTag() + ") " + (holder.size()));
+            if (!holder.contains(stream))
+            {
+                if (holder.add(stream))
+                {
+                    if (mIsDebug)
+                        Log.i(getLogTag(), "register:" + stream + " tag(" + stream.getTag() + ") " + " class(" + item.getName() + ") " + (holder.size()));
+                }
+            }
         }
     }
 
@@ -112,31 +115,46 @@ public class FStreamManager
         if (stream == null)
             return;
 
-        final Class clazz = getStreamClass(stream);
-        final List<FStream> holder = MAP_STREAM.get(clazz);
-        if (holder == null)
-            return;
-
-        if (holder.remove(stream))
+        final List<Class> list = findStreamClass(stream.getClass());
+        for (Class item : list)
         {
-            if (mIsDebug)
-                Log.e(getLogTag(), "unregister:" + stream + " tag(" + stream.getTag() + ") " + (holder.size()));
-        }
+            final List<FStream> holder = MAP_STREAM.get(item);
+            if (holder != null)
+            {
+                if (holder.remove(stream))
+                {
+                    if (mIsDebug)
+                        Log.e(getLogTag(), "unregister:" + stream + " tag(" + stream.getTag() + ") " + " class(" + item.getName() + ") " + (holder.size()));
+                }
 
-        if (holder.isEmpty())
-            MAP_STREAM.remove(clazz);
+                if (holder.isEmpty())
+                    MAP_STREAM.remove(item);
+            }
+        }
     }
 
-    private Class getStreamClass(FStream stream)
+    private List<Class> findStreamClass(Class clazz)
     {
-        final Class[] arrInterface = stream.getClass().getInterfaces();
-        if (arrInterface.length != 1)
+        final List<Class> list = new ArrayList<>();
+
+        if (clazz != null)
         {
-            throw new IllegalArgumentException("Stream can only implements one interface:" + FStream.class.getSimpleName());
-        } else
-        {
-            return arrInterface[0];
+            if (clazz.isInterface())
+                throw new IllegalArgumentException("clazz must not be an interface");
+
+            if (FStream.class.isAssignableFrom(clazz))
+            {
+                final Class[] interfaces = clazz.getInterfaces();
+                for (Class item : interfaces)
+                {
+                    if (FStream.class.isAssignableFrom(item))
+                        list.add(item);
+                }
+                list.addAll(findStreamClass(clazz.getSuperclass()));
+            }
         }
+
+        return list;
     }
 
     private final class ProxyInvocationHandler implements InvocationHandler
