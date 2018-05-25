@@ -82,7 +82,7 @@ FStreamManager.getInstance().unregister(mFragmentCallback);
 ```
 
 # 注意
-1. 有多个代理对象的情况
+* 有多个代理对象的情况 <br>
 创建代理对象的时候可以指定tag，默认代理对象的tag是null。
 只有流对象getTag()方法返回的值和代理对象tag相等的流对象才可以互相通信，tag比较相等的规则为 “==” 或者 “equals”，
 流对象可以通过getTag()方法的返回值决定要和哪些代理对象通信，默认返回null <br> <br>
@@ -94,7 +94,7 @@ private final FragmentCallback mCallback = FStreamManager.getInstance().newProxy
         .build(FragmentCallback.class);
 ```
 
-2. 有多个流对象的情况
+* 有多个流对象的情况 <br>
 这时候调用代理对象通信方法的时候，如果这个方法有返回值的话，默认是用最后注册的一个流对象方法的返回值，
 当然，代理对象也可以在创建的时候设置一个方法返回值筛选器，筛选自己需要的返回值 <br> <br>
 
