@@ -85,6 +85,9 @@ public class FStreamManager
             return;
 
         final List<Class> list = findStreamClass(stream.getClass());
+        if (list.isEmpty())
+            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
+
         for (Class item : list)
         {
             List<FStream> holder = MAP_STREAM.get(item);
@@ -116,6 +119,9 @@ public class FStreamManager
             return;
 
         final List<Class> list = findStreamClass(stream.getClass());
+        if (list.isEmpty())
+            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
+
         for (Class item : list)
         {
             final List<FStream> holder = MAP_STREAM.get(item);
