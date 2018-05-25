@@ -1,7 +1,7 @@
-## Gradle
-[![](https://jitpack.io/v/zj565061763/stream.svg)](https://jitpack.io/#zj565061763/stream)
+# Gradle
+`implementation 'com.fanwe.android:stream:1.0.0-rc1'`
 
-## 使用
+# 使用
 做一个简单的demo，TextView点击之后，通过回调对象返回字符串设置给TextView
 <br>
 1. 自定义一个TextView
@@ -11,7 +11,9 @@ public class TestTextView extends AppCompatTextView
     /**
      * 回调代理对象
      */
-    private Callback mCallback = FStreamManager.getInstance().newProxy(Callback.class);
+    private Callback mCallback = FStreamManager.getInstance().newProxyBuilder()
+            .tag(null) // 默认tag为null
+            .build(Callback.class);
 
     public TestTextView(Context context, AttributeSet attrs)
     {
@@ -21,11 +23,20 @@ public class TestTextView extends AppCompatTextView
             @Override
             public void onClick(View v)
             {
-                setText(String.valueOf(mCallback.getTextViewContent()));
+                /**
+                 * 调用回调代理对象的方法，从注册的流对象中得到一个返回值
+                 *
+                 * 注意：只有tag和当前代理对象tag相等的流对象才会被通知到，tag比较相等的规则为 “==” 或者 “equals”
+                 */
+                final int result = mCallback.getTextViewContent();
+                setText(String.valueOf(result));
             }
         });
     }
 
+    /**
+     * 回调接口继承流接口
+     */
     public interface Callback extends FStream
     {
         int getTextViewContent();
@@ -37,22 +48,30 @@ public class TestTextView extends AppCompatTextView
 ```java
 public class MainActivity extends AppCompatActivity
 {
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mCallback1.register(); // 注册回调对象
-        mCallback2.register();
+        /**
+         * 注册回调对象
+         */
+        FStreamManager.getInstance().register(mCallback1);
+        FStreamManager.getInstance().register(mCallback2);
     }
 
     /**
      * 回调对象
      */
-    private TestTextView.Callback mCallback1 = new TestTextView.Callback()
+    private final TestTextView.Callback mCallback1 = new TestTextView.Callback()
     {
+        @Override
+        public Object getTag()
+        {
+            return null;
+        }
+
         @Override
         public int getTextViewContent()
         {
@@ -63,8 +82,14 @@ public class MainActivity extends AppCompatActivity
     /**
      * 回调对象
      */
-    private TestTextView.Callback mCallback2 = new TestTextView.Callback()
+    private final TestTextView.Callback mCallback2 = new TestTextView.Callback()
     {
+        @Override
+        public Object getTag()
+        {
+            return null;
+        }
+
         @Override
         public int getTextViewContent()
         {
@@ -76,8 +101,12 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        mCallback1.unregister(); //取消注册，在需要资源释放的地方要取消注册，否则会内存泄漏
-        mCallback2.unregister();
+
+        /**
+         * 取消注册，在需要资源释放的地方要取消注册，否则会内存泄漏
+         */
+        FStreamManager.getInstance().unregister(mCallback1);
+        FStreamManager.getInstance().unregister(mCallback2);
     }
 }
 ```
