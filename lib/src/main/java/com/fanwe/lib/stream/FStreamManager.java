@@ -102,7 +102,7 @@ public class FStreamManager
                 if (holder.add(stream))
                 {
                     if (mIsDebug)
-                        Log.i(getLogTag(), "register:" + stream + " class(" + item.getName() + ")" + " tag(" + stream.getTag() + ") " + (holder.size()));
+                        Log.i(getLogTag(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTag() + " size:" + (holder.size()));
                 }
             }
         }
@@ -130,7 +130,7 @@ public class FStreamManager
                 if (holder.remove(stream))
                 {
                     if (mIsDebug)
-                        Log.e(getLogTag(), "unregister:" + stream + " class(" + item.getName() + ")" + " tag(" + stream.getTag() + ") " + (holder.size()));
+                        Log.e(getLogTag(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTag() + " size:" + (holder.size()));
                 }
 
                 if (holder.isEmpty())
@@ -206,7 +206,7 @@ public class FStreamManager
                 {
                     if (mIsDebug)
                     {
-                        Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
+                        Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + nTag + " count:" + holder.size());
                     }
 
                     int notifyCount = 0;
