@@ -1,6 +1,7 @@
 package com.fanwe.stream;
 
 import android.app.Application;
+
 import com.fanwe.lib.stream.FStreamManager;
 
 /**
