@@ -209,14 +209,16 @@ public class FStreamManager
             synchronized (FStreamManager.this)
             {
                 final String methodName = method.getName();
-                if ("getTag".equals(methodName))
+                final Class returnType = method.getReturnType();
+
+                if ("getTag".equals(methodName)
+                        && Object.class == returnType
+                        && method.getParameterTypes().length == 0)
                 {
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
                 }
 
-                final Class returnType = method.getReturnType();
                 final boolean isVoid = returnType == void.class || returnType == Void.class;
-
                 Object result = null;
 
                 //---------- main logic start ----------
@@ -224,9 +226,7 @@ public class FStreamManager
                 if (holder != null)
                 {
                     if (mIsDebug)
-                    {
                         Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + nTag + " count:" + holder.size());
-                    }
 
                     int notifyCount = 0;
                     for (FStream item : holder)
