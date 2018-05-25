@@ -84,7 +84,11 @@ public class FStreamManager
         if (stream == null)
             return;
 
-        final List<Class> list = findStreamClass(stream.getClass());
+        final Class streamClass = stream.getClass();
+        if (Proxy.isProxyClass(streamClass))
+            throw new IllegalArgumentException("can not register proxy instance");
+
+        final List<Class> list = findStreamClass(streamClass);
         if (list.isEmpty())
             throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
 
@@ -118,7 +122,11 @@ public class FStreamManager
         if (stream == null)
             return;
 
-        final List<Class> list = findStreamClass(stream.getClass());
+        final Class streamClass = stream.getClass();
+        if (Proxy.isProxyClass(streamClass))
+            throw new IllegalArgumentException("can not unregister proxy instance");
+
+        final List<Class> list = findStreamClass(streamClass);
         if (list.isEmpty())
             throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
 
