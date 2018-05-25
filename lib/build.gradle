@@ -27,7 +27,7 @@ publish {
     groupId = 'com.fanwe.android'
 
     artifactId = 'stream'
-    publishVersion = '1.0.10'
+    publishVersion = '1.0.0'
     desc = 'android stream library'
     website = 'https://github.com/zj565061763/stream'
 }
