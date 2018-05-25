@@ -200,15 +200,12 @@ public class FStreamManager
                     if (!nListResult.isEmpty())
                     {
                         if (nMethodResultFilter != null)
-                        {
                             result = nMethodResultFilter.filterResult(method, args, nListResult);
-                        } else
-                        {
+                        else
                             result = nListResult.get(nListResult.size() - 1);
-                        }
-                    }
 
-                    nListResult.clear();
+                        nListResult.clear();
+                    }
                 }
                 //---------- main logic end ----------
 
