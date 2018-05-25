@@ -1,9 +1,6 @@
 # About
 可以双向通信的流接口，用于Android开发中复杂嵌套，又需要双向通信的场景
 
-# Gradle
-`implementation 'com.fanwe.android:stream:1.0.0-rc1'`
-
 # 简单使用
 1. 创建接口
 ```java
@@ -82,4 +79,56 @@ FStreamManager.getInstance().register(mFragmentCallback);
  * 取消注册，在需要资源释放的地方要取消注册，否则会内存泄漏
  */
 FStreamManager.getInstance().unregister(mFragmentCallback);
+```
+
+# 注意
+1. 有多个代理对象的情况
+创建代理对象的时候可以指定tag，默认代理对象的tag是null。
+只有流对象getTag()方法返回的值和代理对象tag相等的流对象才可以互相通信，tag比较相等的规则为 “==” 或者 “equals”，
+流对象可以通过getTag()方法的返回值决定要和哪些代理对象通信，默认返回null <br> <br>
+
+设置tag：
+```java
+private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
+        .tag(this) // 设置一个tag
+        .build(FragmentCallback.class);
+```
+
+2. 有多个流对象的情况
+这时候调用代理对象通信方法的时候，如果这个方法有返回值的话，默认是用最后注册的一个流对象方法的返回值，
+当然，代理对象也可以在创建的时候设置一个方法返回值筛选器，筛选自己需要的返回值 <br> <br>
+
+设置方法返回值过滤器：
+```java
+private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
+        .methodResultFilter(new MethodResultFilter()
+        {
+            @Override
+            public Object filterResult(Method method, Object[] args, List<Object> results)
+            {
+                // 筛选results中需要的返回值
+                return null;
+            }
+        })
+        .build(FragmentCallback.class);
+```
+
+
+```java
+/**
+ * 方法返回值过滤接口
+ */
+public interface MethodResultFilter
+{
+    /**
+     * 筛选方法的返回值
+     *
+     * @param method  被触发的方法
+     * @param args    被触发的方法的参数
+     * @param results 所有注册的FStream对象该方法的返回值集合
+     * @return 返回该方法最终的返回值，默认把返回值集合的最后一个当做该方法的返回值
+     */
+    Object filterResult(Method method, Object[] args, List<Object> results);
+}
+
 ```
