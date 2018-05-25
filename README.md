@@ -94,7 +94,7 @@ private final FragmentCallback mCallback = FStreamManager.getInstance().newProxy
 ```
 
 * 有多个流对象的情况 <br> <br>
-这时候调用代理对象通信方法的时候，如果这个方法有返回值的话，默认是用最后注册的一个流对象方法的返回值，
+这如果调用代理对象通信的方法有返回值的话，默认是用最后注册的一个流对象方法的返回值，
 当然，代理对象也可以在创建的时候设置一个方法返回值筛选器，筛选自己需要的返回值 <br> <br>
 
 ```java
