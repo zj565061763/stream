@@ -116,3 +116,32 @@ public class MainActivity extends AppCompatActivity
     }
 }
 ```
+
+# 调试模式
+
+设置调试模式后，内部会输出流对象注册和取消注册，已经代理对象方法触发的日志，demo中的日志如下
+
+```java
+
+// 流对象注册，注册时候的tag，注册后这种类型的流对象的个数
+register:com.fanwe.stream.MainActivity$1@8cf27e6 tag(null) 1
+register:com.fanwe.stream.MainActivity$2@404127 tag(null) 2
+
+// 流代理对象的方法被调用，代理对象的tag
+notify -----> public abstract int com.fanwe.stream.TestTextView$Callback.getTextViewContent()  tag(null)
+
+// 通知第几个流对象，这个流对象的返回值是什么
+notify index:1 stream:com.fanwe.stream.MainActivity$1@8cf27e6 return:1
+notify index:2 stream:com.fanwe.stream.MainActivity$2@404127 return:2
+
+// 最终的返回值是什么
+notify final return 2
+
+// 取消注册流对象，取消注册的这个流对象的tag，取消注册后剩余的相同类型的流对象的个数
+unregister:com.fanwe.stream.MainActivity$1@8cf27e6 tag(null) 1
+unregister:com.fanwe.stream.MainActivity$2@404127 tag(null) 0
+```
+
+```java
+FStreamManager.getInstance().setDebug(true);
+```
