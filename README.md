@@ -20,7 +20,7 @@ public interface FragmentCallback extends FStream
 
 2. 创建接口代理对象
 ```java
-private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder().build(FragmentCallback.class);
+private FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder().build(FragmentCallback.class);
 ```
 
 3. Fragment用代理对象通信
