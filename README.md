@@ -53,7 +53,7 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sa
 
 4. Activity中注册流对象来和代理对象通信
 ```java
-private final TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
+private TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
 {
     @Override
     public void onClickFragment(View v)
