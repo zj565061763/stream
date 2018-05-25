@@ -143,5 +143,6 @@ unregister:com.fanwe.stream.MainActivity$2@404127 tag(null) 0
 ```
 
 ```java
+// 打开调试模式
 FStreamManager.getInstance().setDebug(true);
 ```
