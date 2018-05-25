@@ -166,7 +166,7 @@ public class FStreamManager
                 if (holder != null)
                 {
                     if (mIsDebug)
-                        Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
+                        Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
 
                     int notifyCount = 0;
                     for (FStream item : holder)
@@ -178,12 +178,9 @@ public class FStreamManager
                             notifyCount++;
 
                             if (mIsDebug)
-                                Log.i(getLogTag(), "notify index:" + notifyCount + " item:" + item + " result:" + tempResult);
+                                Log.i(getLogTag(), "notify index:" + notifyCount + " stream:" + item + " return:" + tempResult);
                         }
                     }
-
-                    if (mIsDebug)
-                        Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
 
                     if (!nListResult.isEmpty())
                     {
@@ -208,13 +205,13 @@ public class FStreamManager
                 } else if (returnType.isPrimitive() && result == null)
                 {
                     if (mIsDebug)
-                        Log.e(getLogTag(), "return type:" + returnTypeName + " but result is null");
+                        Log.e(getLogTag(), "return type:" + returnTypeName + " but method result is null");
 
                     result = 0;
                 }
 
                 if (mIsDebug)
-                    Log.i(getLogTag(), "notify result " + result);
+                    Log.i(getLogTag(), "notify final return " + result);
 
                 return result;
             }
