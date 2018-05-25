@@ -198,6 +198,11 @@ public class FStreamManager
                 if ("getTag".equals(methodName))
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
 
+
+                final Class returnType = method.getReturnType();
+                final String returnTypeName = returnType.getName();
+                final boolean isVoid = "void".equals(returnTypeName);
+
                 Object result = null;
 
                 //---------- main logic start ----------
@@ -219,7 +224,7 @@ public class FStreamManager
                             notifyCount++;
 
                             if (mIsDebug)
-                                Log.i(getLogTag(), "notify index:" + notifyCount + " stream:" + item + " return:" + tempResult);
+                                Log.i(getLogTag(), "notify index:" + notifyCount + " stream:" + item + (isVoid ? "" : (" return:" + tempResult)));
                         }
                     }
 
@@ -235,20 +240,18 @@ public class FStreamManager
                 }
                 //---------- main logic end ----------
 
-                final Class returnType = method.getReturnType();
-                final String returnTypeName = returnType.getName();
-                if ("void".equals(returnTypeName))
+                if (isVoid)
                 {
                     result = null;
                 } else if (returnType.isPrimitive() && result == null)
                 {
                     if (mIsDebug)
-                        Log.e(getLogTag(), "return type:" + returnTypeName + " but method result is null");
+                        Log.e(getLogTag(), "return type:" + returnTypeName + " but method result is null, so set to 0");
 
                     result = 0;
                 }
 
-                if (mIsDebug)
+                if (mIsDebug && !isVoid)
                     Log.i(getLogTag(), "notify final return:" + result);
 
                 return result;
