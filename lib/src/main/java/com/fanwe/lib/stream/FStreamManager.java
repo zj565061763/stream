@@ -205,7 +205,9 @@ public class FStreamManager
                 if (holder != null)
                 {
                     if (mIsDebug)
+                    {
                         Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
+                    }
 
                     int notifyCount = 0;
                     for (FStream item : holder)
