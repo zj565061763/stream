@@ -161,17 +161,12 @@ public class FStreamManager
         {
             final Object tag = stream.getTag();
             if (nProxyTag == tag)
-            {
                 return true;
-            }
 
             if (nProxyTag != null && tag != null)
-            {
                 return nProxyTag.equals(tag);
-            } else
-            {
+            else
                 return false;
-            }
         }
 
         @Override
@@ -190,29 +185,24 @@ public class FStreamManager
                 if (holder != null)
                 {
                     if (mIsDebug)
-                    {
                         Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nProxyTag + ")");
-                    }
 
                     int notifyCount = 0;
                     for (FStream item : holder)
                     {
                         if (checkTag(item))
                         {
-                            Object tempResult = method.invoke(item, args);
+                            final Object tempResult = method.invoke(item, args);
                             nListResult.add(tempResult);
                             notifyCount++;
 
                             if (mIsDebug)
-                            {
                                 Log.i(getLogTag(), "notify index:" + notifyCount + " item:" + item + " result:" + tempResult);
-                            }
                         }
                     }
+
                     if (mIsDebug)
-                    {
                         Log.i(getLogTag(), "notifyCount:" + notifyCount + " totalCount:" + holder.size());
-                    }
 
                     if (!nListResult.isEmpty())
                     {
@@ -237,16 +227,13 @@ public class FStreamManager
                 } else if (returnType.isPrimitive() && result == null)
                 {
                     if (mIsDebug)
-                    {
-                        Log.e(getLogTag(), "return type:" + returnTypeName + " but result:" + result);
-                    }
+                        Log.e(getLogTag(), "return type:" + returnTypeName + " but result is null");
+
                     result = 0;
                 }
 
                 if (mIsDebug)
-                {
                     Log.i(getLogTag(), "notify result " + result);
-                }
 
                 return result;
             }
