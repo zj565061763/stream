@@ -210,12 +210,12 @@ public class FStreamManager
             {
                 final String methodName = method.getName();
                 if ("getTag".equals(methodName))
+                {
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
-
+                }
 
                 final Class returnType = method.getReturnType();
-                final String returnTypeName = returnType.getName();
-                final boolean isVoid = "void".equals(returnTypeName);
+                final boolean isVoid = "void".equals(returnType.getName());
 
                 Object result = null;
 
@@ -260,7 +260,7 @@ public class FStreamManager
                 } else if (returnType.isPrimitive() && result == null)
                 {
                     if (mIsDebug)
-                        Log.e(getLogTag(), "return type:" + returnTypeName + " but method result is null, so set to 0");
+                        Log.e(getLogTag(), "return type:" + returnType + " but method result is null, so set to 0");
 
                     result = 0;
                 }
