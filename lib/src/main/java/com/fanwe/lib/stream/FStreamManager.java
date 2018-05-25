@@ -164,7 +164,13 @@ public class FStreamManager
                     if (FStream.class.isAssignableFrom(item) && FStream.class != item)
                         list.add(item);
                 }
-                list.addAll(findStreamClass(clazz.getSuperclass()));
+
+                final List<Class> listSuper = findStreamClass(clazz.getSuperclass());
+                for (Class item : listSuper)
+                {
+                    if (!list.contains(item))
+                        list.add(item);
+                }
             }
         }
 
