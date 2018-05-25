@@ -50,47 +50,13 @@ public class FStreamManager
     }
 
     /**
-     * {@link #newProxy(Class, Object, MethodResultFilter)}
-     */
-    public <T extends FStream> T newProxy(Class<T> clazz)
-    {
-        return newProxy(clazz, null);
-    }
-
-    /**
-     * {@link #newProxy(Class, Object, MethodResultFilter)}
-     */
-    public <T extends FStream> T newProxy(Class<T> clazz, Object tag)
-    {
-        return newProxy(clazz, tag, null);
-    }
-
-    /**
-     * 创建一个代理对象
+     * 流代理对象创建者
      *
-     * @param clazz              要创建的class
-     * @param tag                代理对象的tag
-     * @param methodResultFilter 方法返回值过滤对象，默认返回最后一个流对象的返回值
-     * @param <T>
      * @return
      */
-    public <T extends FStream> T newProxy(Class<T> clazz, Object tag, MethodResultFilter methodResultFilter)
+    public ProxyBuilder newProxyBuilder()
     {
-        if (clazz == null)
-            throw new NullPointerException("clazz is null");
-        if (!clazz.isInterface())
-            throw new IllegalArgumentException("clazz must be an interface");
-        if (clazz == FStream.class)
-            throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
-        if (!FStream.class.isAssignableFrom(clazz))
-            throw new IllegalArgumentException("clazz must extends " + FStream.class.getName());
-
-        final T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag, methodResultFilter));
-
-        if (mIsDebug)
-            Log.i(getLogTag(), "proxy created:" + clazz.getName() + " tag(" + tag + ")");
-
-        return proxy;
+        return new ProxyBuilder();
     }
 
     /**
@@ -161,25 +127,25 @@ public class FStreamManager
     private final class ProxyInvocationHandler implements InvocationHandler
     {
         private final Class nClass;
-        private final Object nProxyTag;
+        private final Object nTag;
         private final MethodResultFilter nMethodResultFilter;
         private final List<Object> nListResult = new ArrayList<>();
 
-        public ProxyInvocationHandler(Class clazz, Object tag, MethodResultFilter methodResultFilter)
+        public ProxyInvocationHandler(ProxyBuilder builder)
         {
-            nClass = clazz;
-            nProxyTag = tag;
-            nMethodResultFilter = methodResultFilter;
+            nClass = builder.clazz;
+            nTag = builder.tag;
+            nMethodResultFilter = builder.methodResultFilter;
         }
 
         private boolean checkTag(FStream stream)
         {
             final Object tag = stream.getTag();
-            if (nProxyTag == tag)
+            if (nTag == tag)
                 return true;
 
-            if (nProxyTag != null && tag != null)
-                return nProxyTag.equals(tag);
+            if (nTag != null && tag != null)
+                return nTag.equals(tag);
             else
                 return false;
         }
@@ -200,7 +166,7 @@ public class FStreamManager
                 if (holder != null)
                 {
                     if (mIsDebug)
-                        Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nProxyTag + ")");
+                        Log.i(getLogTag(), "notify method -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag(" + nTag + ")");
 
                     int notifyCount = 0;
                     for (FStream item : holder)
@@ -252,6 +218,65 @@ public class FStreamManager
 
                 return result;
             }
+        }
+    }
+
+    public final class ProxyBuilder
+    {
+        private Class clazz;
+        private Object tag;
+        private MethodResultFilter methodResultFilter;
+
+        private ProxyBuilder()
+        {
+        }
+
+        /**
+         * 设置流代理对象的tag
+         *
+         * @param tag
+         * @return
+         */
+        public ProxyBuilder tag(Object tag)
+        {
+            this.tag = tag;
+            return this;
+        }
+
+        /**
+         * 设置方法返回值过滤对象，默认使用最后一个注册的流对象的返回值
+         *
+         * @param methodResultFilter
+         * @return
+         */
+        public ProxyBuilder methodResultFilter(MethodResultFilter methodResultFilter)
+        {
+            this.methodResultFilter = methodResultFilter;
+            return this;
+        }
+
+        /**
+         * 创建流代理对象
+         *
+         * @param clazz
+         * @param <T>
+         * @return
+         */
+        public <T> T build(Class<T> clazz)
+        {
+            if (clazz == null)
+                throw new NullPointerException("clazz is null");
+            if (!clazz.isInterface())
+                throw new IllegalArgumentException("clazz must be an interface");
+            if (clazz == FStream.class)
+                throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
+            if (!FStream.class.isAssignableFrom(clazz))
+                throw new IllegalArgumentException("clazz must extends " + FStream.class.getName());
+
+            this.clazz = clazz;
+
+            final T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(this));
+            return proxy;
         }
     }
 }
