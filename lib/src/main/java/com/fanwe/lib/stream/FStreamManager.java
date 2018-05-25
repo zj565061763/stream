@@ -147,7 +147,7 @@ public class FStreamManager
                 final Class[] interfaces = clazz.getInterfaces();
                 for (Class item : interfaces)
                 {
-                    if (FStream.class.isAssignableFrom(item))
+                    if (FStream.class.isAssignableFrom(item) && FStream.class != item)
                         list.add(item);
                 }
                 list.addAll(findStreamClass(clazz.getSuperclass()));
