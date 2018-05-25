@@ -49,17 +49,17 @@ public class FStreamManager
         return FStreamManager.class.getSimpleName();
     }
 
-    public <T extends FStream> T newStream(Class<T> clazz)
+    public <T extends FStream> T newProxy(Class<T> clazz)
     {
-        return newStream(clazz, null);
+        return newProxy(clazz, null);
     }
 
-    public <T extends FStream> T newStream(Class<T> clazz, Object tag)
+    public <T extends FStream> T newProxy(Class<T> clazz, Object tag)
     {
-        return newStream(clazz, tag, null);
+        return newProxy(clazz, tag, null);
     }
 
-    public <T extends FStream> T newStream(Class<T> clazz, Object tag, MethodResultFilter methodResultFilter)
+    public <T extends FStream> T newProxy(Class<T> clazz, Object tag, MethodResultFilter methodResultFilter)
     {
         if (clazz == null)
             throw new NullPointerException("clazz is null");
@@ -73,7 +73,7 @@ public class FStreamManager
         final T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(clazz, tag, methodResultFilter));
 
         if (mIsDebug)
-            Log.i(getLogTag(), "Stream created:" + clazz.getName() + " tag(" + tag + ")");
+            Log.i(getLogTag(), "proxy created:" + clazz.getName() + " tag(" + tag + ")");
 
         return proxy;
     }
