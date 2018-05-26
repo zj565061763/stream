@@ -128,7 +128,7 @@ private final FragmentCallback mCallback = FStreamManager.getInstance().newProxy
             public Object filterResult(Method method, Object[] args, List<Object> results)
             {
                 // 筛选results中需要的返回值
-                return null;
+                return results.get(results.size() - 1);
             }
         })
         .build(FragmentCallback.class);
