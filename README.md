@@ -58,25 +58,48 @@ public class TestFragment extends Fragment
 }
 ```
 
-2. Activity中注册流对象来和代理对象通信
+2. Activity中注册流对象和代理对象通信
 ```java
-private TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
+public class MainActivity extends AppCompatActivity
 {
     @Override
-    public String getActivityContent()
+    protected void onCreate(Bundle savedInstanceState)
     {
-        return "MainActivity";
-    }
-};
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-/**
- * 注册回调对象
- */
-mFragmentCallback.register();
-/**
- * 取消注册，在需要资源释放的地方要取消注册，否则会内存泄漏
- */
-mFragmentCallback.unregister();
+        /**
+         * 添加TestFragment
+         */
+        getSupportFragmentManager().beginTransaction().add(R.id.framelayout, new TestFragment()).commit();
+
+        /**
+         * 注册回调对象
+         */
+        mFragmentCallback.register();
+    }
+
+    private final TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
+    {
+        @Override
+        public String getActivityContent()
+        {
+            return "MainActivity";
+        }
+    };
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        /**
+         * 取消注册
+         * 不取消注册的话，流对象会一直被持有，此时流对象又持有其他UI资源对象的话，会内存泄漏
+         */
+        mFragmentCallback.unregister();
+    }
+}
 ```
 
 # 注意
