@@ -210,8 +210,7 @@ public class FStreamManager
                 final String methodName = method.getName();
                 final Class returnType = method.getReturnType();
 
-                if ("getTag".equals(methodName)
-                        && Object.class == returnType
+                if (("getTag".equals(methodName) || "register".equals(methodName) || "unregister".equals(methodName))
                         && method.getParameterTypes().length == 0)
                 {
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
