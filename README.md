@@ -1,6 +1,18 @@
 # About
 适用于Android开发中复杂嵌套，又需要双向通信的场景<br>
 
+# 项目Module需要支持java8
+```
+android {
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+```
+
 实现原理：<br>
 1. 利用java.lang.reflect.Proxy为接口生成一个代理对象
 2. 监听代理对象方法被触发的时候，通知已经注册的对象
@@ -67,33 +79,28 @@ private TestFragment.FragmentCallback mFragmentCallback = new TestFragment.Fragm
     {
         return "MainActivity";
     }
-
-    @Override
-    public Object getTag()
-    {
-        return null;
-    }
 };
 
 /**
  * 注册回调对象
  */
-FStreamManager.getInstance().register(mFragmentCallback);
+mFragmentCallback.register();
 /**
  * 取消注册，在需要资源释放的地方要取消注册，否则会内存泄漏
  */
-FStreamManager.getInstance().unregister(mFragmentCallback);
+mFragmentCallback.unregister();
 ```
 
 # 注意
 * 有多个代理对象的情况 <br> <br>
 创建代理对象的时候可以指定tag，默认代理对象的tag是null。
 只有流对象getTag()方法返回的值和代理对象tag相等的流对象才可以互相通信，tag比较相等的规则为 “==” 或者 “equals”，
-流对象可以通过getTag()方法的返回值决定要和哪些代理对象通信，默认返回null <br> <br>
+流对象可以重写getTag()方法提供一个tag来决定要和哪些代理对象通信，默认返回null <br> <br>
 
 ```java
 private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
-        .tag(this) // 为代理对象设置一个tag
+        // 为代理对象设置一个tag
+        .tag(this)
         .build(FragmentCallback.class);
 ```
 
@@ -103,7 +110,8 @@ private final FragmentCallback mCallback = FStreamManager.getInstance().newProxy
 
 ```java
 private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
-        .methodResultFilter(new MethodResultFilter() // 为代理对象设置方法返回值筛选器
+        // 为代理对象设置方法返回值筛选器
+        .methodResultFilter(new MethodResultFilter()
         {
             @Override
             public Object filterResult(Method method, Object[] args, List<Object> results)
@@ -140,7 +148,7 @@ public interface MethodResultFilter
 FStreamManager.getInstance().setDebug(true);
 ```
 
-调试模式打开后，会有类似以下的日志，方便调试
+调试模式打开后，会有类似以下的日志，日志的过滤tag：FStreamManager
 
 ```java
 // 注册流对象，流对象所属的接口class，流对象返回的tag，注册后这种class类型的流对象有几个

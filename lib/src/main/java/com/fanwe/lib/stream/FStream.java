@@ -18,7 +18,7 @@ package com.fanwe.lib.stream;
 /**
  * 流接口
  * <p>
- * 当流接口代理对象的方法被调用的时候，会触发和代理对象相同tag的流对象的相同方法
+ * 当流接口代理对象方法被调用的时候，会触发和代理对象相同tag的流对象的相同方法
  */
 public interface FStream
 {
@@ -27,5 +27,24 @@ public interface FStream
      *
      * @return
      */
-    Object getTag();
+    default Object getTag()
+    {
+        return null;
+    }
+
+    /**
+     * 注册流对象
+     */
+    default void register()
+    {
+        FStreamManager.getInstance().register(this);
+    }
+
+    /**
+     * 取消注册流对象
+     */
+    default void unregister()
+    {
+        FStreamManager.getInstance().unregister(this);
+    }
 }

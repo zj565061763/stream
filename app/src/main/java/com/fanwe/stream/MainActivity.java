@@ -5,8 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.fanwe.lib.stream.FStreamManager;
-
 public class MainActivity extends AppCompatActivity
 {
     @Override
@@ -23,7 +21,7 @@ public class MainActivity extends AppCompatActivity
         /**
          * 注册回调对象
          */
-        FStreamManager.getInstance().register(mFragmentCallback);
+        mFragmentCallback.register();
     }
 
     private final TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
@@ -39,12 +37,6 @@ public class MainActivity extends AppCompatActivity
         {
             return "MainActivity";
         }
-
-        @Override
-        public Object getTag()
-        {
-            return null;
-        }
     };
 
     @Override
@@ -55,6 +47,6 @@ public class MainActivity extends AppCompatActivity
         /**
          * 取消注册，在需要资源释放的地方要取消注册，否则会内存泄漏
          */
-        FStreamManager.getInstance().unregister(mFragmentCallback);
+        mFragmentCallback.unregister();
     }
 }
