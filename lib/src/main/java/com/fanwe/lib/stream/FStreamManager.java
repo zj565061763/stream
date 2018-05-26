@@ -158,8 +158,7 @@ public class FStreamManager
 
             if (FStream.class.isAssignableFrom(clazz))
             {
-                final Class[] interfaces = clazz.getInterfaces();
-                for (Class item : interfaces)
+                for (Class item : clazz.getInterfaces())
                 {
                     if (FStream.class.isAssignableFrom(item) && FStream.class != item)
                         list.add(item);
@@ -179,26 +178,26 @@ public class FStreamManager
 
     private final class ProxyInvocationHandler implements InvocationHandler
     {
-        private final Class nClass;
-        private final Object nTag;
-        private final MethodResultFilter nMethodResultFilter;
-        private final List<Object> nListResult = new ArrayList<>();
+        private final Class mClass;
+        private final Object mTag;
+        private final MethodResultFilter mMethodResultFilter;
+        private final List<Object> mListResult = new ArrayList<>();
 
         public ProxyInvocationHandler(ProxyBuilder builder)
         {
-            nClass = builder.clazz;
-            nTag = builder.tag;
-            nMethodResultFilter = builder.methodResultFilter;
+            mClass = builder.mClass;
+            mTag = builder.mTag;
+            mMethodResultFilter = builder.mMethodResultFilter;
         }
 
         private boolean checkTag(FStream stream)
         {
             final Object tag = stream.getTag();
-            if (nTag == tag)
+            if (mTag == tag)
                 return true;
 
-            if (nTag != null && tag != null)
-                return nTag.equals(tag);
+            if (mTag != null && tag != null)
+                return mTag.equals(tag);
             else
                 return false;
         }
@@ -222,34 +221,34 @@ public class FStreamManager
                 Object result = null;
 
                 //---------- main logic start ----------
-                final List<FStream> holder = MAP_STREAM.get(nClass);
+                final List<FStream> holder = MAP_STREAM.get(mClass);
                 if (holder != null)
                 {
                     if (mIsDebug)
-                        Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + nTag + " count:" + holder.size());
+                        Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
 
                     int notifyCount = 0;
                     for (FStream item : holder)
                     {
                         if (checkTag(item))
                         {
-                            final Object tempResult = method.invoke(item, args);
-                            nListResult.add(tempResult);
+                            final Object itemResult = method.invoke(item, args);
+                            mListResult.add(itemResult);
                             notifyCount++;
 
                             if (mIsDebug)
-                                Log.i(getLogTag(), "notify index:" + notifyCount + " stream:" + item + (isVoid ? "" : (" return:" + tempResult)));
+                                Log.i(getLogTag(), "notify index:" + notifyCount + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
                         }
                     }
 
-                    if (!nListResult.isEmpty())
+                    if (!mListResult.isEmpty())
                     {
-                        if (nMethodResultFilter != null)
-                            result = nMethodResultFilter.filterResult(method, args, nListResult);
+                        if (mMethodResultFilter != null)
+                            result = mMethodResultFilter.filterResult(method, args, mListResult);
                         else
-                            result = nListResult.get(nListResult.size() - 1);
+                            result = mListResult.get(mListResult.size() - 1);
 
-                        nListResult.clear();
+                        mListResult.clear();
                     }
                 }
                 //---------- main logic end ----------
@@ -275,9 +274,9 @@ public class FStreamManager
 
     public final class ProxyBuilder
     {
-        private Class clazz;
-        private Object tag;
-        private MethodResultFilter methodResultFilter;
+        private Class mClass;
+        private Object mTag;
+        private MethodResultFilter mMethodResultFilter;
 
         private ProxyBuilder()
         {
@@ -291,7 +290,7 @@ public class FStreamManager
          */
         public ProxyBuilder tag(Object tag)
         {
-            this.tag = tag;
+            mTag = tag;
             return this;
         }
 
@@ -303,7 +302,7 @@ public class FStreamManager
          */
         public ProxyBuilder methodResultFilter(MethodResultFilter methodResultFilter)
         {
-            this.methodResultFilter = methodResultFilter;
+            mMethodResultFilter = methodResultFilter;
             return this;
         }
 
@@ -323,7 +322,7 @@ public class FStreamManager
             if (clazz == FStream.class)
                 throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
 
-            this.clazz = clazz;
+            mClass = clazz;
 
             final T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(this));
             return proxy;
