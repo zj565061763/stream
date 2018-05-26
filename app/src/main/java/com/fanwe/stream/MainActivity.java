@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
 
         /**
-         * 取消注册，在需要资源释放的地方要取消注册，否则会内存泄漏
+         * 取消注册
+         * 不取消注册的话，流对象会一直被持有，此时流对象又持有其他UI资源对象的话，会内存泄漏
          */
         mFragmentCallback.unregister();
     }
