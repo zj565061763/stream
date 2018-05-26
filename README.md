@@ -29,13 +29,10 @@ public interface FragmentCallback extends FStream
 }
 ```
 
-2. 创建接口代理对象
+2. Fragment中创建接口代理对象来通信
 ```java
 private FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder().build(FragmentCallback.class);
-```
 
-3. Fragment用代理对象通信
-```java
 @Override
 public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 {
@@ -57,7 +54,7 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sa
 }
 ```
 
-4. Activity中注册流对象来和代理对象通信
+3. Activity中注册流对象来和代理对象通信
 ```java
 private TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
 {
