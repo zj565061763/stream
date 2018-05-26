@@ -65,7 +65,7 @@ public class FStreamManager
     }
 
     /**
-     * 流代理对象创建者
+     * 代理对象创建者
      *
      * @return
      */
@@ -284,7 +284,7 @@ public class FStreamManager
         }
 
         /**
-         * 设置流代理对象的tag
+         * 设置代理对象的tag
          *
          * @param tag
          * @return
@@ -308,7 +308,7 @@ public class FStreamManager
         }
 
         /**
-         * 创建流代理对象
+         * 创建代理对象
          *
          * @param clazz
          * @param <T>
