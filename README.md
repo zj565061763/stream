@@ -1,6 +1,10 @@
 # About
 适用于Android开发中复杂嵌套，又需要双向通信的场景<br>
 
+实现原理：<br>
+1. 利用java.lang.reflect.Proxy为接口生成一个代理对象
+2. 监听代理对象方法被触发的时候，通知已经注册的对象
+
 # 项目Module需要支持java8
 ```
 android {
@@ -12,10 +16,6 @@ android {
 
 }
 ```
-
-实现原理：<br>
-1. 利用java.lang.reflect.Proxy为接口生成一个代理对象
-2. 监听代理对象方法被触发的时候，通知已经注册的对象
 
 # 简单使用
 1. 创建接口
