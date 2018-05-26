@@ -104,8 +104,8 @@ public class MainActivity extends AppCompatActivity
 
 # 注意
 * 有多个代理对象的情况 <br> <br>
-创建代理对象的时候可以指定tag，默认代理对象的tag是null。
-只有流对象getTag()方法返回的值和代理对象tag相等的流对象才可以互相通信，tag比较相等的规则为 “==” 或者 “equals”，
+创建代理对象的时候可以指定tag，默认代理对象的tag是null<br>
+只有流对象getTag()方法返回值和代理对象tag相等的时候，他们才可以互相通信，tag比较相等的规则为 “==” 或者 “equals”<br>
 流对象可以重写getTag()方法提供一个tag来决定要和哪些代理对象通信，默认返回null <br> <br>
 
 ```java
