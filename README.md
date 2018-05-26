@@ -18,43 +18,47 @@ android {
 ```
 
 # 简单使用
-1. 创建接口
+1. 创建Fragment
 ```java
-/**
- * Fragment中定义一个接口，接口继承流接口
- */
-public interface FragmentCallback extends FStream
+public class TestFragment extends Fragment
 {
-    String getActivityContent();
-}
-```
+    /**
+     * 创建接口代理对象
+     */
+    private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder().build(FragmentCallback.class);
 
-2. Fragment中创建接口代理对象来通信
-```java
-private FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder().build(FragmentCallback.class);
-
-@Override
-public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-{
-    final Button button = new Button(container.getContext());
-    button.setText("button");
-    button.setOnClickListener(new View.OnClickListener()
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        @Override
-        public void onClick(View v)
+        final Button button = new Button(container.getContext());
+        button.setText("button");
+        button.setOnClickListener(new View.OnClickListener()
         {
-            /**
-             * 从Activity中获取内容
-             */
-            final String activityContent = mCallback.getActivityContent();
-            button.setText(activityContent);
-        }
-    });
-    return button;
+            @Override
+            public void onClick(View v)
+            {
+                /**
+                 * 从Activity中获取内容
+                 */
+                final String activityContent = mCallback.getActivityContent();
+                button.setText(activityContent);
+            }
+        });
+
+        return button;
+    }
+
+    /**
+     * 接口继承流接口
+     */
+    public interface FragmentCallback extends FStream
+    {
+        String getActivityContent();
+    }
 }
 ```
 
-3. Activity中注册流对象来和代理对象通信
+2. Activity中注册流对象来和代理对象通信
 ```java
 private TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
 {
