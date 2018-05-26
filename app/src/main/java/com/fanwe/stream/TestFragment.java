@@ -15,17 +15,7 @@ public class TestFragment extends Fragment
     /**
      * 创建接口代理对象
      */
-    private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
-            /**
-             * 设置代理对象的tag，默认tag为null
-             * 注意：只有tag和当前代理对象tag相等的流对象才会被通知到，tag比较相等的规则为 “==” 或者 “equals”
-             */
-            .tag(null)
-            /**
-             * 设置方法返回值过滤对象，默认为null，会用最后一个注册的流对象的返回值
-             */
-            .methodResultFilter(null)
-            .build(FragmentCallback.class);
+    private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder().build(FragmentCallback.class);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -49,7 +39,7 @@ public class TestFragment extends Fragment
     }
 
     /**
-     * 通信接口继承流接口
+     * 接口继承流接口
      */
     public interface FragmentCallback extends FStream
     {
