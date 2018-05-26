@@ -18,7 +18,7 @@ android {
 ```
 
 # Gradle
-`implementation 'com.fanwe.android:stream:1.0.0-rc2'`
+`implementation 'com.fanwe.android:stream:1.0.0-rc3'`
 
 # 简单使用
 1. 创建Fragment
