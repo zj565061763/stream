@@ -13,7 +13,7 @@ import com.fanwe.lib.stream.FStreamManager;
 public class TestFragment extends Fragment
 {
     /**
-     * 回调代理对象
+     * 创建接口代理对象
      */
     private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
             /**
@@ -49,7 +49,7 @@ public class TestFragment extends Fragment
     }
 
     /**
-     * Fragment中定义一个接口，接口继承流接口
+     * 通信接口继承流接口
      */
     public interface FragmentCallback extends FStream
     {
