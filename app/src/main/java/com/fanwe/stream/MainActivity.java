@@ -2,8 +2,6 @@ package com.fanwe.stream;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -26,12 +24,6 @@ public class MainActivity extends AppCompatActivity
 
     private final TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
     {
-        @Override
-        public void onClickFragment(View v)
-        {
-            Toast.makeText(MainActivity.this, "onClickFragment", Toast.LENGTH_SHORT).show();
-        }
-
         @Override
         public String getActivityContent()
         {

@@ -25,8 +25,6 @@ android {
  */
 public interface FragmentCallback extends FStream
 {
-    void onClickFragment();
-
     String getActivityContent();
 }
 ```
@@ -49,11 +47,6 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sa
         public void onClick(View v)
         {
             /**
-             * 通知按钮点击
-             */
-            mCallback.onClickFragment(v);
-
-            /**
              * 从Activity中获取内容
              */
             final String activityContent = mCallback.getActivityContent();
@@ -68,12 +61,6 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle sa
 ```java
 private TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
 {
-    @Override
-    public void onClickFragment(View v)
-    {
-        Toast.makeText(MainActivity.this, "onClickFragment", Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public String getActivityContent()
     {
@@ -132,14 +119,13 @@ public interface MethodResultFilter
     /**
      * 筛选方法的返回值
      *
-     * @param method  被触发的方法
-     * @param args    被触发的方法的参数
-     * @param results 所有注册的FStream对象该方法的返回值集合
+     * @param method  代理对象被触发的方法
+     * @param args    被触发方法的参数
+     * @param results 所有注册的流对象该方法的返回值集合
      * @return 返回该方法最终的返回值，默认把返回值集合的最后一个当做该方法的返回值
      */
     Object filterResult(Method method, Object[] args, List<Object> results);
 }
-
 ```
 
 # 调试模式

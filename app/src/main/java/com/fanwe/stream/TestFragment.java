@@ -38,11 +38,6 @@ public class TestFragment extends Fragment
             public void onClick(View v)
             {
                 /**
-                 * 通知回调按钮点击
-                 */
-                mCallback.onClickFragment(v);
-
-                /**
                  * 从Activity中获取内容
                  */
                 final String activityContent = mCallback.getActivityContent();
@@ -58,8 +53,6 @@ public class TestFragment extends Fragment
      */
     public interface FragmentCallback extends FStream
     {
-        void onClickFragment(View v);
-
         String getActivityContent();
     }
 }
