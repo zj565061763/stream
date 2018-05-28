@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity
 }
 ```
 
+![](http://thumbsnap.com/i/ohw30sWe.gif?0527)
+
 # 注意
 * 有多个代理对象的情况 <br> <br>
 创建代理对象的时候可以指定tag，默认代理对象的tag是null<br>
