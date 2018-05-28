@@ -81,16 +81,9 @@ public class FStreamManager
      */
     public synchronized void register(FStream stream)
     {
-        if (stream == null)
+        final List<Class> list = getStreamClass(stream);
+        if (list == null)
             return;
-
-        final Class streamClass = stream.getClass();
-        if (Proxy.isProxyClass(streamClass))
-            throw new IllegalArgumentException("can not register proxy instance");
-
-        final List<Class> list = findStreamClass(streamClass);
-        if (list.isEmpty())
-            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
 
         for (Class item : list)
         {
@@ -119,16 +112,9 @@ public class FStreamManager
      */
     public synchronized void unregister(FStream stream)
     {
-        if (stream == null)
+        final List<Class> list = getStreamClass(stream);
+        if (list == null)
             return;
-
-        final Class streamClass = stream.getClass();
-        if (Proxy.isProxyClass(streamClass))
-            throw new IllegalArgumentException("can not unregister proxy instance");
-
-        final List<Class> list = findStreamClass(streamClass);
-        if (list.isEmpty())
-            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
 
         for (Class item : list)
         {
@@ -147,7 +133,23 @@ public class FStreamManager
         }
     }
 
-    private List<Class> findStreamClass(Class clazz)
+    private List<Class> getStreamClass(FStream stream)
+    {
+        if (stream == null)
+            return null;
+
+        final Class streamClass = stream.getClass();
+        if (Proxy.isProxyClass(streamClass))
+            throw new IllegalArgumentException("proxy instance is not supported");
+
+        final List<Class> list = findAllStreamClass(streamClass);
+        if (list.isEmpty())
+            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
+
+        return list;
+    }
+
+    private List<Class> findAllStreamClass(Class clazz)
     {
         final List<Class> list = new ArrayList<>();
 
@@ -164,7 +166,7 @@ public class FStreamManager
                         list.add(item);
                 }
 
-                final List<Class> listSuper = findStreamClass(clazz.getSuperclass());
+                final List<Class> listSuper = findAllStreamClass(clazz.getSuperclass());
                 for (Class item : listSuper)
                 {
                     if (!list.contains(item))
