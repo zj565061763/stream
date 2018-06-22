@@ -183,7 +183,7 @@ public class FStreamManager
         private final Class mClass;
         private final Object mTag;
         private final MethodResultFilter mMethodResultFilter;
-        private final List<Object> mListResult = new ArrayList<>();
+        private final List<Object> mListResult = new ArrayList<>(1);
 
         public ProxyInvocationHandler(ProxyBuilder builder)
         {
@@ -234,23 +234,25 @@ public class FStreamManager
                         if (checkTag(item))
                         {
                             final Object itemResult = method.invoke(item, args);
-                            mListResult.add(itemResult);
-                            notifyCount++;
 
+                            if (!isVoid)
+                                mListResult.add(itemResult);
+
+                            notifyCount++;
                             if (mIsDebug)
                                 Log.i(getLogTag(), "notify index:" + notifyCount + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
                         }
                     }
 
-                    if (!mListResult.isEmpty())
+                    if (!mListResult.isEmpty() && !isVoid)
                     {
                         if (mMethodResultFilter != null)
                             result = mMethodResultFilter.filterResult(method, args, mListResult);
                         else
                             result = mListResult.get(mListResult.size() - 1);
-
-                        mListResult.clear();
                     }
+
+                    mListResult.clear();
                 }
                 //---------- main logic end ----------
 
