@@ -18,7 +18,7 @@ android {
 ```
 
 # Gradle
-`implementation 'com.fanwe.android:stream:1.0.0-rc4'`
+[![](https://jitpack.io/v/zj565061763/stream.svg)](https://jitpack.io/#zj565061763/stream)
 
 # 简单使用
 1. 创建Fragment
