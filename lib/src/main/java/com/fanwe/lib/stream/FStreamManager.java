@@ -80,10 +80,23 @@ public class FStreamManager
      * 注册流对象
      *
      * @param stream
+     * @param <T>
      */
-    public synchronized void register(FStream stream)
+    public synchronized <T extends FStream> void register(T stream)
     {
-        final Set<Class> set = getStreamClass(stream);
+        register(stream, null);
+    }
+
+    /**
+     * 注册流对象
+     *
+     * @param stream
+     * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
+     * @param <T>
+     */
+    public synchronized <T extends FStream> void register(T stream, Class<T> targetClass)
+    {
+        final Set<Class> set = getStreamClass(stream, targetClass);
         if (set == null)
             return;
 
@@ -111,10 +124,23 @@ public class FStreamManager
      * 取消注册流对象
      *
      * @param stream
+     * @param <T>
      */
-    public synchronized void unregister(FStream stream)
+    public synchronized <T extends FStream> void unregister(T stream)
     {
-        final Set<Class> set = getStreamClass(stream);
+        unregister(stream, null);
+    }
+
+    /**
+     * 取消注册流对象
+     *
+     * @param stream
+     * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
+     * @param <T>
+     */
+    public synchronized <T extends FStream> void unregister(T stream, Class<T> targetClass)
+    {
+        final Set<Class> set = getStreamClass(stream, targetClass);
         if (set == null)
             return;
 
@@ -135,7 +161,7 @@ public class FStreamManager
         }
     }
 
-    private Set<Class> getStreamClass(FStream stream)
+    private <T extends FStream> Set<Class> getStreamClass(T stream, Class<T> targetClass)
     {
         if (stream == null)
             return null;
@@ -147,6 +173,18 @@ public class FStreamManager
         final Set<Class> set = findAllStreamClass(sourceClass);
         if (set.isEmpty())
             throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
+
+        if (targetClass != null)
+        {
+            if (set.contains(targetClass))
+            {
+                set.clear();
+                set.add(targetClass);
+            } else
+            {
+                throw new RuntimeException("targetClass not found:" + targetClass);
+            }
+        }
 
         return set;
     }
