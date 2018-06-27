@@ -29,30 +29,4 @@ public interface FStream
     {
         return null;
     }
-
-    /**
-     * 注册流对象
-     */
-    default void register()
-    {
-        FStreamManager.getInstance().register(this);
-    }
-
-    /**
-     * 取消注册流对象
-     */
-    default void unregister()
-    {
-        FStreamManager.getInstance().unregister(this);
-    }
-
-    /**
-     * 返回代理对象创建者
-     *
-     * @return
-     */
-    static FStreamManager.ProxyBuilder newProxyBuilder()
-    {
-        return FStreamManager.getInstance().newProxyBuilder();
-    }
 }
