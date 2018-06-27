@@ -28,7 +28,7 @@ public class TestFragment extends Fragment
     /**
      * 创建接口代理对象
      */
-    private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder().build(FragmentCallback.class);
+    private final FragmentCallback mCallback = FStream.newProxyBuilder().build(FragmentCallback.class);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity
 流对象可以重写getTag()方法提供一个tag来决定要和哪些代理对象通信，默认返回null <br> <br>
 
 ```java
-private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
+private final FragmentCallback mCallback = FStream.newProxyBuilder()
         // 为代理对象设置一个tag
         .tag(this)
         .build(FragmentCallback.class);
@@ -122,7 +122,7 @@ private final FragmentCallback mCallback = FStreamManager.getInstance().newProxy
 当然，代理对象也可以在创建的时候设置一个方法返回值筛选器，筛选自己需要的返回值 <br> <br>
 
 ```java
-private final FragmentCallback mCallback = FStreamManager.getInstance().newProxyBuilder()
+private final FragmentCallback mCallback = FStream.newProxyBuilder()
         // 为代理对象设置方法返回值筛选器
         .methodResultFilter(new MethodResultFilter()
         {

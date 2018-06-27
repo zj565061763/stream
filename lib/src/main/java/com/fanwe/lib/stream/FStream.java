@@ -45,4 +45,14 @@ public interface FStream
     {
         FStreamManager.getInstance().unregister(this);
     }
+
+    /**
+     * 返回代理对象创建者
+     *
+     * @return
+     */
+    static FStreamManager.ProxyBuilder newProxyBuilder()
+    {
+        return FStreamManager.getInstance().newProxyBuilder();
+    }
 }
