@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.fanwe.lib.stream.FStreamManager;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements TestFragment.FragmentCallback
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -19,18 +19,15 @@ public class MainActivity extends AppCompatActivity
         /**
          * 注册回调对象
          */
-        FStreamManager.getInstance().register(mFragmentCallback);
+        FStreamManager.getInstance().register(this);
 
     }
 
-    private final TestFragment.FragmentCallback mFragmentCallback = new TestFragment.FragmentCallback()
+    @Override
+    public String getActivityContent()
     {
-        @Override
-        public String getActivityContent()
-        {
-            return "MainActivity";
-        }
-    };
+        return "MainActivity";
+    }
 
     @Override
     protected void onDestroy()
@@ -40,6 +37,6 @@ public class MainActivity extends AppCompatActivity
          * 取消注册
          * 不取消注册的话，流对象会一直被持有，此时流对象又持有其他UI资源对象的话，会内存泄漏
          */
-        FStreamManager.getInstance().unregister(mFragmentCallback);
+        FStreamManager.getInstance().unregister(this);
     }
 }
