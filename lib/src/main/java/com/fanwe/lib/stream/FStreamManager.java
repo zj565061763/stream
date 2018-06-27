@@ -23,8 +23,10 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -81,11 +83,11 @@ public class FStreamManager
      */
     public synchronized void register(FStream stream)
     {
-        final List<Class> list = getStreamClass(stream);
-        if (list == null)
+        final Set<Class> set = getStreamClass(stream);
+        if (set == null)
             return;
 
-        for (Class item : list)
+        for (Class item : set)
         {
             List<FStream> holder = MAP_STREAM.get(item);
             if (holder == null)
@@ -112,11 +114,11 @@ public class FStreamManager
      */
     public synchronized void unregister(FStream stream)
     {
-        final List<Class> list = getStreamClass(stream);
-        if (list == null)
+        final Set<Class> set = getStreamClass(stream);
+        if (set == null)
             return;
 
-        for (Class item : list)
+        for (Class item : set)
         {
             final List<FStream> holder = MAP_STREAM.get(item);
             if (holder != null)
@@ -133,49 +135,45 @@ public class FStreamManager
         }
     }
 
-    private List<Class> getStreamClass(FStream stream)
+    private Set<Class> getStreamClass(FStream stream)
     {
         if (stream == null)
             return null;
 
-        final Class streamClass = stream.getClass();
-        if (Proxy.isProxyClass(streamClass))
+        final Class sourceClass = stream.getClass();
+        if (Proxy.isProxyClass(sourceClass) && FStream.class.isAssignableFrom(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
 
-        final List<Class> list = findAllStreamClass(streamClass);
-        if (list.isEmpty())
+        final Set<Class> set = findAllStreamClass(sourceClass);
+        if (set.isEmpty())
             throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
 
-        return list;
+        return set;
     }
 
-    private List<Class> findAllStreamClass(Class clazz)
+    private Set<Class> findAllStreamClass(Class clazz)
     {
-        final List<Class> list = new ArrayList<>();
+        final Set<Class> set = new HashSet<>();
 
-        if (clazz != null)
+        while (true)
         {
+            if (clazz == null)
+                break;
+            if (!FStream.class.isAssignableFrom(clazz))
+                break;
             if (clazz.isInterface())
                 throw new IllegalArgumentException("clazz must not be an interface");
 
-            if (FStream.class.isAssignableFrom(clazz))
+            for (Class item : clazz.getInterfaces())
             {
-                for (Class item : clazz.getInterfaces())
-                {
-                    if (FStream.class.isAssignableFrom(item) && FStream.class != item)
-                        list.add(item);
-                }
-
-                final List<Class> listSuper = findAllStreamClass(clazz.getSuperclass());
-                for (Class item : listSuper)
-                {
-                    if (!list.contains(item))
-                        list.add(item);
-                }
+                if (FStream.class.isAssignableFrom(item) && FStream.class != item)
+                    set.add(item);
             }
+
+            clazz = clazz.getSuperclass();
         }
 
-        return list;
+        return set;
     }
 
     private final class ProxyInvocationHandler implements InvocationHandler
