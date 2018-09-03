@@ -1,8 +1,8 @@
-package com.fanwe.stream;
+package com.sd.stream;
 
 import android.app.Application;
 
-import com.fanwe.lib.stream.FStreamManager;
+import com.sd.lib.stream.FStreamManager;
 
 /**
  * Created by Administrator on 2018/2/9.

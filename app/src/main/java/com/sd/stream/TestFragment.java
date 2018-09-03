@@ -1,4 +1,4 @@
-package com.fanwe.stream;
+package com.sd.stream;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.fanwe.lib.stream.FStream;
-import com.fanwe.lib.stream.FStreamManager;
+import com.sd.lib.stream.FStream;
+import com.sd.lib.stream.FStreamManager;
 
 public class TestFragment extends Fragment
 {

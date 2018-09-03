@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.fanwe.stream"
+        applicationId "com.sd.stream"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1

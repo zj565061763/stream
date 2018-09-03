@@ -162,18 +162,18 @@ FStreamManager.getInstance().setDebug(true);
 
 ```java
 // 注册流对象，流对象所属的接口class，流对象返回的tag，注册后这种class类型的流对象有几个
-register:com.fanwe.stream.MainActivity$1@53810f5 class:com.fanwe.stream.TestFragment$FragmentCallback tag:null count:1
+register:com.sd.stream.MainActivity$1@53810f5 class:com.sd.stream.TestFragment$FragmentCallback tag:null count:1
 
 // 代理对象的方法被调用，调用的是哪个方法，代理对象的tag，这个接口下有几个流对象需要通知
-notify -----> public abstract java.lang.String com.fanwe.stream.TestFragment$FragmentCallback.getActivityContent()  tag:null count:1
+notify -----> public abstract java.lang.String com.sd.stream.TestFragment$FragmentCallback.getActivityContent()  tag:null count:1
 
 // 通知到了第几个流对象，它的返回值是什么
-notify index:1 stream:com.fanwe.stream.MainActivity$1@53810f5 return:MainActivity
+notify index:1 stream:com.sd.stream.MainActivity$1@53810f5 return:MainActivity
 
 // 代理对象的方法执行后，最终的返回值是什么
 notify final return:MainActivity
 
 // 流对象取消注册
-unregister:com.fanwe.stream.MainActivity$1@53810f5 class:com.fanwe.stream.TestFragment$FragmentCallback tag:null count:0
+unregister:com.sd.stream.MainActivity$1@53810f5 class:com.sd.stream.TestFragment$FragmentCallback tag:null count:0
 
 ```
