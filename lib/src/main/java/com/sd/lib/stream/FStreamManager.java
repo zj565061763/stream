@@ -157,7 +157,7 @@ public class FStreamManager
 
         final Set<Class> set = findAllStreamClass(sourceClass);
         if (set.isEmpty())
-            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found:" + stream);
+            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found in:" + stream);
 
         if (targetClass != null)
         {
@@ -233,8 +233,7 @@ public class FStreamManager
                 final String methodName = method.getName();
                 final Class returnType = method.getReturnType();
 
-                if (("getTag".equals(methodName) || "register".equals(methodName) || "unregister".equals(methodName))
-                        && method.getParameterTypes().length == 0)
+                if ("getTag".equals(methodName) && method.getParameterTypes().length == 0)
                 {
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
                 }
