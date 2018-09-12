@@ -46,21 +46,6 @@ public class FStreamManager
         mIsDebug = debug;
     }
 
-    private String getLogTag()
-    {
-        return FStreamManager.class.getSimpleName();
-    }
-
-    /**
-     * 代理对象创建者
-     *
-     * @return
-     */
-    public ProxyBuilder newProxyBuilder()
-    {
-        return new ProxyBuilder();
-    }
-
     /**
      * 注册流对象
      *
@@ -99,7 +84,7 @@ public class FStreamManager
                 if (holder.add(stream))
                 {
                     if (mIsDebug)
-                        Log.i(getLogTag(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
+                        Log.i(FStreamManager.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
                 }
             }
         }
@@ -137,7 +122,7 @@ public class FStreamManager
                 if (holder.remove(stream))
                 {
                     if (mIsDebug)
-                        Log.e(getLogTag(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
+                        Log.e(FStreamManager.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
                 }
 
                 if (holder.isEmpty())
@@ -199,18 +184,20 @@ public class FStreamManager
         return set;
     }
 
-    private final class ProxyInvocationHandler implements InvocationHandler
+    private static final class ProxyInvocationHandler implements InvocationHandler
     {
+        private final FStreamManager mManager;
         private final Class mClass;
         private final Object mTag;
         private final MethodResultFilter mMethodResultFilter;
         private final List<Object> mListResult = new ArrayList<>(1);
 
-        public ProxyInvocationHandler(ProxyBuilder builder)
+        public ProxyInvocationHandler(ProxyBuilder builder, FStreamManager manager)
         {
             mClass = builder.mClass;
             mTag = builder.mTag;
             mMethodResultFilter = builder.mMethodResultFilter;
+            mManager = manager;
         }
 
         private boolean checkTag(FStream stream)
@@ -228,7 +215,7 @@ public class FStreamManager
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            synchronized (FStreamManager.this)
+            synchronized (mManager)
             {
                 final String methodName = method.getName();
                 final Class returnType = method.getReturnType();
@@ -242,11 +229,11 @@ public class FStreamManager
                 Object result = null;
 
                 //---------- main logic start ----------
-                final List<FStream> holder = MAP_STREAM.get(mClass);
+                final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
                 if (holder != null)
                 {
-                    if (mIsDebug)
-                        Log.i(getLogTag(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
+                    if (mManager.mIsDebug)
+                        Log.i(FStreamManager.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
 
                     int notifyCount = 0;
                     for (FStream item : holder)
@@ -259,8 +246,8 @@ public class FStreamManager
                                 mListResult.add(itemResult);
 
                             notifyCount++;
-                            if (mIsDebug)
-                                Log.i(getLogTag(), "notify index:" + notifyCount + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
+                            if (mManager.mIsDebug)
+                                Log.i(FStreamManager.class.getSimpleName(), "notify index:" + notifyCount + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
                         }
                     }
 
@@ -281,29 +268,25 @@ public class FStreamManager
                     result = null;
                 } else if (returnType.isPrimitive() && result == null)
                 {
-                    if (mIsDebug)
-                        Log.e(getLogTag(), "return type:" + returnType + " but method result is null, so set to 0");
+                    if (mManager.mIsDebug)
+                        Log.e(FStreamManager.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to 0");
 
                     result = 0;
                 }
 
-                if (mIsDebug && !isVoid)
-                    Log.i(getLogTag(), "notify final return:" + result);
+                if (mManager.mIsDebug && !isVoid)
+                    Log.i(FStreamManager.class.getSimpleName(), "notify final return:" + result);
 
                 return result;
             }
         }
     }
 
-    public final class ProxyBuilder
+    public static final class ProxyBuilder
     {
         private Class mClass;
         private Object mTag;
         private MethodResultFilter mMethodResultFilter;
-
-        private ProxyBuilder()
-        {
-        }
 
         /**
          * 设置代理对象的tag
@@ -346,7 +329,7 @@ public class FStreamManager
                 throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
 
             mClass = clazz;
-            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(this));
+            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(this, FStreamManager.getInstance()));
         }
     }
 }
