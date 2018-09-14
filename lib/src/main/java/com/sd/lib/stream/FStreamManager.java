@@ -190,14 +190,17 @@ public class FStreamManager
         private final Class mClass;
         private final Object mTag;
         private final MethodResultFilter mMethodResultFilter;
+        private final DispatchCallback mDispatchCallback;
+
         private final List<Object> mListResult = new ArrayList<>(1);
 
         public ProxyInvocationHandler(ProxyBuilder builder, FStreamManager manager)
         {
+            mManager = manager;
             mClass = builder.mClass;
             mTag = builder.mTag;
             mMethodResultFilter = builder.mMethodResultFilter;
-            mManager = manager;
+            mDispatchCallback = builder.mDispatchCallback;
         }
 
         private boolean checkTag(FStream stream)
@@ -235,19 +238,30 @@ public class FStreamManager
                     if (mManager.mIsDebug)
                         Log.i(FStreamManager.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
 
-                    int notifyCount = 0;
+                    int index = 0;
                     for (FStream item : holder)
                     {
                         if (checkTag(item))
                         {
                             final Object itemResult = method.invoke(item, args);
 
+                            if (mManager.mIsDebug)
+                                Log.i(FStreamManager.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
+
                             if (!isVoid)
                                 mListResult.add(itemResult);
 
-                            notifyCount++;
-                            if (mManager.mIsDebug)
-                                Log.i(FStreamManager.class.getSimpleName(), "notify index:" + notifyCount + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
+                            if (mDispatchCallback != null)
+                            {
+                                if (mDispatchCallback.onDispatch(method, args, itemResult, item))
+                                {
+                                    if (mManager.mIsDebug)
+                                        Log.i(FStreamManager.class.getSimpleName(), "notify breaked");
+                                    break;
+                                }
+                            }
+
+                            index++;
                         }
                     }
 
@@ -287,6 +301,7 @@ public class FStreamManager
         private Class mClass;
         private Object mTag;
         private MethodResultFilter mMethodResultFilter;
+        private DispatchCallback mDispatchCallback;
 
         /**
          * 设置代理对象的tag
@@ -309,6 +324,18 @@ public class FStreamManager
         public ProxyBuilder methodResultFilter(MethodResultFilter methodResultFilter)
         {
             mMethodResultFilter = methodResultFilter;
+            return this;
+        }
+
+        /**
+         * 设置流对象方法分发回调
+         *
+         * @param dispatchCallback
+         * @return
+         */
+        public ProxyBuilder dispatchCallback(DispatchCallback dispatchCallback)
+        {
+            mDispatchCallback = dispatchCallback;
             return this;
         }
 

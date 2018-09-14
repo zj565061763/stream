@@ -168,7 +168,7 @@ register:com.sd.stream.MainActivity$1@53810f5 class:com.sd.stream.TestFragment$F
 notify -----> public abstract java.lang.String com.sd.stream.TestFragment$FragmentCallback.getActivityContent()  tag:null count:1
 
 // 通知到了第几个流对象，它的返回值是什么
-notify index:1 stream:com.sd.stream.MainActivity$1@53810f5 return:MainActivity
+notify index:0 stream:com.sd.stream.MainActivity$1@53810f5 return:MainActivity
 
 // 代理对象的方法执行后，最终的返回值是什么
 notify final return:MainActivity

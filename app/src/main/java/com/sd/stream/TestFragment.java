@@ -7,8 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.sd.lib.stream.DispatchCallback;
 import com.sd.lib.stream.FStream;
 import com.sd.lib.stream.FStreamManager;
+
+import java.lang.reflect.Method;
 
 public class TestFragment extends Fragment
 {
@@ -25,6 +28,16 @@ public class TestFragment extends Fragment
              * 设置方法返回值过滤对象，默认为null会用最后一个注册的流对象的返回值
              */
             .methodResultFilter(null)
+            .dispatchCallback(new DispatchCallback()
+            {
+                @Override
+                public boolean onDispatch(Method method, Object[] methodParams, Object methodResult, Object observer)
+                {
+                    if ("2".equals(methodResult))
+                        return true;
+                    return false;
+                }
+            })
             .build(FragmentCallback.class);
 
     @Override

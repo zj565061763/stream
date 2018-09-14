@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.sd.lib.stream.FStreamManager;
 
-public class MainActivity extends AppCompatActivity implements TestFragment.FragmentCallback
+public class MainActivity extends AppCompatActivity
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -19,15 +19,38 @@ public class MainActivity extends AppCompatActivity implements TestFragment.Frag
         /**
          * 注册回调对象
          */
-        FStreamManager.getInstance().register(this);
+        FStreamManager.getInstance().register(mCallback1);
+        FStreamManager.getInstance().register(mCallback2);
+        FStreamManager.getInstance().register(mCallback3);
 
     }
 
-    @Override
-    public String getActivityContent()
+    private TestFragment.FragmentCallback mCallback1 = new TestFragment.FragmentCallback()
     {
-        return "MainActivity";
-    }
+        @Override
+        public String getActivityContent()
+        {
+            return "1";
+        }
+    };
+
+    private TestFragment.FragmentCallback mCallback2 = new TestFragment.FragmentCallback()
+    {
+        @Override
+        public String getActivityContent()
+        {
+            return "2";
+        }
+    };
+
+    private TestFragment.FragmentCallback mCallback3 = new TestFragment.FragmentCallback()
+    {
+        @Override
+        public String getActivityContent()
+        {
+            return "3";
+        }
+    };
 
     @Override
     protected void onDestroy()
@@ -37,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements TestFragment.Frag
          * 取消注册
          * 不取消注册的话，流对象会一直被持有，此时流对象又持有其他UI资源对象的话，会内存泄漏
          */
-        FStreamManager.getInstance().unregister(this);
+        FStreamManager.getInstance().unregister(mCallback1);
+        FStreamManager.getInstance().unregister(mCallback2);
+        FStreamManager.getInstance().unregister(mCallback3);
     }
 }
