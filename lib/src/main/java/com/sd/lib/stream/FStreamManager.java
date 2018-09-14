@@ -282,10 +282,13 @@ public class FStreamManager
                     result = null;
                 } else if (returnType.isPrimitive() && result == null)
                 {
-                    if (mManager.mIsDebug)
-                        Log.e(FStreamManager.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to 0");
+                    if (boolean.class == returnType)
+                        result = false;
+                    else
+                        result = 0;
 
-                    result = 0;
+                    if (mManager.mIsDebug)
+                        Log.e(FStreamManager.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result);
                 }
 
                 if (mManager.mIsDebug && !isVoid)
