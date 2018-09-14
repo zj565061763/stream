@@ -5,10 +5,10 @@ import android.util.Log;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -192,7 +192,7 @@ public class FStreamManager
         private final MethodResultFilter mMethodResultFilter;
         private final DispatchCallback mDispatchCallback;
 
-        private final List<Object> mListResult = new ArrayList<>(1);
+        private final LinkedList<Object> mListResult = new LinkedList<>();
 
         public ProxyInvocationHandler(ProxyBuilder builder, FStreamManager manager)
         {
@@ -270,7 +270,7 @@ public class FStreamManager
                         if (mMethodResultFilter != null)
                             result = mMethodResultFilter.filterResult(method, args, mListResult);
                         else
-                            result = mListResult.get(mListResult.size() - 1);
+                            result = mListResult.peekLast();
                     }
 
                     mListResult.clear();
