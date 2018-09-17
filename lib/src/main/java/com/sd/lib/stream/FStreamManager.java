@@ -47,14 +47,11 @@ public class FStreamManager
     }
 
     /**
-     * 注册流对象
-     *
-     * @param stream
-     * @param <T>
+     * {@link #register(FStream, Class[])}
      */
-    public synchronized <T extends FStream> void register(T stream)
+    public <T extends FStream> Class[] register(T stream)
     {
-        register(stream, null);
+        return register(stream, null);
     }
 
     /**
@@ -63,8 +60,9 @@ public class FStreamManager
      * @param stream
      * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
      * @param <T>
+     * @return 返回注册的接口
      */
-    public synchronized <T extends FStream> void register(T stream, Class... targetClass)
+    public synchronized <T extends FStream> Class[] register(T stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
@@ -85,15 +83,13 @@ public class FStreamManager
                 }
             }
         }
+        return classes;
     }
 
     /**
-     * 取消注册流对象
-     *
-     * @param stream
-     * @param <T>
+     * {@link #unregister(FStream, Class[])}
      */
-    public synchronized <T extends FStream> void unregister(T stream)
+    public <T extends FStream> void unregister(T stream)
     {
         unregister(stream, null);
     }
@@ -104,8 +100,9 @@ public class FStreamManager
      * @param stream
      * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
      * @param <T>
+     * @return 返回取消注册的接口
      */
-    public synchronized <T extends FStream> void unregister(T stream, Class... targetClass)
+    public synchronized <T extends FStream> Class[] unregister(T stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
@@ -123,6 +120,7 @@ public class FStreamManager
                     MAP_STREAM.remove(item);
             }
         }
+        return classes;
     }
 
     private <T extends FStream> Class[] getStreamClass(T stream, Class... targetClass)
