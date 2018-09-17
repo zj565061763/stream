@@ -89,9 +89,9 @@ public class FStreamManager
     /**
      * {@link #unregister(FStream, Class[])}
      */
-    public <T extends FStream> void unregister(T stream)
+    public <T extends FStream> Class[] unregister(T stream)
     {
-        unregister(stream, null);
+        return unregister(stream, null);
     }
 
     /**
