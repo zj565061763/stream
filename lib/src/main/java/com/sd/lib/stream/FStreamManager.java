@@ -64,7 +64,7 @@ public class FStreamManager
      * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
      * @param <T>
      */
-    public synchronized <T extends FStream> void register(T stream, Class<T>... targetClass)
+    public synchronized <T extends FStream> void register(T stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
@@ -105,7 +105,7 @@ public class FStreamManager
      * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
      * @param <T>
      */
-    public synchronized <T extends FStream> void unregister(T stream, Class<T>... targetClass)
+    public synchronized <T extends FStream> void unregister(T stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
