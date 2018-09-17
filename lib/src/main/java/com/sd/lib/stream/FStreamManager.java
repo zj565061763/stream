@@ -108,13 +108,13 @@ public class FStreamManager
         for (Class item : classes)
         {
             final List<FStream> holder = MAP_STREAM.get(item);
-            if (holder != null)
+            if (holder == null)
+                continue;
+
+            if (holder.remove(stream))
             {
-                if (holder.remove(stream))
-                {
-                    if (mIsDebug)
-                        Log.e(FStreamManager.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
-                }
+                if (mIsDebug)
+                    Log.e(FStreamManager.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
 
                 if (holder.isEmpty())
                     MAP_STREAM.remove(item);
