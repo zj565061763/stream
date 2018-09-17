@@ -64,13 +64,10 @@ public class FStreamManager
      * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
      * @param <T>
      */
-    public synchronized <T extends FStream> void register(T stream, Class<T> targetClass)
+    public synchronized <T extends FStream> void register(T stream, Class<T>... targetClass)
     {
-        final Set<Class> set = getStreamClass(stream, targetClass);
-        if (set == null)
-            return;
-
-        for (Class item : set)
+        final Class[] classes = getStreamClass(stream, targetClass);
+        for (Class item : classes)
         {
             List<FStream> holder = MAP_STREAM.get(item);
             if (holder == null)
@@ -108,13 +105,10 @@ public class FStreamManager
      * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
      * @param <T>
      */
-    public synchronized <T extends FStream> void unregister(T stream, Class<T> targetClass)
+    public synchronized <T extends FStream> void unregister(T stream, Class<T>... targetClass)
     {
-        final Set<Class> set = getStreamClass(stream, targetClass);
-        if (set == null)
-            return;
-
-        for (Class item : set)
+        final Class[] classes = getStreamClass(stream, targetClass);
+        for (Class item : classes)
         {
             final List<FStream> holder = MAP_STREAM.get(item);
             if (holder != null)
@@ -131,11 +125,8 @@ public class FStreamManager
         }
     }
 
-    private <T extends FStream> Set<Class> getStreamClass(T stream, Class<T> targetClass)
+    private <T extends FStream> Class[] getStreamClass(T stream, Class<T>... targetClass)
     {
-        if (stream == null)
-            return null;
-
         final Class sourceClass = stream.getClass();
         if (Proxy.isProxyClass(sourceClass) && FStream.class.isAssignableFrom(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
@@ -144,19 +135,18 @@ public class FStreamManager
         if (set.isEmpty())
             throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found in:" + stream);
 
-        if (targetClass != null)
+        if (targetClass != null && targetClass.length > 0)
         {
-            if (set.contains(targetClass))
+            for (Class<T> item : targetClass)
             {
-                set.clear();
-                set.add(targetClass);
-            } else
-            {
-                throw new RuntimeException("targetClass not found:" + targetClass);
+                if (!set.contains(item))
+                    throw new RuntimeException("targetClass not found:" + item);
             }
+            return targetClass;
+        } else
+        {
+            return set.toArray(new Class[set.size()]);
         }
-
-        return set;
     }
 
     private Set<Class> findAllStreamClass(Class clazz)
