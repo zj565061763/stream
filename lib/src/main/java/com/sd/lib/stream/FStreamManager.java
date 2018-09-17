@@ -211,7 +211,9 @@ public class FStreamManager
                 final String methodName = method.getName();
                 final Class returnType = method.getReturnType();
 
-                if ("getTag".equals(methodName) && method.getParameterTypes().length == 0)
+                final Class<?>[] parameterTypes = method.getParameterTypes();
+                if ("getTag".equals(methodName)
+                        && parameterTypes.length == 1 && parameterTypes[0] == Class.class)
                 {
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");
                 }
@@ -253,15 +255,15 @@ public class FStreamManager
                         }
                     }
 
-                    if (!mListResult.isEmpty() && !isVoid)
+                    if (!mListResult.isEmpty())
                     {
                         if (mMethodResultFilter != null)
                             result = mMethodResultFilter.filterResult(method, args, mListResult);
                         else
                             result = mListResult.peekLast();
-                    }
 
-                    mListResult.clear();
+                        mListResult.clear();
+                    }
                 }
                 //---------- main logic end ----------
 
