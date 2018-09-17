@@ -125,10 +125,10 @@ public class FStreamManager
         }
     }
 
-    private <T extends FStream> Class[] getStreamClass(T stream, Class<T>... targetClass)
+    private <T extends FStream> Class[] getStreamClass(T stream, Class... targetClass)
     {
         final Class sourceClass = stream.getClass();
-        if (Proxy.isProxyClass(sourceClass) && FStream.class.isAssignableFrom(sourceClass))
+        if (Proxy.isProxyClass(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
 
         final Set<Class> set = findAllStreamClass(sourceClass);
@@ -137,7 +137,7 @@ public class FStreamManager
 
         if (targetClass != null && targetClass.length > 0)
         {
-            for (Class<T> item : targetClass)
+            for (Class item : targetClass)
             {
                 if (!set.contains(item))
                     throw new RuntimeException("targetClass not found:" + item);
