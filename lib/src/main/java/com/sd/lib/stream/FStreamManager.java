@@ -79,7 +79,7 @@ public class FStreamManager
                 if (holder.add(stream))
                 {
                     if (mIsDebug)
-                        Log.i(FStreamManager.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
+                        Log.i(FStreamManager.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
                 }
             }
         }
@@ -114,7 +114,7 @@ public class FStreamManager
             if (holder.remove(stream))
             {
                 if (mIsDebug)
-                    Log.e(FStreamManager.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTag(item) + " count:" + (holder.size()));
+                    Log.e(FStreamManager.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
 
                 if (holder.isEmpty())
                     MAP_STREAM.remove(item);
@@ -131,7 +131,11 @@ public class FStreamManager
 
         final Set<Class> set = findAllStreamClass(sourceClass);
         if (set.isEmpty())
-            throw new IllegalArgumentException("interface extends " + FStream.class.getSimpleName() + " is not found in:" + stream);
+        {
+            // 改为日志输出，不抛异常
+            if (mIsDebug)
+                Log.e(FStreamManager.class.getSimpleName(), "interface extends " + FStream.class.getSimpleName() + " is not found in:" + stream);
+        }
 
         if (targetClass != null && targetClass.length > 0)
         {
@@ -193,7 +197,7 @@ public class FStreamManager
 
         private boolean checkTag(FStream stream)
         {
-            final Object tag = stream.getTag(mClass);
+            final Object tag = stream.getTagForClass(mClass);
             if (mTag == tag)
                 return true;
 
@@ -212,7 +216,7 @@ public class FStreamManager
                 final Class returnType = method.getReturnType();
 
                 final Class<?>[] parameterTypes = method.getParameterTypes();
-                if ("getTag".equals(methodName)
+                if ("getTagForClass".equals(methodName)
                         && parameterTypes.length == 1 && parameterTypes[0] == Class.class)
                 {
                     throw new RuntimeException(methodName + " method can not be called on proxy instance");

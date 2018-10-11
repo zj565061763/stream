@@ -13,7 +13,7 @@ public interface FStream
      * @param clazz 对应哪个接口的方法被触发
      * @return
      */
-    default Object getTag(Class<?> clazz)
+    default Object getTagForClass(Class<?> clazz)
     {
         return null;
     }
