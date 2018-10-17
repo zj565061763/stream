@@ -184,7 +184,7 @@ public class FStreamManager
         private final MethodResultFilter mMethodResultFilter;
         private final DispatchCallback mDispatchCallback;
 
-        private final LinkedList<Object> mListResult = new LinkedList<>();
+        private final Map<String, LinkedList<Object>> mMapListResult = new HashMap<>();
 
         public ProxyInvocationHandler(ProxyBuilder builder, FStreamManager manager)
         {
@@ -207,6 +207,27 @@ public class FStreamManager
                 return false;
         }
 
+        private LinkedList<Object> getResultList(Method method)
+        {
+            final String key = method.toString();
+
+            LinkedList<Object> list = mMapListResult.get(key);
+            if (list == null)
+            {
+                synchronized (mMapListResult)
+                {
+                    list = mMapListResult.get(key);
+                    if (list == null)
+                    {
+                        list = new LinkedList<>();
+                        mMapListResult.put(key, list);
+                    }
+                }
+            }
+            return list;
+        }
+
+
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
@@ -224,51 +245,20 @@ public class FStreamManager
             Object result = null;
 
 
-            //---------- main logic start ----------
-            final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
-            if (holder != null)
+            if (isVoid)
             {
-                if (mManager.mIsDebug)
-                    Log.i(FStreamManager.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
+                processMainLogic(isVoid, null, method, args);
+            } else
+            {
+                final LinkedList<Object> listResult = getResultList(method);
+                if (listResult == null)
+                    throw new NullPointerException();
 
-                int index = 0;
-                for (FStream item : holder)
+                synchronized (listResult)
                 {
-                    if (checkTag(item))
-                    {
-                        final Object itemResult = method.invoke(item, args);
-
-                        if (mManager.mIsDebug)
-                            Log.i(FStreamManager.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
-
-                        if (!isVoid)
-                            mListResult.add(itemResult);
-
-                        if (mDispatchCallback != null)
-                        {
-                            if (mDispatchCallback.onDispatch(method, args, itemResult, item))
-                            {
-                                if (mManager.mIsDebug)
-                                    Log.i(FStreamManager.class.getSimpleName(), "notify breaked");
-                                break;
-                            }
-                        }
-
-                        index++;
-                    }
-                }
-
-                if (!mListResult.isEmpty())
-                {
-                    if (mMethodResultFilter != null)
-                        result = mMethodResultFilter.filterResult(method, args, mListResult);
-                    else
-                        result = mListResult.peekLast();
-
-                    mListResult.clear();
+                    result = processMainLogic(isVoid, listResult, method, args);
                 }
             }
-            //---------- main logic end ----------
 
 
             if (isVoid)
@@ -287,6 +277,57 @@ public class FStreamManager
 
             if (mManager.mIsDebug && !isVoid)
                 Log.i(FStreamManager.class.getSimpleName(), "notify final return:" + result);
+
+            return result;
+        }
+
+        private Object processMainLogic(final boolean isVoid, final LinkedList<Object> listResult, final Method method, final Object[] args) throws Throwable
+        {
+            final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
+            if (holder == null)
+                return null;
+
+            Object result = null;
+
+            if (mManager.mIsDebug)
+                Log.i(FStreamManager.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
+
+            int index = 0;
+            for (FStream item : holder)
+            {
+                if (!checkTag(item))
+                    continue;
+
+                final Object itemResult = method.invoke(item, args);
+
+                if (mManager.mIsDebug)
+                    Log.i(FStreamManager.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
+
+                if (!isVoid)
+                    listResult.add(itemResult);
+
+                if (mDispatchCallback != null)
+                {
+                    if (mDispatchCallback.onDispatch(method, args, itemResult, item))
+                    {
+                        if (mManager.mIsDebug)
+                            Log.i(FStreamManager.class.getSimpleName(), "notify breaked");
+                        break;
+                    }
+                }
+
+                index++;
+            }
+
+            if (!isVoid && !listResult.isEmpty())
+            {
+                if (mMethodResultFilter != null)
+                    result = mMethodResultFilter.filterResult(method, args, listResult);
+                else
+                    result = listResult.peekLast();
+
+                listResult.clear();
+            }
 
             return result;
         }
