@@ -214,7 +214,7 @@ public class FStreamManager
             LinkedList<Object> list = mMapListResult.get(key);
             if (list == null)
             {
-                synchronized (mMapListResult)
+                synchronized (ProxyInvocationHandler.this)
                 {
                     list = mMapListResult.get(key);
                     if (list == null)
