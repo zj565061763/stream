@@ -210,86 +210,85 @@ public class FStreamManager
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            synchronized (mManager)
+            final String methodName = method.getName();
+            final Class returnType = method.getReturnType();
+
+            final Class<?>[] parameterTypes = method.getParameterTypes();
+            if ("getTagForClass".equals(methodName)
+                    && parameterTypes.length == 1 && parameterTypes[0] == Class.class)
             {
-                final String methodName = method.getName();
-                final Class returnType = method.getReturnType();
-
-                final Class<?>[] parameterTypes = method.getParameterTypes();
-                if ("getTagForClass".equals(methodName)
-                        && parameterTypes.length == 1 && parameterTypes[0] == Class.class)
-                {
-                    throw new RuntimeException(methodName + " method can not be called on proxy instance");
-                }
-
-                final boolean isVoid = returnType == void.class || returnType == Void.class;
-                Object result = null;
-
-                //---------- main logic start ----------
-                final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
-                if (holder != null)
-                {
-                    if (mManager.mIsDebug)
-                        Log.i(FStreamManager.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
-
-                    int index = 0;
-                    for (FStream item : holder)
-                    {
-                        if (checkTag(item))
-                        {
-                            final Object itemResult = method.invoke(item, args);
-
-                            if (mManager.mIsDebug)
-                                Log.i(FStreamManager.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
-
-                            if (!isVoid)
-                                mListResult.add(itemResult);
-
-                            if (mDispatchCallback != null)
-                            {
-                                if (mDispatchCallback.onDispatch(method, args, itemResult, item))
-                                {
-                                    if (mManager.mIsDebug)
-                                        Log.i(FStreamManager.class.getSimpleName(), "notify breaked");
-                                    break;
-                                }
-                            }
-
-                            index++;
-                        }
-                    }
-
-                    if (!mListResult.isEmpty())
-                    {
-                        if (mMethodResultFilter != null)
-                            result = mMethodResultFilter.filterResult(method, args, mListResult);
-                        else
-                            result = mListResult.peekLast();
-
-                        mListResult.clear();
-                    }
-                }
-                //---------- main logic end ----------
-
-                if (isVoid)
-                {
-                    result = null;
-                } else if (returnType.isPrimitive() && result == null)
-                {
-                    if (boolean.class == returnType)
-                        result = false;
-                    else
-                        result = 0;
-
-                    if (mManager.mIsDebug)
-                        Log.e(FStreamManager.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result);
-                }
-
-                if (mManager.mIsDebug && !isVoid)
-                    Log.i(FStreamManager.class.getSimpleName(), "notify final return:" + result);
-
-                return result;
+                throw new RuntimeException(methodName + " method can not be called on proxy instance");
             }
+
+            final boolean isVoid = returnType == void.class || returnType == Void.class;
+            Object result = null;
+
+
+            //---------- main logic start ----------
+            final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
+            if (holder != null)
+            {
+                if (mManager.mIsDebug)
+                    Log.i(FStreamManager.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
+
+                int index = 0;
+                for (FStream item : holder)
+                {
+                    if (checkTag(item))
+                    {
+                        final Object itemResult = method.invoke(item, args);
+
+                        if (mManager.mIsDebug)
+                            Log.i(FStreamManager.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
+
+                        if (!isVoid)
+                            mListResult.add(itemResult);
+
+                        if (mDispatchCallback != null)
+                        {
+                            if (mDispatchCallback.onDispatch(method, args, itemResult, item))
+                            {
+                                if (mManager.mIsDebug)
+                                    Log.i(FStreamManager.class.getSimpleName(), "notify breaked");
+                                break;
+                            }
+                        }
+
+                        index++;
+                    }
+                }
+
+                if (!mListResult.isEmpty())
+                {
+                    if (mMethodResultFilter != null)
+                        result = mMethodResultFilter.filterResult(method, args, mListResult);
+                    else
+                        result = mListResult.peekLast();
+
+                    mListResult.clear();
+                }
+            }
+            //---------- main logic end ----------
+
+
+            if (isVoid)
+            {
+                result = null;
+            } else if (returnType.isPrimitive() && result == null)
+            {
+                if (boolean.class == returnType)
+                    result = false;
+                else
+                    result = 0;
+
+                if (mManager.mIsDebug)
+                    Log.e(FStreamManager.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result);
+            }
+
+            if (mManager.mIsDebug && !isVoid)
+                Log.i(FStreamManager.class.getSimpleName(), "notify final return:" + result);
+
+            return result;
         }
     }
 
