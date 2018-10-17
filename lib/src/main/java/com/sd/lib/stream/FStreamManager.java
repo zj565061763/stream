@@ -51,7 +51,7 @@ public class FStreamManager
      */
     public <T extends FStream> Class[] register(T stream)
     {
-        return register(stream, null);
+        return register(stream, (Class[]) null);
     }
 
     /**
@@ -91,7 +91,7 @@ public class FStreamManager
      */
     public <T extends FStream> Class[] unregister(T stream)
     {
-        return unregister(stream, null);
+        return unregister(stream, (Class[]) null);
     }
 
     /**
