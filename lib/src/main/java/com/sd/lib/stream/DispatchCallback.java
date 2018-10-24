@@ -2,6 +2,9 @@ package com.sd.lib.stream;
 
 import java.lang.reflect.Method;
 
+/**
+ * 流对象方法分发回调
+ */
 public interface DispatchCallback
 {
     /**
