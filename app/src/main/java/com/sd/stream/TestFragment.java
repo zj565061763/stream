@@ -23,12 +23,11 @@ public class TestFragment extends Fragment
              * 设置代理对象的tag，默认tag为null
              * 注意：只有tag和当前代理对象tag相等的流对象才会被通知到，tag比较相等的规则为 “==” 或者 “equals”
              */
-            .tag(null)
+            .setTag(null)
             /**
-             * 设置方法返回值过滤对象，默认为null会用最后一个注册的流对象的返回值
+             * 设置分发回调
              */
-            .methodResultFilter(null)
-            .dispatchCallback(new DispatchCallback()
+            .setDispatchCallback(new DispatchCallback()
             {
                 @Override
                 public boolean onDispatch(Method method, Object[] methodParams, Object methodResult, Object observer)

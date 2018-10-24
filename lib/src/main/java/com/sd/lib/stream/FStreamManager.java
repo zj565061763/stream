@@ -8,7 +8,6 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -181,17 +180,13 @@ public class FStreamManager
         private final FStreamManager mManager;
         private final Class mClass;
         private final Object mTag;
-        private final MethodResultFilter mMethodResultFilter;
         private final DispatchCallback mDispatchCallback;
-
-        private final Map<String, LinkedList<Object>> mMapListResult = new HashMap<>();
 
         public ProxyInvocationHandler(ProxyBuilder builder, FStreamManager manager)
         {
             mManager = manager;
             mClass = builder.mClass;
             mTag = builder.mTag;
-            mMethodResultFilter = builder.mMethodResultFilter;
             mDispatchCallback = builder.mDispatchCallback;
         }
 
@@ -207,27 +202,6 @@ public class FStreamManager
                 return false;
         }
 
-        private LinkedList<Object> getResultList(Method method)
-        {
-            final String key = method.toString();
-
-            LinkedList<Object> list = mMapListResult.get(key);
-            if (list == null)
-            {
-                synchronized (ProxyInvocationHandler.this)
-                {
-                    list = mMapListResult.get(key);
-                    if (list == null)
-                    {
-                        list = new LinkedList<>();
-                        mMapListResult.put(key, list);
-                    }
-                }
-            }
-            return list;
-        }
-
-
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
@@ -241,24 +215,9 @@ public class FStreamManager
                 throw new RuntimeException(methodName + " method can not be called on proxy instance");
             }
 
+
             final boolean isVoid = returnType == void.class || returnType == Void.class;
-            Object result = null;
-
-
-            if (isVoid)
-            {
-                processMainLogic(isVoid, null, method, args);
-            } else
-            {
-                final LinkedList<Object> listResult = getResultList(method);
-                if (listResult == null)
-                    throw new NullPointerException();
-
-                synchronized (listResult)
-                {
-                    result = processMainLogic(isVoid, listResult, method, args);
-                }
-            }
+            Object result = processMainLogic(isVoid, method, args);
 
 
             if (isVoid)
@@ -281,7 +240,7 @@ public class FStreamManager
             return result;
         }
 
-        private Object processMainLogic(final boolean isVoid, final LinkedList<Object> listResult, final Method method, final Object[] args) throws Throwable
+        private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
             final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
             if (holder == null)
@@ -303,8 +262,7 @@ public class FStreamManager
                 if (mManager.mIsDebug)
                     Log.i(FStreamManager.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
 
-                if (!isVoid)
-                    listResult.add(itemResult);
+                result = itemResult;
 
                 if (mDispatchCallback != null)
                 {
@@ -319,16 +277,6 @@ public class FStreamManager
                 index++;
             }
 
-            if (!isVoid && !listResult.isEmpty())
-            {
-                if (mMethodResultFilter != null)
-                    result = mMethodResultFilter.filterResult(method, args, listResult);
-                else
-                    result = listResult.peekLast();
-
-                listResult.clear();
-            }
-
             return result;
         }
     }
@@ -337,7 +285,6 @@ public class FStreamManager
     {
         private Class mClass;
         private Object mTag;
-        private MethodResultFilter mMethodResultFilter;
         private DispatchCallback mDispatchCallback;
 
         /**
@@ -346,33 +293,21 @@ public class FStreamManager
          * @param tag
          * @return
          */
-        public ProxyBuilder tag(Object tag)
+        public ProxyBuilder setTag(Object tag)
         {
             mTag = tag;
             return this;
         }
 
         /**
-         * 设置方法返回值过滤对象，默认使用最后一个注册的流对象的返回值
-         *
-         * @param methodResultFilter
-         * @return
-         */
-        public ProxyBuilder methodResultFilter(MethodResultFilter methodResultFilter)
-        {
-            mMethodResultFilter = methodResultFilter;
-            return this;
-        }
-
-        /**
          * 设置流对象方法分发回调
          *
-         * @param dispatchCallback
+         * @param callback
          * @return
          */
-        public ProxyBuilder dispatchCallback(DispatchCallback dispatchCallback)
+        public ProxyBuilder setDispatchCallback(DispatchCallback callback)
         {
-            mDispatchCallback = dispatchCallback;
+            mDispatchCallback = callback;
             return this;
         }
 
