@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 20181017
-        versionName "1.1.9"
+        versionCode 20181024
+        versionName "1.1.10"
     }
 
     buildTypes {
