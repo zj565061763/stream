@@ -105,30 +105,29 @@ public class MainActivity extends AppCompatActivity implements TestFragment.Frag
 # 注意
 * 有多个代理对象的情况 <br> <br>
 创建代理对象的时候可以指定tag，默认代理对象的tag是null<br>
-只有流对象getTag()方法返回值和代理对象tag相等的时候，他们才可以互相通信，tag比较相等的规则为 “==” 或者 “equals”<br>
-流对象可以重写getTag()方法提供一个tag来决定要和哪些代理对象通信，默认返回null <br> <br>
+只有流对象getTagForClass()方法返回值和代理对象tag相等的时候，他们才可以互相通信，tag比较相等的规则为 “==” 或者 “equals”<br>
+流对象可以重写getTagForClass()方法提供一个tag来决定要和哪些代理对象通信，默认返回null <br> <br>
 
 ```java
 private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder()
         // 为代理对象设置一个tag
-        .tag(this)
+        .setTag(this)
         .build(FragmentCallback.class);
 ```
 
 * 有多个流对象的情况 <br> <br>
 这如果调用代理对象通信的方法有返回值的话，默认是用最后注册的一个流对象方法的返回值，
-当然，代理对象也可以在创建的时候设置一个方法返回值筛选器，筛选自己需要的返回值 <br> <br>
+当然，代理对象也可以在创建的时候设置一个分发回调，筛选自己需要的返回值 <br> <br>
 
 ```java
 private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder()
-        // 为代理对象设置方法返回值筛选器
-        .methodResultFilter(new MethodResultFilter()
+        // 为代理对象设置分发回调
+        .setDispatchCallback(new DispatchCallback()
         {
             @Override
-            public Object filterResult(Method method, Object[] args, List<Object> results)
+            public boolean onDispatch(Method method, Object[] methodParams, Object methodResult, Object observer)
             {
-                // 筛选results中需要的返回值
-                return results.get(results.size() - 1);
+                return false;
             }
         })
         .build(FragmentCallback.class);
@@ -136,19 +135,20 @@ private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder()
 
 ```java
 /**
- * 方法返回值过滤接口
+ * 流对象方法分发回调
  */
-public interface MethodResultFilter
+public interface DispatchCallback
 {
     /**
-     * 筛选方法的返回值
+     * 流对象的方法被通知的时候回调
      *
-     * @param method  代理对象被触发的方法
-     * @param args    被触发方法的参数
-     * @param results 所有注册的流对象该方法的返回值集合
-     * @return 返回该方法最终的返回值，默认把返回值集合的最后一个当做该方法的返回值
+     * @param method       方法
+     * @param methodParams 方法参数
+     * @param methodResult 方法返回值
+     * @param observer     流对象
+     * @return true-停止分发，false-继续分发
      */
-    Object filterResult(Method method, Object[] args, List<Object> results);
+    boolean onDispatch(Method method, Object[] methodParams, Object methodResult, Object observer);
 }
 ```
 
