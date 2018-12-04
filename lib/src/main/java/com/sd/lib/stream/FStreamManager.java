@@ -54,7 +54,7 @@ public class FStreamManager
      * @param <T>
      * @return
      */
-    public <T extends FStream> List<FStream> getRegisterStream(Class<T> clazz)
+    public <T extends FStream> List<FStream> getRegisteredStream(Class<T> clazz)
     {
         return MAP_STREAM.get(clazz);
     }

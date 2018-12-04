@@ -74,7 +74,7 @@ final class ProxyInvocationHandler implements InvocationHandler
 
     private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
     {
-        final List<FStream> holder = mManager.getRegisterStream(mClass);
+        final List<FStream> holder = mManager.getRegisteredStream(mClass);
         if (holder == null)
             return null;
 
