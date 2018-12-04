@@ -28,7 +28,7 @@ public class TestFragment extends Fragment
     /**
      * 创建接口代理对象
      */
-    private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder().build(FragmentCallback.class);
+    private final FragmentCallback mCallback = new FStream.ProxyBuilder().build(FragmentCallback.class);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements TestFragment.Frag
 流对象可以重写getTagForClass()方法提供一个tag来决定要和哪些代理对象通信，默认返回null <br> <br>
 
 ```java
-private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder()
+private final FragmentCallback mCallback = new FStream.ProxyBuilder()
         // 为代理对象设置一个tag
         .setTag(this)
         .build(FragmentCallback.class);
@@ -120,7 +120,7 @@ private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder()
 当然，代理对象也可以在创建的时候设置一个分发回调，筛选自己需要的返回值 <br> <br>
 
 ```java
-private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder()
+private final FragmentCallback mCallback = new FStream.ProxyBuilder()
         // 为代理对象设置分发回调
         .setDispatchCallback(new DispatchCallback()
         {
@@ -158,7 +158,7 @@ public interface DispatchCallback
 FStreamManager.getInstance().setDebug(true);
 ```
 
-调试模式打开后，会有类似以下的日志，日志的过滤tag：FStreamManager
+调试模式打开后，会有类似以下的日志，日志的过滤tag：FStream
 
 ```java
 // 注册流对象，流对象所属的接口class，流对象返回的tag，注册后这种class类型的流对象有几个

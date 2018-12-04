@@ -7,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.sd.lib.stream.DispatchCallback;
 import com.sd.lib.stream.FStream;
-import com.sd.lib.stream.FStreamManager;
 
 import java.lang.reflect.Method;
 
@@ -18,7 +16,7 @@ public class TestFragment extends Fragment
     /**
      * 创建接口代理对象
      */
-    private final FragmentCallback mCallback = new FStreamManager.ProxyBuilder()
+    private final FragmentCallback mCallback = new FStream.ProxyBuilder()
             /**
              * 设置代理对象的tag，默认tag为null
              * 注意：只有tag和当前代理对象tag相等的流对象才会被通知到，tag比较相等的规则为 “==” 或者 “equals”
@@ -27,7 +25,7 @@ public class TestFragment extends Fragment
             /**
              * 设置分发回调
              */
-            .setDispatchCallback(new DispatchCallback()
+            .setDispatchCallback(new FStream.DispatchCallback()
             {
                 @Override
                 public boolean onDispatch(Method method, Object[] methodParams, Object methodResult, Object observer)

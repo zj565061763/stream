@@ -2,10 +2,7 @@ package com.sd.lib.stream;
 
 import android.util.Log;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,9 +37,26 @@ public class FStreamManager
         return sInstance;
     }
 
+    public boolean isDebug()
+    {
+        return mIsDebug;
+    }
+
     public void setDebug(boolean debug)
     {
         mIsDebug = debug;
+    }
+
+    /**
+     * 返回已注册的对象
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public <T extends FStream> List<FStream> getRegisterStream(Class<T> clazz)
+    {
+        return MAP_STREAM.get(clazz);
     }
 
     /**
@@ -78,7 +92,7 @@ public class FStreamManager
                 if (holder.add(stream))
                 {
                     if (mIsDebug)
-                        Log.i(FStreamManager.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
+                        Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
                 }
             }
         }
@@ -113,7 +127,7 @@ public class FStreamManager
             if (holder.remove(stream))
             {
                 if (mIsDebug)
-                    Log.e(FStreamManager.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
+                    Log.e(FStream.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
 
                 if (holder.isEmpty())
                     MAP_STREAM.remove(item);
@@ -133,7 +147,7 @@ public class FStreamManager
         {
             // 改为日志输出，不抛异常
             if (mIsDebug)
-                Log.e(FStreamManager.class.getSimpleName(), "interface extends " + FStream.class.getSimpleName() + " is not found in:" + stream);
+                Log.e(FStream.class.getSimpleName(), "interface extends " + FStream.class.getSimpleName() + " is not found in:" + stream);
         }
 
         if (targetClass != null && targetClass.length > 0)
@@ -173,162 +187,5 @@ public class FStreamManager
         }
 
         return set;
-    }
-
-    private static final class ProxyInvocationHandler implements InvocationHandler
-    {
-        private final FStreamManager mManager;
-        private final Class mClass;
-        private final Object mTag;
-        private final DispatchCallback mDispatchCallback;
-
-        public ProxyInvocationHandler(ProxyBuilder builder, FStreamManager manager)
-        {
-            mManager = manager;
-            mClass = builder.mClass;
-            mTag = builder.mTag;
-            mDispatchCallback = builder.mDispatchCallback;
-        }
-
-        private boolean checkTag(FStream stream)
-        {
-            final Object tag = stream.getTagForClass(mClass);
-            if (mTag == tag)
-                return true;
-
-            if (mTag != null && tag != null)
-                return mTag.equals(tag);
-            else
-                return false;
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-        {
-            final String methodName = method.getName();
-            final Class returnType = method.getReturnType();
-
-            final Class<?>[] parameterTypes = method.getParameterTypes();
-            if ("getTagForClass".equals(methodName)
-                    && parameterTypes.length == 1 && parameterTypes[0] == Class.class)
-            {
-                throw new RuntimeException(methodName + " method can not be called on proxy instance");
-            }
-
-
-            final boolean isVoid = returnType == void.class || returnType == Void.class;
-            Object result = processMainLogic(isVoid, method, args);
-
-
-            if (isVoid)
-            {
-                result = null;
-            } else if (returnType.isPrimitive() && result == null)
-            {
-                if (boolean.class == returnType)
-                    result = false;
-                else
-                    result = 0;
-
-                if (mManager.mIsDebug)
-                    Log.e(FStreamManager.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result);
-            }
-
-            if (mManager.mIsDebug && !isVoid)
-                Log.i(FStreamManager.class.getSimpleName(), "notify final return:" + result);
-
-            return result;
-        }
-
-        private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
-        {
-            final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
-            if (holder == null)
-                return null;
-
-            Object result = null;
-
-            if (mManager.mIsDebug)
-                Log.i(FStreamManager.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
-
-            int index = 0;
-            for (FStream item : holder)
-            {
-                if (!checkTag(item))
-                    continue;
-
-                final Object itemResult = method.invoke(item, args);
-
-                if (mManager.mIsDebug)
-                    Log.i(FStreamManager.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
-
-                result = itemResult;
-
-                if (mDispatchCallback != null)
-                {
-                    if (mDispatchCallback.onDispatch(method, args, itemResult, item))
-                    {
-                        if (mManager.mIsDebug)
-                            Log.i(FStreamManager.class.getSimpleName(), "notify breaked");
-                        break;
-                    }
-                }
-
-                index++;
-            }
-
-            return result;
-        }
-    }
-
-    public static final class ProxyBuilder
-    {
-        private Class mClass;
-        private Object mTag;
-        private DispatchCallback mDispatchCallback;
-
-        /**
-         * 设置代理对象的tag
-         *
-         * @param tag
-         * @return
-         */
-        public ProxyBuilder setTag(Object tag)
-        {
-            mTag = tag;
-            return this;
-        }
-
-        /**
-         * 设置流对象方法分发回调
-         *
-         * @param callback
-         * @return
-         */
-        public ProxyBuilder setDispatchCallback(DispatchCallback callback)
-        {
-            mDispatchCallback = callback;
-            return this;
-        }
-
-        /**
-         * 创建代理对象
-         *
-         * @param clazz
-         * @param <T>
-         * @return
-         */
-        public <T extends FStream> T build(Class<T> clazz)
-        {
-            if (clazz == null)
-                throw new NullPointerException("clazz is null");
-            if (!clazz.isInterface())
-                throw new IllegalArgumentException("clazz must be an interface");
-            if (clazz == FStream.class)
-                throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
-
-            mClass = clazz;
-            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(this, FStreamManager.getInstance()));
-        }
     }
 }
