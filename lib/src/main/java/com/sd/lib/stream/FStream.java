@@ -68,7 +68,7 @@ public interface FStream
                 throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
 
             mClass = clazz;
-            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new ProxyInvocationHandler(this, FStreamManager.getInstance()));
+            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new FStreamManager.ProxyInvocationHandler(this, FStreamManager.getInstance()));
         }
     }
 
