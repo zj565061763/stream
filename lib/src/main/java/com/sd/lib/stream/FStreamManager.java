@@ -242,14 +242,14 @@ public class FStreamManager
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
             final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
+
+            if (mManager.isDebug())
+                Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + (holder == null ? 0 : holder.size()));
+
             if (holder == null)
                 return null;
 
             Object result = null;
-
-            if (mManager.isDebug())
-                Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + holder.size());
-
             int index = 0;
             for (FStream item : holder)
             {
