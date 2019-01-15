@@ -134,12 +134,6 @@ public class FStreamManager
             throw new IllegalArgumentException("proxy instance is not supported");
 
         final Set<Class> set = findAllStreamClass(sourceClass);
-        if (set.isEmpty())
-        {
-            // 改为日志输出，不抛异常
-            if (mIsDebug)
-                Log.e(FStream.class.getSimpleName(), "interface extends " + FStream.class.getSimpleName() + " is not found in:" + stream);
-        }
 
         if (targetClass != null && targetClass.length > 0)
         {
