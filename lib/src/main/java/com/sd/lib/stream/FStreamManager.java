@@ -83,7 +83,7 @@ public class FStreamManager
                 if (holder.add(stream))
                 {
                     if (mIsDebug)
-                        Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
+                        Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
                 }
             }
         }
@@ -118,7 +118,7 @@ public class FStreamManager
             if (holder.remove(stream))
             {
                 if (mIsDebug)
-                    Log.e(FStream.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " tag:" + stream.getTagForClass(item) + " count:" + (holder.size()));
+                    Log.e(FStream.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
 
                 if (holder.isEmpty())
                     MAP_STREAM.remove(item);
