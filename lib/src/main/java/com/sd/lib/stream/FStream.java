@@ -103,7 +103,7 @@ public interface FStream
     interface ResultFilter
     {
         /**
-         * 返回值过滤回调
+         * 过滤返回值
          *
          * @param method       方法
          * @param methodParams 方法参数
