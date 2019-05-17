@@ -131,9 +131,9 @@ public class FStreamManager
         return classes;
     }
 
-    private Class[] getStreamClass(Object stream, Class... targetClass)
+    private Class[] getStreamClass(Object source, Class... targetClass)
     {
-        final Class sourceClass = stream.getClass();
+        final Class sourceClass = source.getClass();
         if (Proxy.isProxyClass(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
 
