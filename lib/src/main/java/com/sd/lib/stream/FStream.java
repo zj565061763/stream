@@ -2,6 +2,7 @@ package com.sd.lib.stream;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 /**
  * 流接口
@@ -26,6 +27,7 @@ public interface FStream
         Class mClass;
         Object mTag;
         DispatchCallback mDispatchCallback;
+        ResultFilter mResultFilter;
 
         /**
          * 设置代理对象的tag
@@ -48,6 +50,18 @@ public interface FStream
         public ProxyBuilder setDispatchCallback(DispatchCallback callback)
         {
             mDispatchCallback = callback;
+            return this;
+        }
+
+        /**
+         * 设置返回值过滤对象
+         *
+         * @param filter
+         * @return
+         */
+        public ProxyBuilder setResultFilter(ResultFilter filter)
+        {
+            mResultFilter = filter;
             return this;
         }
 
@@ -84,5 +98,18 @@ public interface FStream
          * @return true-停止分发，false-继续分发
          */
         boolean onDispatch(Method method, Object[] methodParams, Object methodResult, FStream stream);
+    }
+
+    interface ResultFilter
+    {
+        /**
+         * 返回值过滤回调
+         *
+         * @param method       方法
+         * @param methodParams 方法参数
+         * @param results      所有流对象的返回值
+         * @return
+         */
+        Object filter(Method method, Object[] methodParams, List<Object> results);
     }
 }

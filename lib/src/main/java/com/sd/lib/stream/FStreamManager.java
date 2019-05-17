@@ -8,6 +8,7 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -184,13 +185,16 @@ public class FStreamManager
         private final Class mClass;
         private final Object mTag;
         private final FStream.DispatchCallback mDispatchCallback;
+        private final FStream.ResultFilter mResultFilter;
 
         public ProxyInvocationHandler(FStream.ProxyBuilder builder, FStreamManager manager)
         {
-            mManager = manager;
             mClass = builder.mClass;
             mTag = builder.mTag;
             mDispatchCallback = builder.mDispatchCallback;
+            mResultFilter = builder.mResultFilter;
+
+            mManager = manager;
         }
 
         private boolean checkTag(FStream stream)
@@ -250,6 +254,9 @@ public class FStreamManager
             if (holder == null)
                 return null;
 
+            final boolean filterResult = mResultFilter != null && !isVoid;
+            final List<Object> listResult = filterResult ? new LinkedList<>() : null;
+
             Object result = null;
             int index = 0;
             for (FStream item : holder)
@@ -264,6 +271,9 @@ public class FStreamManager
 
                 result = itemResult;
 
+                if (filterResult)
+                    listResult.add(itemResult);
+
                 if (mDispatchCallback != null)
                 {
                     if (mDispatchCallback.onDispatch(method, args, itemResult, item))
@@ -276,6 +286,9 @@ public class FStreamManager
 
                 index++;
             }
+
+            if (filterResult)
+                result = mResultFilter.filter(method, args, listResult);
 
             return result;
         }
