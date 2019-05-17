@@ -10,6 +10,7 @@ import android.widget.Button;
 import com.sd.lib.stream.FStream;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class TestFragment extends Fragment
 {
@@ -33,6 +34,17 @@ public class TestFragment extends Fragment
                     if ("2".equals(methodResult))
                         return true;
                     return false;
+                }
+            })
+            /**
+             * 设置返回值过滤
+             */
+            .setResultFilter(new FStream.ResultFilter()
+            {
+                @Override
+                public Object filter(Method method, Object[] methodParams, List<Object> results)
+                {
+                    return results.get(results.size() - 1);
                 }
             })
             .build(FragmentCallback.class);
