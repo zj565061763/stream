@@ -288,7 +288,12 @@ public class FStreamManager
             }
 
             if (filterResult && !listResult.isEmpty())
+            {
                 result = mResultFilter.filter(method, args, listResult);
+
+                if (mManager.isDebug())
+                    Log.i(FStream.class.getSimpleName(), "filter result: " + result);
+            }
 
             return result;
         }
