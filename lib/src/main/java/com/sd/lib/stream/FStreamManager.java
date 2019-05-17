@@ -199,10 +199,7 @@ public class FStreamManager
             if (mTag == tag)
                 return true;
 
-            if (mTag != null && tag != null)
-                return mTag.equals(tag);
-            else
-                return false;
+            return mTag != null && mTag.equals(tag);
         }
 
         @Override
