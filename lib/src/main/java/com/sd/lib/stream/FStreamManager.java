@@ -182,19 +182,20 @@ public class FStreamManager
     static final class ProxyInvocationHandler implements InvocationHandler
     {
         private final FStreamManager mManager;
+
         private final Class mClass;
         private final Object mTag;
         private final FStream.DispatchCallback mDispatchCallback;
         private final FStream.ResultFilter mResultFilter;
 
-        public ProxyInvocationHandler(FStream.ProxyBuilder builder, FStreamManager manager)
+        public ProxyInvocationHandler(FStreamManager manager, FStream.ProxyBuilder builder)
         {
+            mManager = manager;
+
             mClass = builder.mClass;
             mTag = builder.mTag;
             mDispatchCallback = builder.mDispatchCallback;
             mResultFilter = builder.mResultFilter;
-
-            mManager = manager;
         }
 
         private boolean checkTag(FStream stream)
@@ -264,6 +265,16 @@ public class FStreamManager
                 if (!checkTag(item))
                     continue;
 
+                if (mDispatchCallback != null)
+                {
+                    if (mDispatchCallback.beforeDispatch(item, method, args))
+                    {
+                        if (mManager.isDebug())
+                            Log.i(FStream.class.getSimpleName(), "notify breaked before dispatch");
+                        break;
+                    }
+                }
+
                 final Object itemResult = method.invoke(item, args);
 
                 if (mManager.isDebug())
@@ -276,10 +287,10 @@ public class FStreamManager
 
                 if (mDispatchCallback != null)
                 {
-                    if (mDispatchCallback.onDispatch(method, args, itemResult, item))
+                    if (mDispatchCallback.afterDispatch(item, method, args, itemResult))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "notify breaked");
+                            Log.i(FStream.class.getSimpleName(), "notify breaked after dispatch");
                         break;
                     }
                 }

@@ -82,22 +82,32 @@ public interface FStream
                 throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
 
             mClass = clazz;
-            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new FStreamManager.ProxyInvocationHandler(this, FStreamManager.getInstance()));
+            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new FStreamManager.ProxyInvocationHandler(FStreamManager.getInstance(), this));
         }
     }
 
     interface DispatchCallback
     {
         /**
-         * 流对象的方法被通知的时候回调
+         * 流对象的方法被通知之前触发
          *
+         * @param stream       流对象
          * @param method       方法
          * @param methodParams 方法参数
-         * @param methodResult 方法返回值
-         * @param stream       流对象
          * @return true-停止分发，false-继续分发
          */
-        boolean onDispatch(Method method, Object[] methodParams, Object methodResult, FStream stream);
+        boolean beforeDispatch(FStream stream, Method method, Object[] methodParams);
+
+        /**
+         * 流对象的方法被通知之后触发
+         *
+         * @param stream       流对象
+         * @param method       方法
+         * @param methodParams 方法参数
+         * @param methodResult 流对象方法被调用后的返回值
+         * @return true-停止分发，false-继续分发
+         */
+        boolean afterDispatch(FStream stream, Method method, Object[] methodParams, Object methodResult);
     }
 
     interface ResultFilter

@@ -29,7 +29,13 @@ public class TestFragment extends Fragment
             .setDispatchCallback(new FStream.DispatchCallback()
             {
                 @Override
-                public boolean onDispatch(Method method, Object[] methodParams, Object methodResult, FStream stream)
+                public boolean beforeDispatch(FStream stream, Method method, Object[] methodParams)
+                {
+                    return false;
+                }
+
+                @Override
+                public boolean afterDispatch(FStream stream, Method method, Object[] methodParams, Object methodResult)
                 {
                     if ("2".equals(methodResult))
                         return true;
