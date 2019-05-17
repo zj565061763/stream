@@ -51,9 +51,12 @@ public class FStreamManager
     }
 
     /**
-     * {@link #register(FStream, Class[])}
+     * 注册流对象
+     *
+     * @param stream
+     * @return
      */
-    public <T extends FStream> Class[] register(T stream)
+    public Class[] register(Object stream)
     {
         return register(stream, (Class[]) null);
     }
@@ -63,10 +66,9 @@ public class FStreamManager
      *
      * @param stream
      * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
-     * @param <T>
      * @return 返回注册的接口
      */
-    public synchronized <T extends FStream> Class[] register(T stream, Class... targetClass)
+    public synchronized Class[] register(Object stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
@@ -80,7 +82,7 @@ public class FStreamManager
 
             if (!holder.contains(stream))
             {
-                if (holder.add(stream))
+                if (holder.add((FStream) stream))
                 {
                     if (mIsDebug)
                         Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
@@ -91,9 +93,12 @@ public class FStreamManager
     }
 
     /**
-     * {@link #unregister(FStream, Class[])}
+     * 取消注册流对象
+     *
+     * @param stream
+     * @return
      */
-    public <T extends FStream> Class[] unregister(T stream)
+    public Class[] unregister(Object stream)
     {
         return unregister(stream, (Class[]) null);
     }
@@ -103,10 +108,9 @@ public class FStreamManager
      *
      * @param stream
      * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
-     * @param <T>
      * @return 返回取消注册的接口
      */
-    public synchronized <T extends FStream> Class[] unregister(T stream, Class... targetClass)
+    public synchronized Class[] unregister(Object stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
@@ -127,7 +131,7 @@ public class FStreamManager
         return classes;
     }
 
-    private <T extends FStream> Class[] getStreamClass(T stream, Class... targetClass)
+    private Class[] getStreamClass(Object stream, Class... targetClass)
     {
         final Class sourceClass = stream.getClass();
         if (Proxy.isProxyClass(sourceClass))
