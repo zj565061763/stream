@@ -287,7 +287,7 @@ public class FStreamManager
                 index++;
             }
 
-            if (filterResult)
+            if (filterResult && !listResult.isEmpty())
                 result = mResultFilter.filter(method, args, listResult);
 
             return result;
