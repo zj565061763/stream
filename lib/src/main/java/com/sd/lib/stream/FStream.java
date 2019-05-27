@@ -22,6 +22,18 @@ public interface FStream
         return null;
     }
 
+    /**
+     * 创建一个流代理对象返回
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    static <T extends FStream> T newProxy(Class<T> clazz)
+    {
+        return new ProxyBuilder().build(clazz);
+    }
+
     class ProxyBuilder
     {
         Class mClass;
