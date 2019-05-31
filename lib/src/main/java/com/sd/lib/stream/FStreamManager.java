@@ -19,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class FStreamManager
 {
-    private static final Map<Class, List<FStream>> MAP_STREAM = new HashMap<>();
+    private static final Map<Class<? extends FStream>, List<FStream>> MAP_STREAM = new HashMap<>();
     private static final FStreamManager INSTANCE = new FStreamManager();
 
     private boolean mIsDebug;
