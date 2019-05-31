@@ -126,7 +126,7 @@ public class FStreamManager
 
     private Class[] getStreamClass(FStream stream, Class... targetClass)
     {
-        final Class sourceClass = stream.getClass();
+        final Class<?> sourceClass = stream.getClass();
         if (Proxy.isProxyClass(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
 
@@ -146,7 +146,7 @@ public class FStreamManager
         }
     }
 
-    private Set<Class> findAllStreamClass(Class clazz)
+    private Set<Class> findAllStreamClass(Class<?> clazz)
     {
         final Set<Class> set = new HashSet<>();
 
@@ -203,7 +203,7 @@ public class FStreamManager
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
             final String methodName = method.getName();
-            final Class returnType = method.getReturnType();
+            final Class<?> returnType = method.getReturnType();
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
             if ("getTagForStream".equals(methodName)
