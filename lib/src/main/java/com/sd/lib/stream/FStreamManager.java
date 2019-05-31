@@ -55,6 +55,17 @@ public class FStreamManager
     }
 
     /**
+     * 取消注册流对象
+     *
+     * @param stream
+     * @return
+     */
+    public Class<? extends FStream>[] unregister(FStream stream)
+    {
+        return unregister(stream, (Class<? extends FStream>[]) null);
+    }
+
+    /**
      * 注册流对象
      *
      * @param stream
@@ -83,17 +94,6 @@ public class FStreamManager
             }
         }
         return classes;
-    }
-
-    /**
-     * 取消注册流对象
-     *
-     * @param stream
-     * @return
-     */
-    public Class<? extends FStream>[] unregister(FStream stream)
-    {
-        return unregister(stream, (Class<? extends FStream>[]) null);
     }
 
     /**
