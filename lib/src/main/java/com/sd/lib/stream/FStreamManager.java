@@ -19,9 +19,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class FStreamManager
 {
-    private static FStreamManager sInstance;
+    private static final Map<Class, List<FStream>> MAP_STREAM = new HashMap<>();
+    private static final FStreamManager INSTANCE = new FStreamManager();
 
-    private final Map<Class, List<FStream>> MAP_STREAM = new HashMap<>();
     private boolean mIsDebug;
 
     private FStreamManager()
@@ -30,15 +30,7 @@ public class FStreamManager
 
     public static FStreamManager getInstance()
     {
-        if (sInstance == null)
-        {
-            synchronized (FStreamManager.class)
-            {
-                if (sInstance == null)
-                    sInstance = new FStreamManager();
-            }
-        }
-        return sInstance;
+        return INSTANCE;
     }
 
     public boolean isDebug()
