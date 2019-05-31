@@ -75,7 +75,7 @@ public class FStreamManager
 
             if (!holder.contains(stream))
             {
-                if (holder.add((FStream) stream))
+                if (holder.add(stream))
                 {
                     if (mIsDebug)
                         Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
