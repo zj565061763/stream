@@ -157,7 +157,7 @@ public class FStreamManager
             if (!FStream.class.isAssignableFrom(clazz))
                 break;
             if (clazz.isInterface())
-                throw new IllegalArgumentException("clazz must not be an interface");
+                throw new RuntimeException("clazz must not be an interface");
 
             for (Class item : clazz.getInterfaces())
             {
