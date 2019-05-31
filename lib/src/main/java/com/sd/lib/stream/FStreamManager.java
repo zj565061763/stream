@@ -200,7 +200,7 @@ public class FStreamManager
 
         private boolean checkTag(FStream stream)
         {
-            final Object tag = stream.getTagForClass(mClass);
+            final Object tag = stream.getTagForStream(mClass);
             if (mTag == tag)
                 return true;
 
@@ -214,7 +214,7 @@ public class FStreamManager
             final Class returnType = method.getReturnType();
 
             final Class<?>[] parameterTypes = method.getParameterTypes();
-            if ("getTagForClass".equals(methodName)
+            if ("getTagForStream".equals(methodName)
                     && parameterTypes.length == 1 && parameterTypes[0] == Class.class)
             {
                 throw new RuntimeException(methodName + " method can not be called on proxy instance");
