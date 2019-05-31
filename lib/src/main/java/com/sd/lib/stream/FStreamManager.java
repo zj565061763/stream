@@ -49,7 +49,7 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    public Class[] register(Object stream)
+    public Class[] register(FStream stream)
     {
         return register(stream, (Class[]) null);
     }
@@ -61,7 +61,7 @@ public class FStreamManager
      * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
      * @return 返回注册的接口
      */
-    public synchronized Class[] register(Object stream, Class... targetClass)
+    public synchronized Class[] register(FStream stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
@@ -91,7 +91,7 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    public Class[] unregister(Object stream)
+    public Class[] unregister(FStream stream)
     {
         return unregister(stream, (Class[]) null);
     }
@@ -103,7 +103,7 @@ public class FStreamManager
      * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
      * @return 返回取消注册的接口
      */
-    public synchronized Class[] unregister(Object stream, Class... targetClass)
+    public synchronized Class[] unregister(FStream stream, Class... targetClass)
     {
         final Class[] classes = getStreamClass(stream, targetClass);
         for (Class item : classes)
