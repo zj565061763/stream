@@ -6,12 +6,12 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -19,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class FStreamManager
 {
-    private static final Map<Class<? extends FStream>, List<FStream>> MAP_STREAM = new HashMap<>();
+    private static final Map<Class<? extends FStream>, List<FStream>> MAP_STREAM = new ConcurrentHashMap<>();
     private static final FStreamManager INSTANCE = new FStreamManager();
 
     private boolean mIsDebug;
