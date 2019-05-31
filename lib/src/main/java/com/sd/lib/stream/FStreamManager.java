@@ -49,9 +49,9 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    public Class[] register(FStream stream)
+    public Class<? extends FStream>[] register(FStream stream)
     {
-        return register(stream, (Class[]) null);
+        return register(stream, (Class<? extends FStream>[]) null);
     }
 
     /**
@@ -61,10 +61,10 @@ public class FStreamManager
      * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
      * @return 返回注册的接口
      */
-    public synchronized Class[] register(FStream stream, Class... targetClass)
+    public synchronized Class<? extends FStream>[] register(FStream stream, Class<? extends FStream>... targetClass)
     {
-        final Class[] classes = getStreamClass(stream, targetClass);
-        for (Class item : classes)
+        final Class<? extends FStream>[] classes = getStreamClass(stream, targetClass);
+        for (Class<? extends FStream> item : classes)
         {
             List<FStream> holder = MAP_STREAM.get(item);
             if (holder == null)
@@ -91,9 +91,9 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    public Class[] unregister(FStream stream)
+    public Class<? extends FStream>[] unregister(FStream stream)
     {
-        return unregister(stream, (Class[]) null);
+        return unregister(stream, (Class<? extends FStream>[]) null);
     }
 
     /**
@@ -103,10 +103,10 @@ public class FStreamManager
      * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
      * @return 返回取消注册的接口
      */
-    public synchronized Class[] unregister(FStream stream, Class... targetClass)
+    public synchronized Class<? extends FStream>[] unregister(FStream stream, Class<? extends FStream>... targetClass)
     {
-        final Class[] classes = getStreamClass(stream, targetClass);
-        for (Class item : classes)
+        final Class<? extends FStream>[] classes = getStreamClass(stream, targetClass);
+        for (Class<? extends FStream> item : classes)
         {
             final List<FStream> holder = MAP_STREAM.get(item);
             if (holder == null)
@@ -124,17 +124,17 @@ public class FStreamManager
         return classes;
     }
 
-    private Class[] getStreamClass(FStream stream, Class... targetClass)
+    private Class<? extends FStream>[] getStreamClass(FStream stream, Class<? extends FStream>... targetClass)
     {
         final Class<?> sourceClass = stream.getClass();
         if (Proxy.isProxyClass(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
 
-        final Set<Class> set = findAllStreamClass(sourceClass);
+        final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass);
 
         if (targetClass != null && targetClass.length > 0)
         {
-            for (Class item : targetClass)
+            for (Class<? extends FStream> item : targetClass)
             {
                 if (!set.contains(item))
                     throw new RuntimeException("targetClass not found:" + item);
@@ -146,9 +146,9 @@ public class FStreamManager
         }
     }
 
-    private Set<Class> findAllStreamClass(Class<?> clazz)
+    private Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz)
     {
-        final Set<Class> set = new HashSet<>();
+        final Set<Class<? extends FStream>> set = new HashSet<>();
 
         while (true)
         {
@@ -159,10 +159,10 @@ public class FStreamManager
             if (clazz.isInterface())
                 throw new RuntimeException("clazz must not be an interface");
 
-            for (Class item : clazz.getInterfaces())
+            for (Class<?> item : clazz.getInterfaces())
             {
                 if (FStream.class.isAssignableFrom(item) && FStream.class != item)
-                    set.add(item);
+                    set.add((Class<? extends FStream>) item);
             }
 
             clazz = clazz.getSuperclass();
