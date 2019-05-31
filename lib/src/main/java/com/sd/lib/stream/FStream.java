@@ -14,10 +14,10 @@ public interface FStream
      * <p>
      * 代理对象方法被触发的时候，会调用流对象的这个方法返回一个tag用于和代理对象的tag比较，tag相等的流对象才会被通知
      *
-     * @param clazz 对应哪个接口的方法被触发
+     * @param clazz 哪个接口的代理对象方法被触发
      * @return
      */
-    default Object getTagForStream(Class clazz)
+    default Object getTagForStream(Class<? extends FStream> clazz)
     {
         return null;
     }
@@ -36,7 +36,7 @@ public interface FStream
 
     class ProxyBuilder
     {
-        Class mClass;
+        Class<? extends FStream> mClass;
         Object mTag;
         DispatchCallback mDispatchCallback;
         ResultFilter mResultFilter;

@@ -175,7 +175,7 @@ public class FStreamManager
     {
         private final FStreamManager mManager;
 
-        private final Class mClass;
+        private final Class<? extends FStream> mClass;
         private final Object mTag;
         private final FStream.DispatchCallback mDispatchCallback;
         private final FStream.ResultFilter mResultFilter;
