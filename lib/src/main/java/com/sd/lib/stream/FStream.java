@@ -87,7 +87,7 @@ public interface FStream
         public <T extends FStream> T build(Class<T> clazz)
         {
             if (clazz == null)
-                throw new NullPointerException("clazz is null");
+                throw new IllegalArgumentException("clazz is null");
             if (!clazz.isInterface())
                 throw new IllegalArgumentException("clazz must be an interface");
             if (clazz == FStream.class)
