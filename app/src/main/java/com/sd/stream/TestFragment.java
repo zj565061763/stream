@@ -50,7 +50,7 @@ public class TestFragment extends Fragment
                 @Override
                 public Object filter(Method method, Object[] methodParams, List<Object> results)
                 {
-                    return results.get(results.size() - 1);
+                    return results.get(0);
                 }
             })
             .build(FragmentCallback.class);
