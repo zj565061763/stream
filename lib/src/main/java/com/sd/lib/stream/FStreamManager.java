@@ -49,7 +49,23 @@ public class FStreamManager
      * @param stream
      * @return 返回注册的接口
      */
-    public synchronized Class<? extends FStream>[] register(FStream stream)
+    public Class<? extends FStream>[] register(FStream stream)
+    {
+        return registerInternal(stream);
+    }
+
+    /**
+     * 取消注册流对象
+     *
+     * @param stream
+     * @return 返回取消注册的接口
+     */
+    public Class<? extends FStream>[] unregister(FStream stream)
+    {
+        return unregisterInternal(stream);
+    }
+
+    private synchronized Class<? extends FStream>[] registerInternal(FStream stream)
     {
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
@@ -73,13 +89,7 @@ public class FStreamManager
         return classes;
     }
 
-    /**
-     * 取消注册流对象
-     *
-     * @param stream
-     * @return 返回取消注册的接口
-     */
-    public synchronized Class<? extends FStream>[] unregister(FStream stream)
+    private synchronized Class<? extends FStream>[] unregisterInternal(FStream stream)
     {
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
