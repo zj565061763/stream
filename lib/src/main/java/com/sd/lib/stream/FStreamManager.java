@@ -47,34 +47,11 @@ public class FStreamManager
      * 注册流对象
      *
      * @param stream
-     * @return
-     */
-    public Class<? extends FStream>[] register(FStream stream)
-    {
-        return register(stream, (Class<? extends FStream>[]) null);
-    }
-
-    /**
-     * 取消注册流对象
-     *
-     * @param stream
-     * @return
-     */
-    public Class<? extends FStream>[] unregister(FStream stream)
-    {
-        return unregister(stream, (Class<? extends FStream>[]) null);
-    }
-
-    /**
-     * 注册流对象
-     *
-     * @param stream
-     * @param targetClass 要注册的接口，如果为null则当前流对象实现的所有流接口都会被注册
      * @return 返回注册的接口
      */
-    public synchronized Class<? extends FStream>[] register(FStream stream, Class<? extends FStream>... targetClass)
+    public synchronized Class<? extends FStream>[] register(FStream stream)
     {
-        final Class<? extends FStream>[] classes = getStreamClass(stream, targetClass);
+        final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
             List<FStream> holder = MAP_STREAM.get(item);
@@ -100,12 +77,11 @@ public class FStreamManager
      * 取消注册流对象
      *
      * @param stream
-     * @param targetClass 要取消注册的接口，如果为null则当前流对象实现的所有流接口都会被取消注册
      * @return 返回取消注册的接口
      */
-    public synchronized Class<? extends FStream>[] unregister(FStream stream, Class<? extends FStream>... targetClass)
+    public synchronized Class<? extends FStream>[] unregister(FStream stream)
     {
-        final Class<? extends FStream>[] classes = getStreamClass(stream, targetClass);
+        final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
             final List<FStream> holder = MAP_STREAM.get(item);
@@ -124,26 +100,14 @@ public class FStreamManager
         return classes;
     }
 
-    private Class<? extends FStream>[] getStreamClass(FStream stream, Class<? extends FStream>... targetClass)
+    private Class<? extends FStream>[] getStreamClass(FStream stream)
     {
         final Class<?> sourceClass = stream.getClass();
         if (Proxy.isProxyClass(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass);
-
-        if (targetClass != null && targetClass.length > 0)
-        {
-            for (Class<? extends FStream> item : targetClass)
-            {
-                if (!set.contains(item))
-                    throw new RuntimeException("targetClass not found:" + item);
-            }
-            return targetClass;
-        } else
-        {
-            return set.toArray(new Class[set.size()]);
-        }
+        return set.toArray(new Class[set.size()]);
     }
 
     private Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz)
