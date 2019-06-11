@@ -1,6 +1,7 @@
 package com.sd.lib.stream;
 
 import android.util.Log;
+import android.view.View;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -11,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -20,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class FStreamManager
 {
     private static final Map<Class<? extends FStream>, List<FStream>> MAP_STREAM = new ConcurrentHashMap<>();
+    private static final Map<FStream, ViewStreamBinder> MAP_STREAM_BINDER = new WeakHashMap<>();
     private static final FStreamManager INSTANCE = new FStreamManager();
 
     private boolean mIsDebug;
@@ -44,6 +47,25 @@ public class FStreamManager
     }
 
     /**
+     * {@link ViewStreamBinder}
+     *
+     * @param stream
+     * @param view   null-取消注册流对象，并解除绑定
+     */
+    public synchronized void bind(FStream stream, View view)
+    {
+        final ViewStreamBinder binder = MAP_STREAM_BINDER.remove(stream);
+        if (binder != null)
+            binder.destroy();
+
+        if (view != null)
+        {
+            final ViewStreamBinder newBinder = new ViewStreamBinder(stream, view);
+            MAP_STREAM_BINDER.put(stream, newBinder);
+        }
+    }
+
+    /**
      * 注册流对象
      *
      * @param stream
@@ -65,7 +87,7 @@ public class FStreamManager
         return unregisterInternal(stream);
     }
 
-    private synchronized Class<? extends FStream>[] registerInternal(FStream stream)
+    synchronized Class<? extends FStream>[] registerInternal(FStream stream)
     {
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
@@ -89,7 +111,7 @@ public class FStreamManager
         return classes;
     }
 
-    private synchronized Class<? extends FStream>[] unregisterInternal(FStream stream)
+    synchronized Class<? extends FStream>[] unregisterInternal(FStream stream)
     {
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
