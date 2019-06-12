@@ -52,28 +52,41 @@ public class FStreamManager
      * @param stream
      * @param view   null-取消注册流对象，并解除绑定
      */
-    public synchronized void bind(FStream stream, View view)
+    public void bind(FStream stream, View view)
     {
-        final ViewStreamBinder binder = MAP_STREAM_BINDER.remove(stream);
-        if (binder != null)
+        synchronized (MAP_STREAM_BINDER)
         {
-            binder.destroy();
+            final ViewStreamBinder binder = MAP_STREAM_BINDER.remove(stream);
+            if (binder != null)
+            {
+                binder.destroy();
 
-            if (mIsDebug)
-                Log.e(FStream.class.getSimpleName(), "bind destroy:" + stream + " View:" + binder.getView() + " count:" + (MAP_STREAM_BINDER.size()));
+                if (mIsDebug)
+                    Log.e(FStream.class.getSimpleName(), "bind destroy:" + stream + " View:" + binder.getView() + " count:" + (MAP_STREAM_BINDER.size()));
+            }
+
+            if (view != null)
+            {
+                final Class<? extends FStream>[] classes = getStreamClass(stream, true);
+                if (classes.length > 0)
+                {
+                    final ViewStreamBinder newBinder = new ViewStreamBinder(stream, view);
+                    MAP_STREAM_BINDER.put(stream, newBinder);
+
+                    if (mIsDebug)
+                        Log.i(FStream.class.getSimpleName(), "bind:" + stream + " View:" + view + " count:" + (MAP_STREAM_BINDER.size()));
+                }
+            }
         }
+    }
 
-        if (view != null)
+    private void checkStreamBind(FStream stream, boolean register)
+    {
+        synchronized (MAP_STREAM_BINDER)
         {
-            final Class<? extends FStream>[] classes = getStreamClass(stream, true);
-            if (classes.length <= 0)
-                return;
-
-            final ViewStreamBinder newBinder = new ViewStreamBinder(stream, view);
-            MAP_STREAM_BINDER.put(stream, newBinder);
-
-            if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "bind:" + stream + " View:" + view + " count:" + (MAP_STREAM_BINDER.size()));
+            final ViewStreamBinder binder = MAP_STREAM_BINDER.get(stream);
+            if (binder != null)
+                throw new IllegalArgumentException((register ? "register" : "unregister") + " failed because stream has bind: " + stream + " View:" + binder.getView());
         }
     }
 
@@ -85,6 +98,7 @@ public class FStreamManager
      */
     public Class<? extends FStream>[] register(FStream stream)
     {
+        checkStreamBind(stream, true);
         return registerInternal(stream);
     }
 
@@ -96,6 +110,7 @@ public class FStreamManager
      */
     public Class<? extends FStream>[] unregister(FStream stream)
     {
+        checkStreamBind(stream, false);
         return unregisterInternal(stream);
     }
 
