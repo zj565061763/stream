@@ -56,7 +56,7 @@ public class FStreamManager
     public void bind(FStream stream, Activity activity)
     {
         if (activity.isFinishing())
-            throw new IllegalArgumentException("Bind failed because activity is isFinishing");
+            throw new IllegalArgumentException("Bind stream failed because activity is isFinishing");
 
         bind(stream, activity.getWindow().getDecorView());
     }

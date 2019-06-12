@@ -28,7 +28,7 @@ class ViewStreamBinder
         if (context instanceof Activity)
         {
             if (((Activity) context).isFinishing())
-                throw new IllegalArgumentException("Bind failed because view's host activity is isFinishing");
+                throw new IllegalArgumentException("Bind stream failed because view's host activity is isFinishing");
         }
 
         mStream = new WeakReference<>(stream);
