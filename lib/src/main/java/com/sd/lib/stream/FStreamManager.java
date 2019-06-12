@@ -48,18 +48,18 @@ public class FStreamManager
     }
 
     /**
-     * {@link #bind(FStream, View)}
+     * {@link #bindView(FStream, View)}
      *
      * @param stream
      * @param activity null-取消注册流对象，并解除绑定
      */
-    public void bind(FStream stream, Activity activity)
+    public void bindActivity(FStream stream, Activity activity)
     {
         if (activity != null && activity.isFinishing())
             throw new IllegalArgumentException("Bind stream failed because activity is isFinishing");
 
         final View view = activity == null ? null : activity.getWindow().getDecorView();
-        bind(stream, view);
+        bindView(stream, view);
     }
 
     /**
@@ -68,7 +68,7 @@ public class FStreamManager
      * @param stream
      * @param view   null-取消注册流对象，并解除绑定
      */
-    public void bind(FStream stream, View view)
+    public void bindView(FStream stream, View view)
     {
         synchronized (MAP_STREAM_BINDER)
         {
