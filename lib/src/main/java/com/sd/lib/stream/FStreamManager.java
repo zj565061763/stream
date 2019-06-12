@@ -51,14 +51,15 @@ public class FStreamManager
      * {@link #bind(FStream, View)}
      *
      * @param stream
-     * @param activity
+     * @param activity null-取消注册流对象，并解除绑定
      */
     public void bind(FStream stream, Activity activity)
     {
-        if (activity.isFinishing())
+        if (activity != null && activity.isFinishing())
             throw new IllegalArgumentException("Bind stream failed because activity is isFinishing");
 
-        bind(stream, activity.getWindow().getDecorView());
+        final View view = activity == null ? null : activity.getWindow().getDecorView();
+        bind(stream, view);
     }
 
     /**
