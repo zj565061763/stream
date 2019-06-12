@@ -53,7 +53,11 @@ class ViewStreamBinder
     {
         final FStream stream = mStream.get();
         if (stream != null && isAttached(mView.get()))
-            FStreamManager.getInstance().registerInternal(stream);
+        {
+            final Class<? extends FStream>[] classes = FStreamManager.getInstance().registerInternal(stream);
+            if (classes.length <= 0)
+                destroy();
+        }
     }
 
     private void unregisterStream()
