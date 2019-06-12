@@ -1,5 +1,7 @@
 package com.sd.lib.stream;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.view.View;
 
@@ -21,6 +23,13 @@ class ViewStreamBinder
     {
         if (stream == null || view == null)
             throw new IllegalArgumentException("stream or view is null when create " + ViewStreamBinder.class.getName());
+
+        final Context context = view.getContext();
+        if (context instanceof Activity)
+        {
+            if (((Activity) context).isFinishing())
+                throw new IllegalArgumentException("Bind failed because view's host activity is isFinishing");
+        }
 
         mStream = new WeakReference<>(stream);
         mView = new WeakReference<>(view);
