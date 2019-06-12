@@ -65,6 +65,10 @@ public class FStreamManager
 
         if (view != null)
         {
+            final Class<? extends FStream>[] classes = getStreamClass(stream, true);
+            if (classes.length <= 0)
+                return;
+
             final ViewStreamBinder newBinder = new ViewStreamBinder(stream, view);
             MAP_STREAM_BINDER.put(stream, newBinder);
 
