@@ -1,5 +1,6 @@
 package com.sd.lib.stream;
 
+import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
@@ -44,6 +45,20 @@ public class FStreamManager
     public void setDebug(boolean debug)
     {
         mIsDebug = debug;
+    }
+
+    /**
+     * {@link #bind(FStream, View)}
+     *
+     * @param stream
+     * @param activity
+     */
+    public void bind(FStream stream, Activity activity)
+    {
+        if (activity.isFinishing())
+            throw new IllegalArgumentException("Bind failed because activity is isFinishing");
+
+        bind(stream, activity.getWindow().getDecorView());
     }
 
     /**
