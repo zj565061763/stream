@@ -146,11 +146,11 @@ public class FStreamManager
         if (Proxy.isProxyClass(sourceClass))
             throw new IllegalArgumentException("proxy instance is not supported");
 
-        final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass);
+        final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass, false);
         return set.toArray(new Class[set.size()]);
     }
 
-    private Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz)
+    private Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz, boolean getOne)
     {
         final Set<Class<? extends FStream>> set = new HashSet<>();
 
@@ -166,8 +166,16 @@ public class FStreamManager
             for (Class<?> item : clazz.getInterfaces())
             {
                 if (FStream.class.isAssignableFrom(item) && FStream.class != item)
+                {
                     set.add((Class<? extends FStream>) item);
+
+                    if (getOne && set.size() > 0)
+                        break;
+                }
             }
+
+            if (getOne && set.size() > 0)
+                break;
 
             clazz = clazz.getSuperclass();
         }
