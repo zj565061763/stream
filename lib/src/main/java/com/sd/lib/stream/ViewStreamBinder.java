@@ -29,6 +29,11 @@ class ViewStreamBinder
         registerStream();
     }
 
+    public final View getView()
+    {
+        return mView.get();
+    }
+
     private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener()
     {
         @Override
@@ -61,7 +66,7 @@ class ViewStreamBinder
     /**
      * 取消注册流对象，并解除绑定关系
      */
-    void destroy()
+    public final void destroy()
     {
         final View view = mView.get();
         if (view != null)

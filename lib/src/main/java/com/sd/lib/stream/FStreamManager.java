@@ -56,12 +56,20 @@ public class FStreamManager
     {
         final ViewStreamBinder binder = MAP_STREAM_BINDER.remove(stream);
         if (binder != null)
+        {
             binder.destroy();
+
+            if (mIsDebug)
+                Log.e(FStream.class.getSimpleName(), "bind destroy:" + stream + " View:" + binder.getView() + " count:" + (MAP_STREAM_BINDER.size()));
+        }
 
         if (view != null)
         {
             final ViewStreamBinder newBinder = new ViewStreamBinder(stream, view);
             MAP_STREAM_BINDER.put(stream, newBinder);
+
+            if (mIsDebug)
+                Log.i(FStream.class.getSimpleName(), "bind:" + stream + " View:" + view + " count:" + (MAP_STREAM_BINDER.size()));
         }
     }
 
