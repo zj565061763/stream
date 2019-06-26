@@ -1,6 +1,5 @@
 package com.sd.lib.stream;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
@@ -45,21 +44,6 @@ public class FStreamManager
     public void setDebug(boolean debug)
     {
         mIsDebug = debug;
-    }
-
-    /**
-     * {@link #bindView(FStream, View)}
-     *
-     * @param stream
-     * @param activity null-取消注册流对象，并解除绑定
-     */
-    public void bindActivity(FStream stream, Activity activity)
-    {
-        if (activity != null && activity.isFinishing())
-            throw new IllegalArgumentException("Bind stream failed because activity is isFinishing");
-
-        final View view = activity == null ? null : activity.getWindow().getDecorView();
-        bindView(stream, view);
     }
 
     /**
