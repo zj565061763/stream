@@ -99,7 +99,7 @@ public class FStreamManager
             binder.destroy();
 
             if (mIsDebug)
-                Log.e(FStream.class.getSimpleName(), "Bind destroy stream:" + stream + " target:" + binder.getTarget());
+                Log.e(FStream.class.getSimpleName(), "bind destroyed stream:" + stream + " target:" + binder.getTarget());
         }
     }
 
@@ -115,7 +115,7 @@ public class FStreamManager
         {
             final StreamBinder binder = MAP_STREAM_BINDER.get(stream);
             if (binder != null)
-                throw new IllegalArgumentException("Stream has bound stream: " + stream + " target:" + binder.getTarget());
+                throw new IllegalArgumentException("stream has bound stream: " + stream + " target:" + binder.getTarget());
         }
     }
 
