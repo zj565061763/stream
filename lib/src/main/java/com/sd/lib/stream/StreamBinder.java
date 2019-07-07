@@ -1,0 +1,73 @@
+package com.sd.lib.stream;
+
+import java.lang.ref.WeakReference;
+
+public abstract class StreamBinder<T>
+{
+    private final WeakReference<FStream> mStream;
+    private final WeakReference<T> mTarget;
+
+    protected StreamBinder(FStream stream, T target)
+    {
+        if (stream == null)
+            throw new IllegalArgumentException("stream is null when create " + getClass().getName());
+
+        if (target == null)
+            throw new IllegalArgumentException("target is null when create " + getClass().getName());
+
+        mStream = new WeakReference<>(stream);
+        mTarget = new WeakReference<>(target);
+    }
+
+    /**
+     * 返回Stream对象
+     *
+     * @return
+     */
+    public final FStream getStream()
+    {
+        return mStream.get();
+    }
+
+    /**
+     * 返回要绑定的对象
+     *
+     * @return
+     */
+    public final T getTarget()
+    {
+        return mTarget.get();
+    }
+
+    /**
+     * 注册流对象
+     */
+    protected void registerStream()
+    {
+        final FStream stream = mStream.get();
+        if (stream != null)
+        {
+            final Class<? extends FStream>[] classes = FStreamManager.getInstance().registerInternal(stream);
+            if (classes.length <= 0)
+                destroy();
+        }
+    }
+
+    /**
+     * 取消注册流对象
+     */
+    protected final void unregisterStream()
+    {
+        final FStream stream = mStream.get();
+        if (stream != null)
+            FStreamManager.getInstance().unregisterInternal(stream);
+    }
+
+    /**
+     * 取消注册流对象，并解除绑定关系
+     */
+    public void destroy()
+    {
+        unregisterStream();
+    }
+}
