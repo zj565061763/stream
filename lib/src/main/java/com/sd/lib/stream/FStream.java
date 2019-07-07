@@ -17,22 +17,7 @@ public interface FStream
      * @param clazz 哪个接口的代理对象方法被触发
      * @return
      */
-    default Object getTagForStream(Class<? extends FStream> clazz)
-    {
-        return null;
-    }
-
-    /**
-     * 创建一个流代理对象返回
-     *
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    static <T extends FStream> T newProxy(Class<T> clazz)
-    {
-        return new ProxyBuilder().build(clazz);
-    }
+    Object getTagForStream(Class<? extends FStream> clazz);
 
     class ProxyBuilder
     {

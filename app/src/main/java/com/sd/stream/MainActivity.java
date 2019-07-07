@@ -3,6 +3,7 @@ package com.sd.stream;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.sd.lib.stream.FStream;
 import com.sd.lib.stream.FStreamManager;
 
 public class MainActivity extends AppCompatActivity
@@ -25,8 +26,14 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private TestFragment.FragmentCallback mCallback1 = new TestFragment.FragmentCallback()
+    private final TestFragment.FragmentCallback mCallback1 = new TestFragment.FragmentCallback()
     {
+        @Override
+        public Object getTagForStream(Class<? extends FStream> clazz)
+        {
+            return null;
+        }
+
         @Override
         public String getActivityContent()
         {
@@ -34,8 +41,14 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    private TestFragment.FragmentCallback mCallback2 = new TestFragment.FragmentCallback()
+    private final TestFragment.FragmentCallback mCallback2 = new TestFragment.FragmentCallback()
     {
+        @Override
+        public Object getTagForStream(Class<? extends FStream> clazz)
+        {
+            return null;
+        }
+
         @Override
         public String getActivityContent()
         {
@@ -43,8 +56,14 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    private TestFragment.FragmentCallback mCallback3 = new TestFragment.FragmentCallback()
+    private final TestFragment.FragmentCallback mCallback3 = new TestFragment.FragmentCallback()
     {
+        @Override
+        public Object getTagForStream(Class<? extends FStream> clazz)
+        {
+            return null;
+        }
+
         @Override
         public String getActivityContent()
         {
