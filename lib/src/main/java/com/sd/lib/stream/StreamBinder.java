@@ -20,16 +20,6 @@ public abstract class StreamBinder<T>
     }
 
     /**
-     * 返回Stream对象
-     *
-     * @return
-     */
-    public final FStream getStream()
-    {
-        return mStream.get();
-    }
-
-    /**
      * 返回要绑定的对象
      *
      * @return
