@@ -223,12 +223,9 @@ public class FStreamManager
                     set.add((Class<? extends FStream>) item);
 
                     if (getOne && set.size() > 0)
-                        break;
+                        return set;
                 }
             }
-
-            if (getOne && set.size() > 0)
-                break;
 
             clazz = clazz.getSuperclass();
         }
