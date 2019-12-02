@@ -3,12 +3,17 @@ package com.sd.lib.stream;
 public class SimpleDefaultStreamFactory implements FStreamManager.DefaultStreamFactory
 {
     @Override
-    public FStream create(Class<? extends FStream> classStream, Class<? extends FStream> classDefaultStream)
+    public final FStream create(Class<? extends FStream> classStream, Class<? extends FStream> classDefaultStream)
     {
-        FStream stream = null;
+        final FStream stream = newInstance(classStream, classDefaultStream);
+        return stream;
+    }
+
+    protected FStream newInstance(Class<? extends FStream> classStream, Class<? extends FStream> classDefaultStream)
+    {
         try
         {
-            stream = classDefaultStream.newInstance();
+            return classDefaultStream.newInstance();
         } catch (InstantiationException e)
         {
             e.printStackTrace();
@@ -16,6 +21,6 @@ public class SimpleDefaultStreamFactory implements FStreamManager.DefaultStreamF
         {
             e.printStackTrace();
         }
-        return stream;
+        return null;
     }
 }
