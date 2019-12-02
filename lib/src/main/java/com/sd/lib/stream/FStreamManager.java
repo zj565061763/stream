@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.sd.lib.stream.factory.DefaultStreamFactory;
-import com.sd.lib.stream.factory.SimpleDefaultStreamFactory;
+import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -421,7 +421,7 @@ public class FStreamManager
             return null;
 
         if (mDefaultStreamFactory == null)
-            mDefaultStreamFactory = new SimpleDefaultStreamFactory();
+            mDefaultStreamFactory = new WeakCacheDefaultStreamFactory();
 
         return mDefaultStreamFactory.create(new DefaultStreamFactory.CreateParam(clazz, defaultClass));
     }
