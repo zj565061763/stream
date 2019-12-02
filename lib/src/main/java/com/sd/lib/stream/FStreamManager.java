@@ -385,6 +385,13 @@ public class FStreamManager
     private final Map<Class<? extends FStream>, Class<? extends FStream>> mMapDefaultStreamClass = new ConcurrentHashMap<>();
     private DefaultStreamFactory mDefaultStreamFactory;
 
+    /**
+     * 注册默认的流接口实现类
+     * <p>
+     * {@link DefaultStreamFactory}
+     *
+     * @param clazz
+     */
     public synchronized void registerDefaultStream(Class<? extends FStream> clazz)
     {
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
@@ -397,6 +404,11 @@ public class FStreamManager
         }
     }
 
+    /**
+     * 取消注册默认的流接口实现类
+     *
+     * @param clazz
+     */
     public synchronized void unregisterDefaultStream(Class<? extends FStream> clazz)
     {
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
@@ -409,6 +421,11 @@ public class FStreamManager
         }
     }
 
+    /**
+     * 设置{@link DefaultStreamFactory}
+     *
+     * @param defaultStreamFactory
+     */
     public synchronized void setDefaultStreamFactory(DefaultStreamFactory defaultStreamFactory)
     {
         mDefaultStreamFactory = defaultStreamFactory;
