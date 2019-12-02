@@ -337,7 +337,7 @@ public class FStreamManager
                     if (mDispatchCallback.beforeDispatch(item, method, args))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "notify breaked before dispatch");
+                            Log.i(FStream.class.getSimpleName(), "notify broken before dispatch");
                         break;
                     }
                 }
@@ -357,7 +357,7 @@ public class FStreamManager
                     if (mDispatchCallback.afterDispatch(item, method, args, itemResult))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "notify breaked after dispatch");
+                            Log.i(FStream.class.getSimpleName(), "notify broken after dispatch");
                         break;
                     }
                 }
