@@ -17,5 +17,8 @@ public class App extends Application
 
         // 打开调试模式
         FStreamManager.getInstance().setDebug(true);
+
+        // 注册默认的Stream
+        FStreamManager.getInstance().registerDefaultStream(DefaultFragmentCallback.class);
     }
 }
