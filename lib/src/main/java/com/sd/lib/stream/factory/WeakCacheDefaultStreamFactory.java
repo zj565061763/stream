@@ -25,7 +25,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
     {
         final WeakReference<FStream> reference = mMapStream.get(param.classStream);
         final FStream stream = reference == null ? null : reference.get();
-        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream + " stream:" + stream);
+        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
         return stream;
     }
 
@@ -37,8 +37,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         final WeakReference<FStream> reference = new WeakReference<>(stream, mReferenceQueue);
         mMapStream.put(param.classStream, reference);
         mMapStreamReverse.put(reference, param.classStream);
-        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "setCache for class:" + param.classStream + " stream:" + stream + "\r\n" +
-                "size:" + mMapStream.size() + "," + mMapStreamReverse.size());
+        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "setCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
     }
 
     private void releaseReference()
@@ -58,7 +57,12 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
 
         if (count > 0)
         {
-            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference count:" + count + " size:" + mMapStream.size() + "," + mMapStreamReverse.size());
+            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference count:" + count + getSizeLog());
         }
+    }
+
+    private String getSizeLog()
+    {
+        return "\r\n" + "size:" + mMapStream.size() + "," + mMapStreamReverse.size();
     }
 }
