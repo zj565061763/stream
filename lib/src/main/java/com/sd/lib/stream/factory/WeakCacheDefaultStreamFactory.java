@@ -1,5 +1,7 @@
 package com.sd.lib.stream.factory;
 
+import android.util.Log;
+
 import com.sd.lib.stream.FStream;
 
 import java.lang.ref.Reference;
@@ -23,6 +25,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
     {
         final WeakReference<FStream> reference = mMapStream.get(param.classStream);
         final FStream stream = reference == null ? null : reference.get();
+        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream + " stream:" + stream);
         return stream;
     }
 
@@ -34,18 +37,28 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         final WeakReference<FStream> reference = new WeakReference<>(stream, mReferenceQueue);
         mMapStream.put(param.classStream, reference);
         mMapStreamReverse.put(reference, param.classStream);
+        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "setCache for class:" + param.classStream + " stream:" + stream + "\r\n" +
+                "size:" + mMapStream.size() + "," + mMapStreamReverse.size());
     }
 
     private void releaseReference()
     {
+        int count = 0;
         while (true)
         {
             final Reference<? extends FStream> reference = mReferenceQueue.poll();
             if (reference == null)
-                return;
+                break;
 
             final Class<? extends FStream> clazz = mMapStreamReverse.remove(reference);
             mMapStream.remove(clazz);
+
+            count++;
+        }
+
+        if (count > 0)
+        {
+            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference count:" + count + " size:" + mMapStream.size() + "," + mMapStreamReverse.size());
         }
     }
 }
