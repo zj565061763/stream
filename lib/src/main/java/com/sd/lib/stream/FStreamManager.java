@@ -7,6 +7,7 @@ import android.view.View;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -302,13 +303,24 @@ public class FStreamManager
 
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
-            final List<FStream> holder = mManager.mMapStream.get(mClass);
+            List<FStream> holder = mManager.mMapStream.get(mClass);
 
             if (mManager.isDebug())
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + (holder == null ? 0 : holder.size()));
 
             if (holder == null)
-                return null;
+            {
+                final FStream stream = mManager.getDefaultStream(mClass);
+                if (stream == null)
+                {
+                    return null;
+                } else
+                {
+                    holder = new ArrayList<>(1);
+                    holder.add(stream);
+                    Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
+                }
+            }
 
             final boolean filterResult = mResultFilter != null && !isVoid;
             final List<Object> listResult = filterResult ? new LinkedList<>() : null;
@@ -364,4 +376,57 @@ public class FStreamManager
             return result;
         }
     }
+
+    //---------- default stream start ----------
+
+    private final Map<Class<? extends FStream>, Class<? extends FStream>> mMapDefaultStreamClass = new ConcurrentHashMap<>();
+    private DefaultStreamFactory mDefaultStreamFactory;
+
+    public synchronized void registerDefaultStream(Class<? extends FStream> clazz)
+    {
+        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
+        if (set.isEmpty())
+            return;
+
+        for (Class<? extends FStream> item : set)
+        {
+            mMapDefaultStreamClass.put(item, clazz);
+        }
+    }
+
+    public synchronized void unregisterDefaultStream(Class<? extends FStream> clazz)
+    {
+        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
+        if (set.isEmpty())
+            return;
+
+        for (Class<? extends FStream> item : set)
+        {
+            mMapDefaultStreamClass.remove(item);
+        }
+    }
+
+    public synchronized void setDefaultStreamFactory(DefaultStreamFactory defaultStreamFactory)
+    {
+        mDefaultStreamFactory = defaultStreamFactory;
+    }
+
+    private synchronized FStream getDefaultStream(Class<? extends FStream> clazz)
+    {
+        final Class<? extends FStream> defaultClass = mMapDefaultStreamClass.get(clazz);
+        if (defaultClass == null)
+            return null;
+
+        if (mDefaultStreamFactory == null)
+            mDefaultStreamFactory = new SimpleDefaultStreamFactory();
+
+        return mDefaultStreamFactory.create(clazz, defaultClass);
+    }
+
+    public interface DefaultStreamFactory
+    {
+        FStream create(Class<? extends FStream> classStream, Class<? extends FStream> classDefaultStream);
+    }
+
+    //---------- default stream end ----------
 }
