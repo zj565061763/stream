@@ -22,11 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class FStreamManager
 {
-    private static final Map<Class<? extends FStream>, List<FStream>> MAP_STREAM = new ConcurrentHashMap<>();
-    private static final Map<FStream, StreamBinder> MAP_STREAM_BINDER = new WeakHashMap<>();
     private static final FStreamManager INSTANCE = new FStreamManager();
-
-    private boolean mIsDebug;
 
     private FStreamManager()
     {
@@ -36,6 +32,11 @@ public class FStreamManager
     {
         return INSTANCE;
     }
+
+    private final Map<Class<? extends FStream>, List<FStream>> mMapStream = new ConcurrentHashMap<>();
+    private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
+
+    private boolean mIsDebug;
 
     public boolean isDebug()
     {
@@ -55,13 +56,13 @@ public class FStreamManager
      */
     public void bindActivity(FStream stream, Activity target)
     {
-        synchronized (MAP_STREAM_BINDER)
+        synchronized (mMapStreamBinder)
         {
             removeStreamBinder(stream);
             if (target != null && canBindStream(stream))
             {
                 final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
-                MAP_STREAM_BINDER.put(stream, binder);
+                mMapStreamBinder.put(stream, binder);
 
                 if (mIsDebug)
                     Log.i(FStream.class.getSimpleName(), "bindActivity stream:" + stream + " target:" + target);
@@ -77,13 +78,13 @@ public class FStreamManager
      */
     public void bindView(FStream stream, View target)
     {
-        synchronized (MAP_STREAM_BINDER)
+        synchronized (mMapStreamBinder)
         {
             removeStreamBinder(stream);
             if (target != null && canBindStream(stream))
             {
                 final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
-                MAP_STREAM_BINDER.put(stream, binder);
+                mMapStreamBinder.put(stream, binder);
 
                 if (mIsDebug)
                     Log.i(FStream.class.getSimpleName(), "bindView stream:" + stream + " target:" + target);
@@ -93,7 +94,7 @@ public class FStreamManager
 
     private void removeStreamBinder(FStream stream)
     {
-        final StreamBinder binder = MAP_STREAM_BINDER.remove(stream);
+        final StreamBinder binder = mMapStreamBinder.remove(stream);
         if (binder != null)
         {
             binder.destroy();
@@ -135,9 +136,9 @@ public class FStreamManager
 
     private void checkStreamBinder(FStream stream)
     {
-        synchronized (MAP_STREAM_BINDER)
+        synchronized (mMapStreamBinder)
         {
-            final StreamBinder binder = MAP_STREAM_BINDER.get(stream);
+            final StreamBinder binder = mMapStreamBinder.get(stream);
             if (binder != null)
                 throw new IllegalArgumentException("stream has bound stream: " + stream + " target:" + binder.getTarget());
         }
@@ -148,11 +149,11 @@ public class FStreamManager
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
-            List<FStream> holder = MAP_STREAM.get(item);
+            List<FStream> holder = mMapStream.get(item);
             if (holder == null)
             {
                 holder = new CopyOnWriteArrayList<>();
-                MAP_STREAM.put(item, holder);
+                mMapStream.put(item, holder);
             }
 
             if (!holder.contains(stream))
@@ -172,7 +173,7 @@ public class FStreamManager
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
-            final List<FStream> holder = MAP_STREAM.get(item);
+            final List<FStream> holder = mMapStream.get(item);
             if (holder == null)
                 continue;
 
@@ -182,7 +183,7 @@ public class FStreamManager
                     Log.e(FStream.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
 
                 if (holder.isEmpty())
-                    MAP_STREAM.remove(item);
+                    mMapStream.remove(item);
             }
         }
         return classes;
@@ -301,7 +302,7 @@ public class FStreamManager
 
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
-            final List<FStream> holder = mManager.MAP_STREAM.get(mClass);
+            final List<FStream> holder = mManager.mMapStream.get(mClass);
 
             if (mManager.isDebug())
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + (holder == null ? 0 : holder.size()));
