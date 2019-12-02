@@ -22,7 +22,8 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
     protected FStream getCache(CreateParam param)
     {
         final WeakReference<FStream> reference = mMapStream.get(param.classStream);
-        return reference == null ? null : reference.get();
+        final FStream stream = reference == null ? null : reference.get();
+        return stream;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
             if (reference == null)
                 return;
 
-            final Class<? extends FStream> clazz = mMapStreamReverse.get(reference);
+            final Class<? extends FStream> clazz = mMapStreamReverse.remove(reference);
             mMapStream.remove(clazz);
         }
     }
