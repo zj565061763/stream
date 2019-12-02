@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
+import com.sd.lib.stream.factory.DefaultStreamFactory;
+import com.sd.lib.stream.factory.SimpleDefaultStreamFactory;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -420,12 +423,7 @@ public class FStreamManager
         if (mDefaultStreamFactory == null)
             mDefaultStreamFactory = new SimpleDefaultStreamFactory();
 
-        return mDefaultStreamFactory.create(clazz, defaultClass);
-    }
-
-    public interface DefaultStreamFactory
-    {
-        FStream create(Class<? extends FStream> classStream, Class<? extends FStream> classDefaultStream);
+        return mDefaultStreamFactory.create(new DefaultStreamFactory.CreateParam(clazz, defaultClass));
     }
 
     //---------- default stream end ----------
