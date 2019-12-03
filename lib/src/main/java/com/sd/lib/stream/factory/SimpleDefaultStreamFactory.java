@@ -15,13 +15,9 @@ public class SimpleDefaultStreamFactory implements DefaultStreamFactory
         try
         {
             return param.classDefaultStream.newInstance();
-        } catch (InstantiationException e)
+        } catch (Exception e)
         {
-            e.printStackTrace();
-        } catch (IllegalAccessException e)
-        {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }
