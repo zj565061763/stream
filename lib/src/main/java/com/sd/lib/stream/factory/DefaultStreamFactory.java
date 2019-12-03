@@ -33,5 +33,14 @@ public interface DefaultStreamFactory
             this.classStream = classStream;
             this.classDefaultStream = classDefaultStream;
         }
+
+        @Override
+        public String toString()
+        {
+            final String superInfo = super.toString();
+            return superInfo + "\r\n" +
+                    " classStream:" + classStream + "\r\n" +
+                    " classDefaultStream:" + classDefaultStream;
+        }
     }
 }
