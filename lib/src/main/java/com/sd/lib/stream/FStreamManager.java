@@ -53,24 +53,43 @@ public class FStreamManager
     }
 
     /**
+     * {@link #bindStream(FStream, Activity)}
+     */
+    @Deprecated
+    public void bindActivity(FStream stream, Activity target)
+    {
+        bindStream(stream, target);
+    }
+
+    /**
+     * {@link #bindStream(FStream, View)}
+     */
+    @Deprecated
+    public void bindView(FStream stream, View target)
+    {
+        bindStream(stream, target);
+    }
+
+    /**
      * {@link ActivityStreamBinder}
      *
      * @param stream
-     * @param target null-取消注册流对象，并解除绑定
+     * @param target
      */
-    public void bindActivity(FStream stream, Activity target)
+    public void bindStream(FStream stream, Activity target)
     {
+        if (target == null || !canBindStream(stream))
+            return;
+
         synchronized (mMapStreamBinder)
         {
-            removeStreamBinder(stream);
-            if (target != null && canBindStream(stream))
-            {
-                final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
-                mMapStreamBinder.put(stream, binder);
+            unbindStreamInternal(stream);
 
-                if (mIsDebug)
-                    Log.i(FStream.class.getSimpleName(), "bindActivity stream:" + stream + " target:" + target);
-            }
+            final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
+            mMapStreamBinder.put(stream, binder);
+
+            if (mIsDebug)
+                Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target);
         }
     }
 
@@ -78,25 +97,36 @@ public class FStreamManager
      * {@link ViewStreamBinder}
      *
      * @param stream
-     * @param target null-取消注册流对象，并解除绑定
+     * @param target
      */
-    public void bindView(FStream stream, View target)
+    public void bindStream(FStream stream, View target)
     {
+        if (target == null || !canBindStream(stream))
+            return;
+
         synchronized (mMapStreamBinder)
         {
-            removeStreamBinder(stream);
-            if (target != null && canBindStream(stream))
-            {
-                final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
-                mMapStreamBinder.put(stream, binder);
+            unbindStreamInternal(stream);
 
-                if (mIsDebug)
-                    Log.i(FStream.class.getSimpleName(), "bindView stream:" + stream + " target:" + target);
-            }
+            final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
+            mMapStreamBinder.put(stream, binder);
+
+            if (mIsDebug)
+                Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target);
         }
     }
 
-    private void removeStreamBinder(FStream stream)
+    /**
+     * 解除流对象绑定
+     *
+     * @param stream
+     */
+    public synchronized void unbindStream(FStream stream)
+    {
+        unbindStreamInternal(stream);
+    }
+
+    private void unbindStreamInternal(FStream stream)
     {
         final StreamBinder binder = mMapStreamBinder.remove(stream);
         if (binder != null)
