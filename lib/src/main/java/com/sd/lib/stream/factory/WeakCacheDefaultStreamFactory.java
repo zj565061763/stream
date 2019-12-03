@@ -3,6 +3,7 @@ package com.sd.lib.stream.factory;
 import android.util.Log;
 
 import com.sd.lib.stream.FStream;
+import com.sd.lib.stream.FStreamManager;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -20,18 +21,28 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
 
     private final Map<WeakReference<FStream>, Class<? extends FStream>> mMapStreamReverse = new HashMap<>();
 
+    private boolean isDebug()
+    {
+        return FStreamManager.getInstance().isDebug();
+    }
+
     @Override
     protected FStream getCache(CreateParam param)
     {
         final WeakReference<FStream> reference = mMapStream.get(param.classStream);
         final FStream stream = reference == null ? null : reference.get();
-        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
+
+        if (isDebug())
+            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
 
         if (stream == null && reference != null)
         {
             // 对象已经被回收，移除引用
             if (removeReference(reference))
-                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "removeReference when getCache reference:" + reference + getSizeLog());
+            {
+                if (isDebug())
+                    Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "removeReference when getCache reference:" + reference + getSizeLog());
+            }
         }
 
         return stream;
@@ -46,8 +57,11 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         mMapStream.put(param.classStream, reference);
         mMapStreamReverse.put(reference, param.classStream);
 
-        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "+++++ setCache for class:" + param.classStream.getName() + " stream:" + stream + " reference:" + reference
-                + getSizeLog());
+        if (isDebug())
+        {
+            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "+++++ setCache for class:" + param.classStream.getName() + " stream:" + stream + " reference:" + reference
+                    + getSizeLog());
+        }
     }
 
     private void releaseReference()
@@ -65,7 +79,8 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
 
         if (count > 0)
         {
-            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference count:" + count + getSizeLog());
+            if (isDebug())
+                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference count:" + count + getSizeLog());
         }
     }
 
