@@ -235,8 +235,7 @@ public class FStreamManager
     private Class<? extends FStream>[] getStreamClass(FStream stream, boolean getOne)
     {
         final Class<?> sourceClass = stream.getClass();
-        if (Proxy.isProxyClass(sourceClass))
-            throw new IllegalArgumentException("proxy instance is not supported");
+        checkProxyClass(sourceClass);
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass, getOne);
         return set.toArray(new Class[set.size()]);
@@ -428,6 +427,8 @@ public class FStreamManager
      */
     public synchronized void registerDefaultStream(Class<? extends FStream> clazz)
     {
+        checkProxyClass(clazz);
+
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
         if (set.isEmpty())
             return;
@@ -445,6 +446,8 @@ public class FStreamManager
      */
     public synchronized void unregisterDefaultStream(Class<? extends FStream> clazz)
     {
+        checkProxyClass(clazz);
+
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
         if (set.isEmpty())
             return;
@@ -478,4 +481,10 @@ public class FStreamManager
     }
 
     //---------- default stream end ----------
+
+    private static void checkProxyClass(Class<?> clazz)
+    {
+        if (Proxy.isProxyClass(clazz))
+            throw new IllegalArgumentException("proxy class is not supported");
+    }
 }
