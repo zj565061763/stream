@@ -24,9 +24,20 @@ class ViewStreamBinder extends StreamBinder<View>
             if (((Activity) context).isFinishing())
                 throw new IllegalArgumentException("Bind stream failed because view's host activity is isFinishing");
         }
+    }
 
-        target.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
-        registerStream();
+    @Override
+    public final void bind()
+    {
+        final View target = getTarget();
+        if (target != null)
+        {
+            target.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
+            target.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+
+            if (isAttached(target))
+                registerStream();
+        }
     }
 
     private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener()
@@ -45,14 +56,7 @@ class ViewStreamBinder extends StreamBinder<View>
     };
 
     @Override
-    protected void registerStream()
-    {
-        if (isAttached(getTarget()))
-            super.registerStream();
-    }
-
-    @Override
-    public final void destroy()
+    public void destroy()
     {
         super.destroy();
         final View target = getTarget();

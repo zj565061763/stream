@@ -30,9 +30,14 @@ public abstract class StreamBinder<T>
     }
 
     /**
+     * 绑定
+     */
+    public abstract void bind();
+
+    /**
      * 注册流对象
      */
-    protected void registerStream()
+    protected final void registerStream()
     {
         final FStream stream = mStream.get();
         if (stream != null)

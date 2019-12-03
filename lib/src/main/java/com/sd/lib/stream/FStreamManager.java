@@ -86,6 +86,7 @@ public class FStreamManager
             unbindStreamInternal(stream);
 
             final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
+            binder.bind();
             mMapStreamBinder.put(stream, binder);
 
             if (mIsDebug)
@@ -109,6 +110,7 @@ public class FStreamManager
             unbindStreamInternal(stream);
 
             final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
+            binder.bind();
             mMapStreamBinder.put(stream, binder);
 
             if (mIsDebug)
