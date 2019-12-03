@@ -27,8 +27,12 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         final FStream stream = reference == null ? null : reference.get();
         Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
 
-        if (removeReference(reference))
-            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "removeReference when getCache" + getSizeLog());
+        if (stream == null && reference != null)
+        {
+            // 对象已经被回收，移除引用
+            if (removeReference(reference))
+                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "removeReference when getCache" + getSizeLog());
+        }
 
         return stream;
     }
@@ -65,13 +69,11 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
 
     private boolean removeReference(Reference<? extends FStream> reference)
     {
-        if (reference != null)
-        {
-            final Class<? extends FStream> clazz = mMapStreamReverse.remove(reference);
-            mMapStream.remove(clazz);
-            return true;
-        }
-        return false;
+        if (reference == null)
+            throw new IllegalArgumentException("reference is null");
+
+        final Class<? extends FStream> clazz = mMapStreamReverse.remove(reference);
+        return mMapStream.remove(clazz) == reference;
     }
 
     private String getSizeLog()
