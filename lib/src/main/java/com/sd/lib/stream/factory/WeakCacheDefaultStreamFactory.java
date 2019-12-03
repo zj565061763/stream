@@ -31,7 +31,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         {
             // 对象已经被回收，移除引用
             if (removeReference(reference))
-                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "removeReference when getCache" + getSizeLog());
+                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "removeReference when getCache reference:" + reference + getSizeLog());
         }
 
         return stream;
