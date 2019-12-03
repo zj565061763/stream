@@ -477,7 +477,12 @@ public class FStreamManager
         if (mDefaultStreamFactory == null)
             mDefaultStreamFactory = new WeakCacheDefaultStreamFactory();
 
-        return mDefaultStreamFactory.create(new DefaultStreamFactory.CreateParam(clazz, defaultClass));
+        final DefaultStreamFactory.CreateParam param = new DefaultStreamFactory.CreateParam(clazz, defaultClass);
+        final FStream stream = mDefaultStreamFactory.create(param);
+        if (stream == null)
+            throw new RuntimeException(mDefaultStreamFactory + " create null for param:" + param);
+
+        return stream;
     }
 
     //---------- default stream end ----------
