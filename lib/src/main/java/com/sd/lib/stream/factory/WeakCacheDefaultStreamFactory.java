@@ -45,7 +45,9 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         final WeakReference<FStream> reference = new WeakReference<>(stream, mReferenceQueue);
         mMapStream.put(param.classStream, reference);
         mMapStreamReverse.put(reference, param.classStream);
-        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "setCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
+
+        Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "setCache for class:" + param.classStream.getName() + " stream:" + stream + " reference:" + reference
+                + getSizeLog());
     }
 
     private void releaseReference()
