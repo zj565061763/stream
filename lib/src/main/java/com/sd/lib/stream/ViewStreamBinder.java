@@ -27,17 +27,19 @@ class ViewStreamBinder extends StreamBinder<View>
     }
 
     @Override
-    public final void bind()
+    public final boolean bind()
     {
         final View target = getTarget();
-        if (target != null)
-        {
-            target.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
-            target.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+        if (target == null)
+            return false;
 
-            if (isAttached(target))
-                registerStream();
-        }
+        target.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
+        target.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+
+        if (isAttached(target))
+            registerStream();
+
+        return true;
     }
 
     private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener()

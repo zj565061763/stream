@@ -86,11 +86,12 @@ public class FStreamManager
             unbindStreamInternal(stream);
 
             final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
-            binder.bind();
-            mMapStreamBinder.put(stream, binder);
-
-            if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target);
+            if (binder.bind())
+            {
+                mMapStreamBinder.put(stream, binder);
+                if (mIsDebug)
+                    Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target);
+            }
         }
     }
 
@@ -110,11 +111,12 @@ public class FStreamManager
             unbindStreamInternal(stream);
 
             final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
-            binder.bind();
-            mMapStreamBinder.put(stream, binder);
-
-            if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target);
+            if (binder.bind())
+            {
+                mMapStreamBinder.put(stream, binder);
+                if (mIsDebug)
+                    Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target);
+            }
         }
     }
 

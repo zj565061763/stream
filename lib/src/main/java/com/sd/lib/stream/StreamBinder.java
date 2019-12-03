@@ -31,8 +31,10 @@ public abstract class StreamBinder<T>
 
     /**
      * 绑定
+     *
+     * @return
      */
-    public abstract void bind();
+    public abstract boolean bind();
 
     /**
      * 注册流对象

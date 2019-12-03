@@ -34,16 +34,17 @@ class ActivityStreamBinder extends StreamBinder<Activity>
     }
 
     @Override
-    public void bind()
+    public final boolean bind()
     {
         final View decorView = mDecorView.get();
-        if (decorView != null)
-        {
-            decorView.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
-            decorView.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+        if (decorView == null)
+            return false;
 
-            registerStream();
-        }
+        decorView.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
+        decorView.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+
+        registerStream();
+        return true;
     }
 
     private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener()
