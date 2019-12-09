@@ -409,10 +409,11 @@ public class FStreamManager
     public synchronized void registerDefaultStream(Class<? extends FStream> clazz)
     {
         checkProxyClass(clazz);
+        checkFStreamClass(clazz);
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
         if (set.isEmpty())
-            return;
+            throw new IllegalArgumentException("stream class was not found in " + clazz);
 
         for (Class<? extends FStream> item : set)
         {
@@ -428,6 +429,7 @@ public class FStreamManager
     public synchronized void unregisterDefaultStream(Class<? extends FStream> clazz)
     {
         checkProxyClass(clazz);
+        checkFStreamClass(clazz);
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
         if (set.isEmpty())
@@ -472,5 +474,11 @@ public class FStreamManager
     {
         if (Proxy.isProxyClass(clazz))
             throw new IllegalArgumentException("proxy class is not supported");
+    }
+
+    private static void checkFStreamClass(Class<?> clazz)
+    {
+        if (clazz == FStream.class)
+            throw new IllegalArgumentException("class must not be " + FStream.class);
     }
 }
