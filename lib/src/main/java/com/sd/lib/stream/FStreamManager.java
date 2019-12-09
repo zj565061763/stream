@@ -76,22 +76,19 @@ public class FStreamManager
      * @param stream
      * @param target
      */
-    public void bindStream(FStream stream, Activity target)
+    public synchronized void bindStream(FStream stream, Activity target)
     {
         if (target == null || !canBindStream(stream))
             return;
 
-        synchronized (mMapStreamBinder)
-        {
-            unbindStreamInternal(stream);
+        unbindStreamInternal(stream);
 
-            final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
-            if (binder.bind())
-            {
-                mMapStreamBinder.put(stream, binder);
-                if (mIsDebug)
-                    Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target);
-            }
+        final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
+        if (binder.bind())
+        {
+            mMapStreamBinder.put(stream, binder);
+            if (mIsDebug)
+                Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target);
         }
     }
 
@@ -101,22 +98,19 @@ public class FStreamManager
      * @param stream
      * @param target
      */
-    public void bindStream(FStream stream, View target)
+    public synchronized void bindStream(FStream stream, View target)
     {
         if (target == null || !canBindStream(stream))
             return;
 
-        synchronized (mMapStreamBinder)
-        {
-            unbindStreamInternal(stream);
+        unbindStreamInternal(stream);
 
-            final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
-            if (binder.bind())
-            {
-                mMapStreamBinder.put(stream, binder);
-                if (mIsDebug)
-                    Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target);
-            }
+        final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
+        if (binder.bind())
+        {
+            mMapStreamBinder.put(stream, binder);
+            if (mIsDebug)
+                Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target);
         }
     }
 
@@ -172,14 +166,11 @@ public class FStreamManager
         return unregisterInternal(stream);
     }
 
-    private void checkStreamBinder(FStream stream)
+    private synchronized void checkStreamBinder(FStream stream)
     {
-        synchronized (mMapStreamBinder)
-        {
-            final StreamBinder binder = mMapStreamBinder.get(stream);
-            if (binder != null)
-                throw new IllegalArgumentException("stream has bound stream: " + stream + " target:" + binder.getTarget());
-        }
+        final StreamBinder binder = mMapStreamBinder.get(stream);
+        if (binder != null)
+            throw new IllegalArgumentException("stream has bound stream: " + stream + " target:" + binder.getTarget());
     }
 
     synchronized Class<? extends FStream>[] registerInternal(FStream stream)
