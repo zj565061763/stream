@@ -114,17 +114,7 @@ public class FStreamManager
         }
     }
 
-    /**
-     * 解除流对象绑定
-     *
-     * @param stream
-     */
-    public synchronized void unbindStream(FStream stream)
-    {
-        unbindStreamInternal(stream);
-    }
-
-    private void unbindStreamInternal(FStream stream)
+    private boolean unbindStreamInternal(FStream stream)
     {
         final StreamBinder binder = mMapStreamBinder.remove(stream);
         if (binder != null)
@@ -133,7 +123,10 @@ public class FStreamManager
 
             if (mIsDebug)
                 Log.e(FStream.class.getSimpleName(), "bind destroyed stream:" + stream + " target:" + binder.getTarget());
+
+            return true;
         }
+        return false;
     }
 
     private boolean canBindStream(FStream stream)
@@ -148,9 +141,12 @@ public class FStreamManager
      * @param stream
      * @return 返回注册的接口
      */
-    public Class<? extends FStream>[] register(FStream stream)
+    public synchronized Class<? extends FStream>[] register(FStream stream)
     {
-        checkStreamBinder(stream);
+        final StreamBinder binder = mMapStreamBinder.get(stream);
+        if (binder != null)
+            throw new IllegalArgumentException("stream has bound stream: " + stream + " target:" + binder.getTarget());
+
         return registerInternal(stream);
     }
 
@@ -158,19 +154,13 @@ public class FStreamManager
      * 取消注册流对象
      *
      * @param stream
-     * @return 返回取消注册的接口
      */
-    public Class<? extends FStream>[] unregister(FStream stream)
+    public synchronized void unregister(FStream stream)
     {
-        checkStreamBinder(stream);
-        return unregisterInternal(stream);
-    }
+        if (unbindStreamInternal(stream))
+            return;
 
-    private synchronized void checkStreamBinder(FStream stream)
-    {
-        final StreamBinder binder = mMapStreamBinder.get(stream);
-        if (binder != null)
-            throw new IllegalArgumentException("stream has bound stream: " + stream + " target:" + binder.getTarget());
+        unregisterInternal(stream);
     }
 
     synchronized Class<? extends FStream>[] registerInternal(FStream stream)
