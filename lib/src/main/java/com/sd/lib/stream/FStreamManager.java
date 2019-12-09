@@ -87,8 +87,9 @@ public class FStreamManager
         if (binder.bind())
         {
             mMapStreamBinder.put(stream, binder);
+
             if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target);
+                Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target + " size:" + mMapStreamBinder.size());
         }
     }
 
@@ -109,8 +110,9 @@ public class FStreamManager
         if (binder.bind())
         {
             mMapStreamBinder.put(stream, binder);
+
             if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target);
+                Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target + " count:" + mMapStreamBinder.size());
         }
     }
 
@@ -122,7 +124,7 @@ public class FStreamManager
             binder.destroy();
 
             if (mIsDebug)
-                Log.e(FStream.class.getSimpleName(), "bind destroyed stream:" + stream + " target:" + binder.getTarget());
+                Log.e(FStream.class.getSimpleName(), "bind destroyed stream:" + stream + " target:" + binder.getTarget() + " count:" + mMapStreamBinder.size());
 
             return true;
         }
