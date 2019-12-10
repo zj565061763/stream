@@ -38,16 +38,23 @@ public abstract class StreamBinder<T>
 
     /**
      * 注册流对象
+     *
+     * @return
      */
-    protected final void registerStream()
+    protected final boolean registerStream()
     {
         final FStream stream = mStream.get();
-        if (stream != null)
+        if (stream == null)
+            return false;
+
+        final Class<? extends FStream>[] classes = FStreamManager.getInstance().registerInternal(stream);
+        if (classes.length <= 0)
         {
-            final Class<? extends FStream>[] classes = FStreamManager.getInstance().registerInternal(stream);
-            if (classes.length <= 0)
-                destroy();
+            destroy();
+            return false;
         }
+
+        return true;
     }
 
     /**
@@ -56,8 +63,10 @@ public abstract class StreamBinder<T>
     protected final void unregisterStream()
     {
         final FStream stream = mStream.get();
-        if (stream != null)
-            FStreamManager.getInstance().unregisterInternal(stream);
+        if (stream == null)
+            return;
+
+        FStreamManager.getInstance().unregisterInternal(stream);
     }
 
     /**
