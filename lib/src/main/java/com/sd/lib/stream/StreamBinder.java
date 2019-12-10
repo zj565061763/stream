@@ -75,8 +75,6 @@ public abstract class StreamBinder<T>
     public void destroy()
     {
         unregisterStream();
-
         mStream.clear();
-        mTarget.clear();
     }
 }
