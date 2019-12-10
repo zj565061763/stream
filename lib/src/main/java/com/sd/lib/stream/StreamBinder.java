@@ -48,7 +48,7 @@ public abstract class StreamBinder<T>
             return false;
 
         final Class<? extends FStream>[] classes = FStreamManager.getInstance().registerInternal(stream);
-        if (classes.length <= 0)
+        if (classes == null || classes.length <= 0)
         {
             destroy();
             return false;
