@@ -37,7 +37,7 @@ class ViewStreamBinder extends StreamBinder<View>
         target.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
 
         if (isAttached(target))
-            registerStream();
+            return registerStream();
 
         return true;
     }
