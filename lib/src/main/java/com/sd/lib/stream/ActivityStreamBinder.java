@@ -41,10 +41,14 @@ class ActivityStreamBinder extends StreamBinder<Activity>
         if (decorView == null)
             return false;
 
-        decorView.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
-        decorView.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+        if (registerStream())
+        {
+            decorView.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
+            decorView.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+            return true;
+        }
 
-        return registerStream();
+        return false;
     }
 
     private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener()
