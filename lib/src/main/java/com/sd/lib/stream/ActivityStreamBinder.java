@@ -19,9 +19,6 @@ class ActivityStreamBinder extends StreamBinder<Activity>
     {
         super(stream, target);
 
-        if (target.isFinishing())
-            throw new RuntimeException("Bind stream failed because activity isFinishing");
-
         final Window window = target.getWindow();
         if (window == null)
             throw new RuntimeException("Bind stream failed because activity's window is null");
@@ -36,6 +33,10 @@ class ActivityStreamBinder extends StreamBinder<Activity>
     @Override
     public final boolean bind()
     {
+        final Activity activity = getTarget();
+        if (activity == null || activity.isFinishing())
+            return false;
+
         final View decorView = mDecorView.get();
         if (decorView == null)
             return false;
@@ -43,8 +44,7 @@ class ActivityStreamBinder extends StreamBinder<Activity>
         decorView.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
         decorView.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
 
-        registerStream();
-        return true;
+        return registerStream();
     }
 
     private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener()
