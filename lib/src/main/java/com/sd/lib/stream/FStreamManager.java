@@ -195,7 +195,7 @@ public class FStreamManager
         for (Class<? extends FStream> item : classes)
         {
             final List<FStream> holder = mMapStream.get(item);
-            if (holder == null)
+            if (holder == null || holder.isEmpty())
                 continue;
 
             if (holder.remove(stream))
@@ -327,7 +327,7 @@ public class FStreamManager
             if (mManager.isDebug())
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + (holder == null ? 0 : holder.size()));
 
-            if (holder == null)
+            if (holder == null || holder.isEmpty())
             {
                 final FStream stream = mManager.getDefaultStream(mClass);
                 if (stream == null)
