@@ -17,13 +17,6 @@ class ViewStreamBinder extends StreamBinder<View>
     protected ViewStreamBinder(FStream stream, View target)
     {
         super(stream, target);
-
-        final Context context = target.getContext();
-        if (context instanceof Activity)
-        {
-            if (((Activity) context).isFinishing())
-                throw new IllegalArgumentException("Bind stream failed because view's host activity is isFinishing");
-        }
     }
 
     @Override
@@ -32,6 +25,14 @@ class ViewStreamBinder extends StreamBinder<View>
         final View target = getTarget();
         if (target == null)
             return false;
+
+        final Context context = target.getContext();
+        if (context instanceof Activity)
+        {
+            final Activity activity = (Activity) context;
+            if (activity.isFinishing())
+                return false;
+        }
 
         target.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
         target.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
