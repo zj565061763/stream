@@ -254,7 +254,21 @@ public class FStreamManager
         return set;
     }
 
-    static final class ProxyInvocationHandler implements InvocationHandler
+    /**
+     * 生成代理对象
+     *
+     * @param clazz
+     * @param builder
+     * @param <T>
+     * @return
+     */
+    <T extends FStream> T newProxyInstance(Class<T> clazz, FStream.ProxyBuilder builder)
+    {
+        final InvocationHandler handler = new FStreamManager.ProxyInvocationHandler(this, builder);
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, handler);
+    }
+
+    private static final class ProxyInvocationHandler implements InvocationHandler
     {
         private final FStreamManager mManager;
 

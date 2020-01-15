@@ -1,7 +1,6 @@
 package com.sd.lib.stream;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.List;
 
 /**
@@ -79,7 +78,7 @@ public interface FStream
                 throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
 
             mClass = clazz;
-            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, new FStreamManager.ProxyInvocationHandler(FStreamManager.getInstance(), this));
+            return FStreamManager.getInstance().newProxyInstance(clazz, this);
         }
     }
 
