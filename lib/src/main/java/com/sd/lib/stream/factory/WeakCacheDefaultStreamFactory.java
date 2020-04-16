@@ -19,7 +19,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
     private final Map<Class<? extends FStream>, WeakReference<FStream>> mMapStream = new HashMap<>();
     private final ReferenceQueue<FStream> mReferenceQueue = new ReferenceQueue<>();
 
-    private final Map<WeakReference<FStream>, Class<? extends FStream>> mMapStreamReverse = new HashMap<>();
+    private final Map<WeakReference<FStream>, Class<? extends FStream>> mMapReference = new HashMap<>();
 
     private boolean isDebug()
     {
@@ -35,16 +35,6 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         if (isDebug())
             Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
 
-        if (stream == null && reference != null)
-        {
-            // 对象已经被回收，移除引用
-            if (removeReference(reference))
-            {
-                if (isDebug())
-                    Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "removeReference when getCache reference:" + reference + getSizeLog());
-            }
-        }
-
         return stream;
     }
 
@@ -54,8 +44,17 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         releaseReference();
 
         final WeakReference<FStream> reference = new WeakReference<>(stream, mReferenceQueue);
-        mMapStream.put(param.classStream, reference);
-        mMapStreamReverse.put(reference, param.classStream);
+        final WeakReference<FStream> oldReference = mMapStream.put(param.classStream, reference);
+        if (oldReference != null)
+        {
+            /**
+             * 由于被回收的引用不一定会被及时的添加到ReferenceQueue中，
+             * 所以这边判断一下旧的引用不为null的话，要移除掉
+             */
+            mMapReference.remove(oldReference);
+        }
+
+        mMapReference.put(reference, param.classStream);
 
         if (isDebug())
         {
@@ -73,8 +72,23 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
             if (reference == null)
                 break;
 
-            if (removeReference(reference))
+            final Class<? extends FStream> clazz = mMapReference.remove(reference);
+            final WeakReference<FStream> streamReference = mMapStream.remove(clazz);
+
+            if (streamReference == reference)
+            {
                 count++;
+            } else
+            {
+                if (isDebug())
+                {
+                    Log.e(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference"
+                            + " class:" + clazz.getName()
+                            + " reference:" + reference
+                            + " streamReference:" + streamReference
+                    );
+                }
+            }
         }
 
         if (count > 0)
@@ -84,17 +98,8 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         }
     }
 
-    private boolean removeReference(Reference<? extends FStream> reference)
-    {
-        if (reference == null)
-            throw new IllegalArgumentException("reference is null");
-
-        final Class<? extends FStream> clazz = mMapStreamReverse.remove(reference);
-        return mMapStream.remove(clazz) == reference;
-    }
-
     private String getSizeLog()
     {
-        return "\r\n" + "size:" + mMapStream.size() + "," + mMapStreamReverse.size();
+        return "\r\n" + "size:" + mMapStream.size() + "," + mMapReference.size();
     }
 }
