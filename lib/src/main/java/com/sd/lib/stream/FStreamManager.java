@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 流管理类
@@ -174,17 +174,14 @@ public class FStreamManager
             Collection<FStream> holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new CopyOnWriteArrayList<>();
+                holder = new CopyOnWriteArraySet<>();
                 mMapStream.put(item, holder);
             }
 
-            if (!holder.contains(stream))
+            if (holder.add(stream))
             {
-                if (holder.add(stream))
-                {
-                    if (mIsDebug)
-                        Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
-                }
+                if (mIsDebug)
+                    Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
             }
         }
         return classes;
