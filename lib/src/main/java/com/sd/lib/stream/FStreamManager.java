@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class FStreamManager
         return INSTANCE;
     }
 
-    private final Map<Class<? extends FStream>, List<FStream>> mMapStream = new ConcurrentHashMap<>();
+    private final Map<Class<? extends FStream>, Collection<FStream>> mMapStream = new ConcurrentHashMap<>();
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
 
     private boolean mIsDebug;
@@ -170,7 +171,7 @@ public class FStreamManager
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
-            List<FStream> holder = mMapStream.get(item);
+            Collection<FStream> holder = mMapStream.get(item);
             if (holder == null)
             {
                 holder = new CopyOnWriteArrayList<>();
@@ -194,7 +195,7 @@ public class FStreamManager
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
-            final List<FStream> holder = mMapStream.get(item);
+            final Collection<FStream> holder = mMapStream.get(item);
             if (holder == null || holder.isEmpty())
                 continue;
 
@@ -336,7 +337,7 @@ public class FStreamManager
 
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
-            List<FStream> holder = mManager.mMapStream.get(mClass);
+            Collection<FStream> holder = mManager.mMapStream.get(mClass);
 
             if (mManager.isDebug())
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + (holder == null ? 0 : holder.size()));
