@@ -31,10 +31,6 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
     {
         final WeakReference<FStream> reference = mMapStream.get(param.classStream);
         final FStream stream = reference == null ? null : reference.get();
-
-        if (isDebug())
-            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "getCache for class:" + param.classStream.getName() + " stream:" + stream + getSizeLog());
-
         return stream;
     }
 
@@ -52,6 +48,9 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
              * 所以这边判断一下旧的引用不为null的话，要移除掉
              */
             mMapReference.remove(oldReference);
+
+            if (isDebug())
+                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "remove old reference:" + oldReference + getSizeLog());
         }
 
         mMapReference.put(reference, param.classStream);
