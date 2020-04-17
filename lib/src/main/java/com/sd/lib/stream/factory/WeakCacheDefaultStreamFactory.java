@@ -74,7 +74,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
             final Class<? extends FStream> clazz = mMapReference.remove(reference);
             if (clazz == null)
             {
-                // 如果为null，说明这个引用已经被边手动从map中移除
+                // 如果为null，说明这个引用已经被手动从map中移除
                 if (isDebug())
                     Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference ghost reference was found:" + reference);
                 continue;
