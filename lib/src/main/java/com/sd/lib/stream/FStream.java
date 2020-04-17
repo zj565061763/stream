@@ -78,7 +78,7 @@ public interface FStream
                 throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
 
             mClass = clazz;
-            return FStreamManager.getInstance().newProxyInstance(this);
+            return (T) FStreamManager.getInstance().newProxyInstance(this);
         }
     }
 

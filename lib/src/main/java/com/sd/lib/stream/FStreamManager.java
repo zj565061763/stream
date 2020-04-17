@@ -256,14 +256,13 @@ public class FStreamManager
      * 生成代理对象
      *
      * @param builder
-     * @param <T>
      * @return
      */
-    <T extends FStream> T newProxyInstance(FStream.ProxyBuilder builder)
+    FStream newProxyInstance(FStream.ProxyBuilder builder)
     {
         final Class<?> clazz = builder.mClass;
         final InvocationHandler handler = new FStreamManager.ProxyInvocationHandler(this, builder);
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, handler);
+        return (FStream) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, handler);
     }
 
     private static final class ProxyInvocationHandler implements InvocationHandler
