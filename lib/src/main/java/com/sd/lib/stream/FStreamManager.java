@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * 流管理类
@@ -174,7 +174,7 @@ public class FStreamManager
             Collection<FStream> holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new CopyOnWriteArraySet<>();
+                holder = new ConcurrentSkipListSet<>();
                 mMapStream.put(item, holder);
             }
 
