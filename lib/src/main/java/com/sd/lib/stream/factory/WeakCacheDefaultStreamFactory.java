@@ -73,8 +73,13 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
                 break;
 
             final Class<? extends FStream> clazz = mMapReference.remove(reference);
-            final WeakReference<FStream> streamReference = mMapStream.remove(clazz);
+            if (clazz == null)
+            {
+                // 如果为null，说明这个引用已经被边手动从map中移除
+                continue;
+            }
 
+            final WeakReference<FStream> streamReference = mMapStream.remove(clazz);
             if (streamReference == reference)
             {
                 count++;
