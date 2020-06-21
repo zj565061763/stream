@@ -216,7 +216,6 @@ public class FStreamManager
     private Class<? extends FStream>[] getStreamClass(FStream stream, boolean getOne)
     {
         final Class<?> sourceClass = stream.getClass();
-        checkProxyClass(sourceClass);
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass, getOne);
         return set.toArray(new Class[set.size()]);
@@ -224,6 +223,7 @@ public class FStreamManager
 
     private Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz, boolean getOne)
     {
+        checkProxyClass(clazz);
         final Set<Class<? extends FStream>> set = new HashSet<>();
 
         while (true)
@@ -421,7 +421,6 @@ public class FStreamManager
      */
     public synchronized void registerDefaultStream(Class<? extends FStream> clazz)
     {
-        checkProxyClass(clazz);
         checkFStreamClass(clazz);
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
@@ -441,7 +440,6 @@ public class FStreamManager
      */
     public synchronized void unregisterDefaultStream(Class<? extends FStream> clazz)
     {
-        checkProxyClass(clazz);
         checkFStreamClass(clazz);
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
