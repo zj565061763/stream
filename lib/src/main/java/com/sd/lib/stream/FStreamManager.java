@@ -82,7 +82,18 @@ public class FStreamManager
         if (target == null || !canBindStream(stream))
             return;
 
-        unbindStream(stream);
+        final StreamBinder oldBinder = mMapStreamBinder.get(stream);
+        if (oldBinder != null)
+        {
+            if (oldBinder.getTarget() == target)
+            {
+                //  已经绑定过了
+                return;
+            } else
+            {
+                unbindStream(stream);
+            }
+        }
 
         final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
         if (binder.bind())
@@ -105,7 +116,18 @@ public class FStreamManager
         if (target == null || !canBindStream(stream))
             return;
 
-        unbindStream(stream);
+        final StreamBinder oldBinder = mMapStreamBinder.get(stream);
+        if (oldBinder != null)
+        {
+            if (oldBinder.getTarget() == target)
+            {
+                //  已经绑定过了
+                return;
+            } else
+            {
+                unbindStream(stream);
+            }
+        }
 
         final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
         if (binder.bind())
