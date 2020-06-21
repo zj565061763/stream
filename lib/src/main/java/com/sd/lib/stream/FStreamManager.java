@@ -145,7 +145,7 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    private boolean unbindStream(FStream stream)
+    public synchronized boolean unbindStream(FStream stream)
     {
         final StreamBinder binder = mMapStreamBinder.remove(stream);
         if (binder != null)
