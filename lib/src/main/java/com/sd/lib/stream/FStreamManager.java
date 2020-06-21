@@ -123,7 +123,7 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    public synchronized boolean unbindStream(FStream stream)
+    private boolean unbindStream(FStream stream)
     {
         final StreamBinder binder = mMapStreamBinder.remove(stream);
         if (binder != null)
@@ -144,6 +144,13 @@ public class FStreamManager
         return classes.length > 0;
     }
 
+    private void checkHasBound(FStream stream)
+    {
+        final StreamBinder binder = mMapStreamBinder.get(stream);
+        if (binder != null)
+            throw new IllegalArgumentException("stream has bound. stream: " + stream + " target:" + binder.getTarget());
+    }
+
     /**
      * 注册流对象
      *
@@ -152,10 +159,7 @@ public class FStreamManager
      */
     public synchronized Class<? extends FStream>[] register(FStream stream)
     {
-        final StreamBinder binder = mMapStreamBinder.get(stream);
-        if (binder != null)
-            throw new IllegalArgumentException("stream has bound stream: " + stream + " target:" + binder.getTarget());
-
+        checkHasBound(stream);
         return registerInternal(stream);
     }
 
@@ -166,9 +170,7 @@ public class FStreamManager
      */
     public synchronized void unregister(FStream stream)
     {
-        if (unbindStream(stream))
-            return;
-
+        checkHasBound(stream);
         unregisterInternal(stream);
     }
 
