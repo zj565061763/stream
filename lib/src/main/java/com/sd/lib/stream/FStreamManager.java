@@ -82,7 +82,7 @@ public class FStreamManager
         if (target == null || !canBindStream(stream))
             return;
 
-        unbindStreamInternal(stream);
+        unbindStream(stream);
 
         final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
         if (binder.bind())
@@ -105,7 +105,7 @@ public class FStreamManager
         if (target == null || !canBindStream(stream))
             return;
 
-        unbindStreamInternal(stream);
+        unbindStream(stream);
 
         final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
         if (binder.bind())
@@ -117,7 +117,13 @@ public class FStreamManager
         }
     }
 
-    private boolean unbindStreamInternal(FStream stream)
+    /**
+     * 解绑并取消注册
+     *
+     * @param stream
+     * @return
+     */
+    public synchronized boolean unbindStream(FStream stream)
     {
         final StreamBinder binder = mMapStreamBinder.remove(stream);
         if (binder != null)
@@ -125,7 +131,7 @@ public class FStreamManager
             binder.destroy();
 
             if (mIsDebug)
-                Log.e(FStream.class.getSimpleName(), "bind destroyed stream:" + stream + " target:" + binder.getTarget() + " size:" + mMapStreamBinder.size());
+                Log.i(FStream.class.getSimpleName(), "unbind stream:" + stream + " target:" + binder.getTarget() + " size:" + mMapStreamBinder.size());
 
             return true;
         }
@@ -160,7 +166,7 @@ public class FStreamManager
      */
     public synchronized void unregister(FStream stream)
     {
-        if (unbindStreamInternal(stream))
+        if (unbindStream(stream))
             return;
 
         unregisterInternal(stream);
