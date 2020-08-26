@@ -76,14 +76,15 @@ public class FStreamManager
      *
      * @param stream
      * @param target
+     * @return true-绑定成功或者已绑定；false-绑定失败
      */
-    public synchronized void bindStream(FStream stream, Activity target)
+    public synchronized boolean bindStream(FStream stream, Activity target)
     {
         if (target == null)
-            return;
+            return false;
 
         if (!checkBindStream(stream))
-            return;
+            return false;
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
         if (oldBinder != null)
@@ -91,7 +92,7 @@ public class FStreamManager
             if (oldBinder.getTarget() == target)
             {
                 //  已经绑定过了
-                return;
+                return true;
             } else
             {
                 unbindStream(stream);
@@ -105,7 +106,10 @@ public class FStreamManager
 
             if (mIsDebug)
                 Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target + " size:" + mMapStreamBinder.size());
+
+            return true;
         }
+        return false;
     }
 
     /**
@@ -113,14 +117,15 @@ public class FStreamManager
      *
      * @param stream
      * @param target
+     * @return true-绑定成功或者已绑定；false-绑定失败
      */
-    public synchronized void bindStream(FStream stream, View target)
+    public synchronized boolean bindStream(FStream stream, View target)
     {
         if (target == null)
-            return;
+            return false;
 
         if (!checkBindStream(stream))
-            return;
+            return false;
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
         if (oldBinder != null)
@@ -128,7 +133,7 @@ public class FStreamManager
             if (oldBinder.getTarget() == target)
             {
                 //  已经绑定过了
-                return;
+                return true;
             } else
             {
                 unbindStream(stream);
@@ -142,7 +147,10 @@ public class FStreamManager
 
             if (mIsDebug)
                 Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target + " size:" + mMapStreamBinder.size());
+
+            return true;
         }
+        return false;
     }
 
     /**
