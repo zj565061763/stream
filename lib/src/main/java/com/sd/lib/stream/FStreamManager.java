@@ -79,7 +79,10 @@ public class FStreamManager
      */
     public synchronized void bindStream(FStream stream, Activity target)
     {
-        if (target == null || !canBindStream(stream))
+        if (target == null)
+            return;
+
+        if (!checkBindStream(stream))
             return;
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
@@ -113,7 +116,10 @@ public class FStreamManager
      */
     public synchronized void bindStream(FStream stream, View target)
     {
-        if (target == null || !canBindStream(stream))
+        if (target == null)
+            return;
+
+        if (!checkBindStream(stream))
             return;
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
@@ -158,12 +164,6 @@ public class FStreamManager
             return true;
         }
         return false;
-    }
-
-    private boolean canBindStream(FStream stream)
-    {
-        final Class<? extends FStream>[] classes = getStreamClass(stream, true);
-        return classes.length > 0;
     }
 
     private void checkHasBound(FStream stream)
@@ -238,12 +238,18 @@ public class FStreamManager
         return classes;
     }
 
-    private Class<? extends FStream>[] getStreamClass(FStream stream)
+    private static boolean checkBindStream(FStream stream)
+    {
+        final Class<? extends FStream>[] classes = getStreamClass(stream, true);
+        return classes.length > 0;
+    }
+
+    private static Class<? extends FStream>[] getStreamClass(FStream stream)
     {
         return getStreamClass(stream, false);
     }
 
-    private Class<? extends FStream>[] getStreamClass(FStream stream, boolean getOne)
+    private static Class<? extends FStream>[] getStreamClass(FStream stream, boolean getOne)
     {
         final Class<?> sourceClass = stream.getClass();
 
@@ -251,7 +257,7 @@ public class FStreamManager
         return set.toArray(new Class[set.size()]);
     }
 
-    private Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz, boolean getOne)
+    private static Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz, boolean getOne)
     {
         checkProxyClass(clazz);
         final Set<Class<? extends FStream>> set = new HashSet<>();
