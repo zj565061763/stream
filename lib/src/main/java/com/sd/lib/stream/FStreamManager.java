@@ -249,7 +249,7 @@ public class FStreamManager
             {
                 if (mIsDebug)
                 {
-                    Log.i(FStream.class.getSimpleName(), "register +++++"
+                    Log.i(FStream.class.getSimpleName(), "+++++ register"
                             + " stream:" + stream
                             + " class:" + item.getName()
                             + " count:" + (holder.size()));
@@ -280,7 +280,7 @@ public class FStreamManager
 
                 if (mIsDebug)
                 {
-                    Log.i(FStream.class.getSimpleName(), "unregister -----"
+                    Log.i(FStream.class.getSimpleName(), "----- unregister"
                             + " stream:" + stream
                             + " class:" + item.getName()
                             + " count:" + (holder.size()));
