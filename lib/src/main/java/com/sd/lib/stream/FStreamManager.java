@@ -42,9 +42,9 @@ public class FStreamManager
 
     private final Map<Class<? extends FStream>, Collection<FStream>> mMapStream = new ConcurrentHashMap<>();
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
-    private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
 
-    private final Collection<Class<? extends FStream>> mDirtyHolder = new HashSet<>();
+    private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
+    private final Map<Class<? extends FStream>, String> mMapDirtyClass = new ConcurrentHashMap<>();
 
     private boolean mIsDebug;
 
@@ -290,6 +290,12 @@ public class FStreamManager
         }
     }
 
+    /**
+     * 返回流对象连接对象
+     *
+     * @param stream
+     * @return
+     */
     public StreamConnection getConnection(FStream stream)
     {
         return mMapStreamConnection.get(stream);
@@ -310,16 +316,13 @@ public class FStreamManager
         @Override
         protected void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
         {
-            synchronized (FStreamManager.this)
+            mMapDirtyClass.put(clazz, "");
+            if (isDebug())
             {
-                mDirtyHolder.add(clazz);
-                if (isDebug())
-                {
-                    Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
-                            + " priority:" + priority
-                            + " clazz:" + clazz.getName()
-                            + " stream:" + stream);
-                }
+                Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
+                        + " priority:" + priority
+                        + " clazz:" + clazz.getName()
+                        + " stream:" + stream);
             }
         }
     }
@@ -502,7 +505,7 @@ public class FStreamManager
             {
                 synchronized (mManager)
                 {
-                    if (mManager.mDirtyHolder.remove(mClass))
+                    if (mManager.mMapDirtyClass.remove(mClass) != null)
                     {
                         final List<FStream> listEntry = new ArrayList<>(holder);
                         Collections.sort(listEntry, mManager.newStreamComparator(mClass));
