@@ -11,12 +11,13 @@ public abstract class StreamConnection
     StreamConnection(FStream stream, Class<? extends FStream>[] classes)
     {
         mStream = stream;
-        if (classes != null && classes.length > 0)
+
+        for (Class<? extends FStream> item : classes)
         {
-            for (Class<? extends FStream> item : classes)
-            {
-                getItem(item);
-            }
+            if (!item.isAssignableFrom(mStream.getClass()))
+                throw new IllegalArgumentException("class is not assignable from " + mStream.getClass().getName() + " class:" + item.getName());
+
+            mMapItem.put(item, new ConnectionItem(item));
         }
     }
 
@@ -51,8 +52,7 @@ public abstract class StreamConnection
         {
             for (Map.Entry<Class<? extends FStream>, ConnectionItem> item : mMapItem.entrySet())
             {
-                final ConnectionItem connectionItem = item.getValue();
-                connectionItem.setPriority(priority);
+                item.getValue().setPriority(priority);
             }
         } else
         {
@@ -111,20 +111,6 @@ public abstract class StreamConnection
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
             item.resetBreakDispatch();
-    }
-
-    private synchronized ConnectionItem getItem(Class<? extends FStream> clazz)
-    {
-        if (!clazz.isAssignableFrom(mStream.getClass()))
-            throw new IllegalArgumentException("clazz is not assignable from " + mStream.getClass().getName());
-
-        ConnectionItem item = mMapItem.get(clazz);
-        if (item == null)
-        {
-            item = new ConnectionItem(clazz);
-            mMapItem.put(clazz, item);
-        }
-        return item;
     }
 
     private final class ConnectionItem
