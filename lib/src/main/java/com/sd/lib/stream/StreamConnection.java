@@ -11,12 +11,9 @@ public abstract class StreamConnection
     StreamConnection(FStream stream, Class<? extends FStream>[] classes)
     {
         mStream = stream;
-
         for (Class<? extends FStream> item : classes)
         {
-            if (!item.isAssignableFrom(mStream.getClass()))
-                throw new IllegalArgumentException("class is not assignable from " + mStream.getClass().getName() + " class:" + item.getName());
-
+            checkClassInterface(item);
             mMapItem.put(item, new ConnectionItem(item));
         }
     }
@@ -29,10 +26,21 @@ public abstract class StreamConnection
      */
     synchronized int getPriority(Class<? extends FStream> clazz)
     {
+        checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
             return item.nPriority;
         return 0;
+    }
+
+    /**
+     * 设置优先级
+     *
+     * @param priority
+     */
+    public void setPriority(int priority)
+    {
+        setPriority(priority, null);
     }
 
     /**
@@ -51,6 +59,9 @@ public abstract class StreamConnection
             }
         } else
         {
+            checkClassInterface(clazz);
+            checkClassAssignable(clazz);
+
             final ConnectionItem connectionItem = mMapItem.get(clazz);
             if (connectionItem != null)
                 connectionItem.setPriority(priority);
@@ -64,6 +75,9 @@ public abstract class StreamConnection
      */
     public synchronized void breakDispatch(Class<? extends FStream> clazz)
     {
+        checkClassInterface(clazz);
+        checkClassAssignable(clazz);
+
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
             item.breakDispatch();
@@ -76,6 +90,7 @@ public abstract class StreamConnection
      */
     synchronized void enableBreakDispatch(Class<? extends FStream> clazz)
     {
+        checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
             item.enableBreakDispatch();
@@ -89,6 +104,7 @@ public abstract class StreamConnection
      */
     synchronized boolean shouldBreakDispatch(Class<? extends FStream> clazz)
     {
+        checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
             return item.nShouldBreakDispatch;
@@ -103,9 +119,22 @@ public abstract class StreamConnection
      */
     synchronized void resetBreakDispatch(Class<? extends FStream> clazz)
     {
+        checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
             item.resetBreakDispatch();
+    }
+
+    private void checkClassAssignable(Class<? extends FStream> clazz)
+    {
+        if (!clazz.isAssignableFrom(mStream.getClass()))
+            throw new IllegalArgumentException("class is not assignable from " + mStream.getClass().getName() + " class:" + clazz.getName());
+    }
+
+    private static void checkClassInterface(Class<? extends FStream> clazz)
+    {
+        if (!clazz.isInterface())
+            throw new IllegalArgumentException("class must be an interface class:" + clazz.getName());
     }
 
     private final class ConnectionItem
