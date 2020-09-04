@@ -262,6 +262,11 @@ public class FStreamManager
         }
     }
 
+    public StreamConnection getConnection(FStream stream)
+    {
+        return mMapStreamConnection.get(stream);
+    }
+
     private final class InternalStreamConnection extends StreamConnection
     {
         InternalStreamConnection(FStream stream, Class<? extends FStream>[] classes)
