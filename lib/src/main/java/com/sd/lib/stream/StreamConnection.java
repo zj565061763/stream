@@ -20,6 +20,11 @@ public abstract class StreamConnection
         }
     }
 
+    public final FStream getStream()
+    {
+        return mStream;
+    }
+
     /**
      * 设置优先级
      *
