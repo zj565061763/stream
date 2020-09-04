@@ -566,7 +566,7 @@ public class FStreamManager
                 {
                     synchronized (mClass)
                     {
-                        connection.enableBreakDispatch(mClass);
+                        connection.resetBreakDispatch(mClass);
 
                         itemResult = method.invoke(item, args);
 

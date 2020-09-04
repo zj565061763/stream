@@ -84,19 +84,6 @@ public abstract class StreamConnection
     }
 
     /**
-     * 设置允许停止分发
-     *
-     * @param clazz
-     */
-    synchronized void enableBreakDispatch(Class<? extends FStream> clazz)
-    {
-        checkClassInterface(clazz);
-        final ConnectionItem item = mMapItem.get(clazz);
-        if (item != null)
-            item.enableBreakDispatch();
-    }
-
-    /**
      * 是否需要停止分发
      *
      * @param clazz
@@ -142,9 +129,6 @@ public abstract class StreamConnection
         public final Class<? extends FStream> nClass;
         /** 优先级 */
         private volatile int nPriority;
-
-        /** 是否允许停止分发 */
-        private volatile boolean nEnableBreakDispatch;
         /** 是否停止分发 */
         private volatile boolean nShouldBreakDispatch;
 
@@ -168,20 +152,11 @@ public abstract class StreamConnection
         }
 
         /**
-         * 允许停止分发
-         */
-        public void enableBreakDispatch()
-        {
-            nEnableBreakDispatch = true;
-        }
-
-        /**
          * 设置停止分发
          */
         public void breakDispatch()
         {
-            if (nEnableBreakDispatch)
-                nShouldBreakDispatch = true;
+            nShouldBreakDispatch = true;
         }
 
         /**
@@ -189,7 +164,6 @@ public abstract class StreamConnection
          */
         public void resetBreakDispatch()
         {
-            nEnableBreakDispatch = false;
             nShouldBreakDispatch = false;
         }
     }
