@@ -41,6 +41,8 @@ public class FStreamManager
     private final Map<Class<? extends FStream>, Collection<FStream>> mMapStream = new ConcurrentHashMap<>();
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
 
+    private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
+
     private boolean mIsDebug;
 
     public boolean isDebug()
@@ -185,9 +187,9 @@ public class FStreamManager
      * 注册流对象
      *
      * @param stream
-     * @return 返回注册的接口
+     * @return null-注册失败
      */
-    public synchronized Class<? extends FStream>[] register(FStream stream)
+    public synchronized StreamConnection register(FStream stream)
     {
         checkHasBound(stream);
         return registerInternal(stream);
@@ -204,9 +206,19 @@ public class FStreamManager
         unregisterInternal(stream);
     }
 
-    synchronized Class<? extends FStream>[] registerInternal(FStream stream)
+    synchronized StreamConnection registerInternal(FStream stream)
     {
         final Class<? extends FStream>[] classes = getStreamClass(stream);
+        if (classes == null || classes.length <= 0)
+            return null;
+
+        InternalStreamConnection streamConnection = mMapStreamConnection.get(stream);
+        if (streamConnection == null)
+        {
+            streamConnection = new InternalStreamConnection(stream, classes);
+            mMapStreamConnection.put(stream, streamConnection);
+        }
+
         for (Class<? extends FStream> item : classes)
         {
             Collection<FStream> holder = mMapStream.get(item);
@@ -222,12 +234,17 @@ public class FStreamManager
                     Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
             }
         }
-        return classes;
+        return streamConnection;
     }
 
-    synchronized Class<? extends FStream>[] unregisterInternal(FStream stream)
+    synchronized void unregisterInternal(FStream stream)
     {
         final Class<? extends FStream>[] classes = getStreamClass(stream);
+        if (classes == null || classes.length <= 0)
+            return;
+
+        mMapStreamConnection.remove(stream);
+
         for (Class<? extends FStream> item : classes)
         {
             final Collection<FStream> holder = mMapStream.get(item);
@@ -243,7 +260,20 @@ public class FStreamManager
                     mMapStream.remove(item);
             }
         }
-        return classes;
+    }
+
+    private final class InternalStreamConnection extends StreamConnection
+    {
+        InternalStreamConnection(FStream stream, Class<? extends FStream>[] classes)
+        {
+            super(stream, classes);
+        }
+
+        @Override
+        protected void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
+        {
+
+        }
     }
 
     private static boolean checkBindStream(FStream stream)
