@@ -117,12 +117,12 @@ public abstract class StreamConnection
     {
         public final Class<? extends FStream> mClass;
         /** 优先级 */
-        private int mPriority;
+        private volatile int mPriority;
 
         /** 是否允许停止分发 */
-        private boolean mEnableBreakDispatch;
+        private volatile boolean mEnableBreakDispatch;
         /** 是否停止分发 */
-        private boolean mShouldBreakDispatch;
+        private volatile boolean mShouldBreakDispatch;
 
         private ConnectionItem(Class<? extends FStream> clazz)
         {
