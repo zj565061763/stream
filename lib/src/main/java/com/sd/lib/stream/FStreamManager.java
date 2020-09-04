@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -241,7 +242,7 @@ public class FStreamManager
             Collection<FStream> holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new HashSet<>();
+                holder = new LinkedHashSet<>();
                 mMapStream.put(item, holder);
             }
 
@@ -506,11 +507,18 @@ public class FStreamManager
                         final List<FStream> listEntry = new ArrayList<>(holder);
                         Collections.sort(listEntry, mManager.newStreamComparator(mClass));
 
+                        holder.clear();
+                        holder.addAll(listEntry);
+
+                        listStream = listEntry;
+
                         if (mManager.isDebug())
                             Log.i(FStream.class.getSimpleName(), "sort stream");
                     }
                 }
-                listStream = new ArrayList<>(holder);
+
+                if (listStream == null)
+                    listStream = new ArrayList<>(holder);
             }
 
             final boolean filterResult = mResultFilter != null && !isVoid;
