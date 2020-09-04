@@ -21,18 +21,13 @@ public abstract class StreamConnection
         }
     }
 
-    public final FStream getStream()
-    {
-        return mStream;
-    }
-
     /**
      * 返回优先级
      *
      * @param clazz
      * @return
      */
-    public synchronized int getPriority(Class<? extends FStream> clazz)
+    synchronized int getPriority(Class<? extends FStream> clazz)
     {
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
