@@ -451,14 +451,19 @@ public class FStreamManager
                     }
                 }
 
+                Object itemResult = null;
                 boolean shouldBreakDispatch = false;
-                final StreamConnection connection = mManager.mMapStreamConnection.get(item);
-                connection.enableBreakDispatch(mClass);
 
-                final Object itemResult = method.invoke(item, args);
+                synchronized (mClass)
+                {
+                    final StreamConnection connection = mManager.mMapStreamConnection.get(item);
+                    connection.enableBreakDispatch(mClass);
 
-                shouldBreakDispatch = connection.shouldBreakDispatch(mClass);
-                connection.resetBreakDispatch(mClass);
+                    itemResult = method.invoke(item, args);
+
+                    shouldBreakDispatch = connection.shouldBreakDispatch(mClass);
+                    connection.resetBreakDispatch(mClass);
+                }
 
                 if (mManager.isDebug())
                 {
