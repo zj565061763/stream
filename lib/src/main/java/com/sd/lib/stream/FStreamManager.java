@@ -109,7 +109,12 @@ public class FStreamManager
             mMapStreamBinder.put(stream, binder);
 
             if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "bind activity stream:" + stream + " target:" + target + " size:" + mMapStreamBinder.size());
+            {
+                Log.i(FStream.class.getSimpleName(), "bind activity"
+                        + " stream:" + stream
+                        + " target:" + target
+                        + " size:" + mMapStreamBinder.size());
+            }
 
             return true;
         }
@@ -150,7 +155,12 @@ public class FStreamManager
             mMapStreamBinder.put(stream, binder);
 
             if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "bind view stream:" + stream + " target:" + target + " size:" + mMapStreamBinder.size());
+            {
+                Log.i(FStream.class.getSimpleName(), "bind view"
+                        + " stream:" + stream
+                        + " target:" + target
+                        + " size:" + mMapStreamBinder.size());
+            }
 
             return true;
         }
@@ -171,7 +181,12 @@ public class FStreamManager
             binder.destroy();
 
             if (mIsDebug)
-                Log.i(FStream.class.getSimpleName(), "unbind stream:" + stream + " target:" + binder.getTarget() + " size:" + mMapStreamBinder.size());
+            {
+                Log.i(FStream.class.getSimpleName(), "unbind"
+                        + " stream:" + stream
+                        + " target:" + binder.getTarget()
+                        + " size:" + mMapStreamBinder.size());
+            }
 
             return true;
         }
@@ -233,7 +248,12 @@ public class FStreamManager
             if (holder.add(stream))
             {
                 if (mIsDebug)
-                    Log.i(FStream.class.getSimpleName(), "register:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
+                {
+                    Log.i(FStream.class.getSimpleName(), "register +++++"
+                            + " stream:" + stream
+                            + " class:" + item.getName()
+                            + " count:" + (holder.size()));
+                }
             }
         }
         return streamConnection;
@@ -259,7 +279,12 @@ public class FStreamManager
                     mMapStream.remove(item);
 
                 if (mIsDebug)
-                    Log.e(FStream.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
+                {
+                    Log.i(FStream.class.getSimpleName(), "unregister -----"
+                            + " stream:" + stream
+                            + " class:" + item.getName()
+                            + " count:" + (holder.size()));
+                }
             }
         }
     }
@@ -455,7 +480,11 @@ public class FStreamManager
             List<FStream> listStream = null;
 
             if (mManager.isDebug())
-                Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + (holder == null ? 0 : holder.size()));
+            {
+                Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args))
+                        + " tag:" + mTag
+                        + " count:" + (holder == null ? 0 : holder.size()));
+            }
 
             if (holder == null || holder.isEmpty())
             {
