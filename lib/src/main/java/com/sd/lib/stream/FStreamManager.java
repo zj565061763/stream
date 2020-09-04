@@ -446,10 +446,20 @@ public class FStreamManager
                     }
                 }
 
+                boolean shouldBreakDispatch = false;
+                final StreamConnection connection = mManager.mMapStreamConnection.get(item);
+                connection.enableBreakDispatch(mClass);
+
                 final Object itemResult = method.invoke(item, args);
 
+                shouldBreakDispatch = connection.shouldBreakDispatch(mClass);
+                connection.resetBreakDispatch(mClass);
+
                 if (mManager.isDebug())
-                    Log.i(FStream.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult)));
+                {
+                    Log.i(FStream.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult))
+                            + " shouldBreakDispatch:" + shouldBreakDispatch);
+                }
 
                 result = itemResult;
 
@@ -465,6 +475,9 @@ public class FStreamManager
                         break;
                     }
                 }
+
+                if (shouldBreakDispatch)
+                    break;
 
                 index++;
             }

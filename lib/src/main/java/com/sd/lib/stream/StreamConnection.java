@@ -49,19 +49,6 @@ public abstract class StreamConnection
     }
 
     /**
-     * 设置是否允许停止分发
-     *
-     * @param enable
-     * @param clazz
-     */
-    public synchronized void enableBreakDispatch(boolean enable, Class<? extends FStream> clazz)
-    {
-        final ConnectionItem item = mMapItem.get(clazz);
-        if (item != null)
-            item.enableBreakDispatch(enable);
-    }
-
-    /**
      * 停止分发
      *
      * @param clazz
@@ -74,18 +61,42 @@ public abstract class StreamConnection
     }
 
     /**
+     * 设置允许停止分发
+     *
+     * @param clazz
+     */
+    synchronized void enableBreakDispatch(Class<? extends FStream> clazz)
+    {
+        final ConnectionItem item = mMapItem.get(clazz);
+        if (item != null)
+            item.enableBreakDispatch();
+    }
+
+    /**
      * 是否需要停止分发
      *
      * @param clazz
      * @return
      */
-    public synchronized boolean shouldBreakDispatch(Class<? extends FStream> clazz)
+    synchronized boolean shouldBreakDispatch(Class<? extends FStream> clazz)
     {
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
             return item.mShouldBreakDispatch;
 
         return false;
+    }
+
+    /**
+     * 重置停止分发标志
+     *
+     * @param clazz
+     */
+    synchronized void resetBreakDispatch(Class<? extends FStream> clazz)
+    {
+        final ConnectionItem item = mMapItem.get(clazz);
+        if (item != null)
+            item.resetBreakDispatch();
     }
 
     private synchronized ConnectionItem getItem(Class<? extends FStream> clazz)
@@ -133,13 +144,11 @@ public abstract class StreamConnection
         }
 
         /**
-         * 设置是否允许停止分发
-         *
-         * @param enable
+         * 允许停止分发
          */
-        public void enableBreakDispatch(boolean enable)
+        public void enableBreakDispatch()
         {
-            mEnableBreakDispatch = enable;
+            mEnableBreakDispatch = true;
         }
 
         /**
@@ -149,6 +158,15 @@ public abstract class StreamConnection
         {
             if (mEnableBreakDispatch)
                 mShouldBreakDispatch = true;
+        }
+
+        /**
+         * 重置停止分发标志
+         */
+        public void resetBreakDispatch()
+        {
+            mEnableBreakDispatch = false;
+            mShouldBreakDispatch = false;
         }
     }
 
