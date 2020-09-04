@@ -549,7 +549,10 @@ public class FStreamManager
 
                 if (mManager.isDebug())
                 {
-                    Log.i(FStream.class.getSimpleName(), "notify index:" + index + " stream:" + item + (isVoid ? "" : (" return:" + itemResult))
+                    Log.i(FStream.class.getSimpleName(), "notify"
+                            + " index:" + index
+                            + " stream:" + item
+                            + " return:" + (isVoid ? "" : itemResult)
                             + " shouldBreakDispatch:" + shouldBreakDispatch);
                 }
 
