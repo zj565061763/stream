@@ -13,14 +13,15 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 流管理类
@@ -224,7 +225,8 @@ public class FStreamManager
             Collection<FStream> holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new CopyOnWriteArraySet<>();
+                final Comparator<FStream> comparator = new InternalStreamComparator(item);
+                holder = new TreeSet<>(comparator);
                 mMapStream.put(item, holder);
             }
 
@@ -248,7 +250,7 @@ public class FStreamManager
         for (Class<? extends FStream> item : classes)
         {
             final Collection<FStream> holder = mMapStream.get(item);
-            if (holder == null || holder.isEmpty())
+            if (holder == null)
                 continue;
 
             if (holder.remove(stream))
@@ -278,6 +280,28 @@ public class FStreamManager
         protected void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
         {
 
+        }
+    }
+
+    private final class InternalStreamComparator implements Comparator<FStream>
+    {
+        private final Class<? extends FStream> nClass;
+
+        public InternalStreamComparator(Class<? extends FStream> clazz)
+        {
+            nClass = clazz;
+        }
+
+        @Override
+        public int compare(FStream o1, FStream o2)
+        {
+            final StreamConnection o1Connection = getConnection(o1);
+            final StreamConnection o2Connection = getConnection(o2);
+            if (o1Connection != null && o2Connection != null)
+            {
+                return o2Connection.getPriority(nClass) - o1Connection.getPriority(nClass);
+            }
+            return 0;
         }
     }
 
@@ -412,7 +436,8 @@ public class FStreamManager
 
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
-            Collection<FStream> holder = mManager.mMapStream.get(mClass);
+            final Collection<FStream> holder = mManager.mMapStream.get(mClass);
+            List<FStream> listStream = null;
 
             if (mManager.isDebug())
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args)) + " tag:" + mTag + " count:" + (holder == null ? 0 : holder.size()));
@@ -421,14 +446,14 @@ public class FStreamManager
             {
                 final FStream stream = mManager.getDefaultStream(mClass);
                 if (stream == null)
-                {
                     return null;
-                } else
-                {
-                    holder = new ArrayList<>(1);
-                    holder.add(stream);
-                    Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
-                }
+
+                listStream = new ArrayList<>(1);
+                listStream.add(stream);
+                Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
+            } else
+            {
+                listStream = new ArrayList<>(holder);
             }
 
             final boolean filterResult = mResultFilter != null && !isVoid;
@@ -436,7 +461,7 @@ public class FStreamManager
 
             Object result = null;
             int index = 0;
-            for (FStream item : holder)
+            for (FStream item : listStream)
             {
                 if (!checkTag(item))
                     continue;
