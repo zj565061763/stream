@@ -490,12 +490,14 @@ public class FStreamManager
                         + " count:" + (holder == null ? 0 : holder.size()));
             }
 
+            boolean isDefaultStream = false;
             if (holder == null || holder.isEmpty())
             {
                 final FStream stream = mManager.getDefaultStream(mClass);
                 if (stream == null)
                     return null;
 
+                isDefaultStream = true;
                 listStream = new ArrayList<>(1);
                 listStream.add(stream);
 
@@ -532,8 +534,14 @@ public class FStreamManager
             for (FStream item : listStream)
             {
                 final StreamConnection connection = mManager.getConnection(item);
-                if (connection == null)
-                    continue;
+                if (isDefaultStream)
+                {
+                    // 不判断
+                } else
+                {
+                    if (connection == null)
+                        continue;
+                }
 
                 if (!checkTag(item))
                     continue;
@@ -551,14 +559,20 @@ public class FStreamManager
                 Object itemResult = null;
                 boolean shouldBreakDispatch = false;
 
-                synchronized (mClass)
+                if (isDefaultStream)
                 {
-                    connection.enableBreakDispatch(mClass);
-
                     itemResult = method.invoke(item, args);
+                } else
+                {
+                    synchronized (mClass)
+                    {
+                        connection.enableBreakDispatch(mClass);
 
-                    shouldBreakDispatch = connection.shouldBreakDispatch(mClass);
-                    connection.resetBreakDispatch(mClass);
+                        itemResult = method.invoke(item, args);
+
+                        shouldBreakDispatch = connection.shouldBreakDispatch(mClass);
+                        connection.resetBreakDispatch(mClass);
+                    }
                 }
 
                 if (mManager.isDebug())
