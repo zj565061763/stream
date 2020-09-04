@@ -26,6 +26,20 @@ public abstract class StreamConnection
     }
 
     /**
+     * 返回优先级
+     *
+     * @param clazz
+     * @return
+     */
+    public synchronized int getPriority(Class<? extends FStream> clazz)
+    {
+        final ConnectionItem item = mMapItem.get(clazz);
+        if (item != null)
+            return item.nPriority;
+        return 0;
+    }
+
+    /**
      * 设置优先级
      *
      * @param priority
@@ -82,7 +96,7 @@ public abstract class StreamConnection
     {
         final ConnectionItem item = mMapItem.get(clazz);
         if (item != null)
-            return item.mShouldBreakDispatch;
+            return item.nShouldBreakDispatch;
 
         return false;
     }
@@ -115,18 +129,18 @@ public abstract class StreamConnection
 
     private final class ConnectionItem
     {
-        public final Class<? extends FStream> mClass;
+        public final Class<? extends FStream> nClass;
         /** 优先级 */
-        private volatile int mPriority;
+        private volatile int nPriority;
 
         /** 是否允许停止分发 */
-        private volatile boolean mEnableBreakDispatch;
+        private volatile boolean nEnableBreakDispatch;
         /** 是否停止分发 */
-        private volatile boolean mShouldBreakDispatch;
+        private volatile boolean nShouldBreakDispatch;
 
         private ConnectionItem(Class<? extends FStream> clazz)
         {
-            mClass = clazz;
+            nClass = clazz;
         }
 
         /**
@@ -136,10 +150,10 @@ public abstract class StreamConnection
          */
         public void setPriority(int priority)
         {
-            if (mPriority != priority)
+            if (nPriority != priority)
             {
-                mPriority = priority;
-                StreamConnection.this.onPriorityChanged(priority, mStream, mClass);
+                nPriority = priority;
+                StreamConnection.this.onPriorityChanged(priority, mStream, nClass);
             }
         }
 
@@ -148,7 +162,7 @@ public abstract class StreamConnection
          */
         public void enableBreakDispatch()
         {
-            mEnableBreakDispatch = true;
+            nEnableBreakDispatch = true;
         }
 
         /**
@@ -156,8 +170,8 @@ public abstract class StreamConnection
          */
         public void breakDispatch()
         {
-            if (mEnableBreakDispatch)
-                mShouldBreakDispatch = true;
+            if (nEnableBreakDispatch)
+                nShouldBreakDispatch = true;
         }
 
         /**
@@ -165,8 +179,8 @@ public abstract class StreamConnection
          */
         public void resetBreakDispatch()
         {
-            mEnableBreakDispatch = false;
-            mShouldBreakDispatch = false;
+            nEnableBreakDispatch = false;
+            nShouldBreakDispatch = false;
         }
     }
 
