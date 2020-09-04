@@ -13,13 +13,13 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,8 +41,9 @@ public class FStreamManager
 
     private final Map<Class<? extends FStream>, Collection<FStream>> mMapStream = new ConcurrentHashMap<>();
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
-
     private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
+
+    private final Collection<Class<? extends FStream>> mDirtyHolder = new HashSet<>();
 
     private boolean mIsDebug;
 
@@ -225,8 +226,7 @@ public class FStreamManager
             Collection<FStream> holder = mMapStream.get(item);
             if (holder == null)
             {
-                final Comparator<FStream> comparator = new InternalStreamComparator(item);
-                holder = new TreeSet<>(comparator);
+                holder = new HashSet<>();
                 mMapStream.put(item, holder);
             }
 
@@ -255,11 +255,11 @@ public class FStreamManager
 
             if (holder.remove(stream))
             {
-                if (mIsDebug)
-                    Log.e(FStream.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
-
                 if (holder.isEmpty())
                     mMapStream.remove(item);
+
+                if (mIsDebug)
+                    Log.e(FStream.class.getSimpleName(), "unregister:" + stream + " class:" + item.getName() + " count:" + (holder.size()));
             }
         }
     }
@@ -267,6 +267,11 @@ public class FStreamManager
     public StreamConnection getConnection(FStream stream)
     {
         return mMapStreamConnection.get(stream);
+    }
+
+    private Comparator<FStream> newStreamComparator(Class<? extends FStream> clazz)
+    {
+        return new InternalStreamComparator(clazz);
     }
 
     private final class InternalStreamConnection extends StreamConnection
@@ -279,7 +284,17 @@ public class FStreamManager
         @Override
         protected void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
         {
-
+            synchronized (FStreamManager.this)
+            {
+                mDirtyHolder.add(clazz);
+                if (isDebug())
+                {
+                    Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
+                            + " priority:" + priority
+                            + " clazz:" + clazz.getName()
+                            + " stream:" + stream);
+                }
+            }
         }
     }
 
@@ -450,9 +465,22 @@ public class FStreamManager
 
                 listStream = new ArrayList<>(1);
                 listStream.add(stream);
-                Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
+
+                if (mManager.isDebug())
+                    Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
             } else
             {
+                synchronized (mManager)
+                {
+                    if (mManager.mDirtyHolder.remove(mClass))
+                    {
+                        final List<FStream> listEntry = new ArrayList<>(holder);
+                        Collections.sort(listEntry, mManager.newStreamComparator(mClass));
+
+                        if (mManager.isDebug())
+                            Log.i(FStream.class.getSimpleName(), "sort stream");
+                    }
+                }
                 listStream = new ArrayList<>(holder);
             }
 
