@@ -531,6 +531,10 @@ public class FStreamManager
             int index = 0;
             for (FStream item : listStream)
             {
+                final StreamConnection connection = mManager.getConnection(item);
+                if (connection == null)
+                    continue;
+
                 if (!checkTag(item))
                     continue;
 
@@ -549,7 +553,6 @@ public class FStreamManager
 
                 synchronized (mClass)
                 {
-                    final StreamConnection connection = mManager.mMapStreamConnection.get(item);
                     connection.enableBreakDispatch(mClass);
 
                     itemResult = method.invoke(item, args);
