@@ -251,8 +251,8 @@ public class FStreamManager
                 if (mIsDebug)
                 {
                     Log.i(FStream.class.getSimpleName(), "+++++ register"
-                            + " stream:" + stream
                             + " class:" + item.getName()
+                            + " stream:" + stream
                             + " count:" + (holder.size()));
                 }
             }
@@ -282,8 +282,8 @@ public class FStreamManager
                 if (mIsDebug)
                 {
                     Log.i(FStream.class.getSimpleName(), "----- unregister"
-                            + " stream:" + stream
                             + " class:" + item.getName()
+                            + " stream:" + stream
                             + " count:" + (holder.size()));
                 }
             }
@@ -469,11 +469,12 @@ public class FStreamManager
                     result = 0;
 
                 if (mManager.isDebug())
-                    Log.e(FStream.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result);
+                    Log.i(FStream.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result
+                            + " class:" + mClass.getName());
             }
 
-            if (mManager.isDebug() && !isVoid)
-                Log.i(FStream.class.getSimpleName(), "notify final return:" + result);
+            if (mManager.isDebug())
+                Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " class:" + mClass.getName());
 
             return result;
         }
@@ -518,7 +519,7 @@ public class FStreamManager
                         listStream = listEntry;
 
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "sort stream");
+                            Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
                     }
                 }
 
@@ -551,7 +552,7 @@ public class FStreamManager
                     if (mDispatchCallback.beforeDispatch(item, method, args))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "notify broken before dispatch");
+                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before class:" + mClass.getName());
                         break;
                     }
                 }
@@ -579,8 +580,9 @@ public class FStreamManager
                 {
                     Log.i(FStream.class.getSimpleName(), "notify"
                             + " index:" + index
-                            + " stream:" + item
                             + " return:" + (isVoid ? "" : itemResult)
+                            + " class:" + mClass.getName()
+                            + " stream:" + item
                             + " shouldBreakDispatch:" + shouldBreakDispatch);
                 }
 
@@ -594,7 +596,7 @@ public class FStreamManager
                     if (mDispatchCallback.afterDispatch(item, method, args, itemResult))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "notify broken after dispatch");
+                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after class:" + mClass.getName());
                         break;
                     }
                 }
@@ -610,7 +612,7 @@ public class FStreamManager
                 result = mResultFilter.filter(method, args, listResult);
 
                 if (mManager.isDebug())
-                    Log.i(FStream.class.getSimpleName(), "filter result: " + result);
+                    Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " class:" + mClass.getName());
             }
 
             return result;
