@@ -53,18 +53,18 @@ public abstract class StreamConnection
     {
         if (clazz == null)
         {
-            for (Map.Entry<Class<? extends FStream>, ConnectionItem> item : mMapItem.entrySet())
+            for (ConnectionItem item : mMapItem.values())
             {
-                item.getValue().setPriority(priority);
+                item.setPriority(priority);
             }
         } else
         {
             checkClassInterface(clazz);
             checkClassAssignable(clazz);
 
-            final ConnectionItem connectionItem = mMapItem.get(clazz);
-            if (connectionItem != null)
-                connectionItem.setPriority(priority);
+            final ConnectionItem item = mMapItem.get(clazz);
+            if (item != null)
+                item.setPriority(priority);
         }
     }
 
