@@ -498,17 +498,18 @@ public class FStreamManager
                 if (stream == null)
                     return null;
 
-                isDefaultStream = true;
                 listStream = new ArrayList<>(1);
                 listStream.add(stream);
+
+                isDefaultStream = true;
 
                 if (mManager.isDebug())
                     Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
             } else
             {
-                synchronized (mManager)
+                if (mManager.mMapDirtyClass.remove(mClass) != null)
                 {
-                    if (mManager.mMapDirtyClass.remove(mClass) != null)
+                    synchronized (mManager)
                     {
                         final List<FStream> listEntry = new ArrayList<>(holder);
                         Collections.sort(listEntry, mManager.newStreamComparator(mClass));
