@@ -13,10 +13,8 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +38,7 @@ public class FStreamManager
         return INSTANCE;
     }
 
-    private final Map<Class<? extends FStream>, Collection<FStream>> mMapStream = new ConcurrentHashMap<>();
+    private final Map<Class<? extends FStream>, FStreamHolder> mMapStream = new ConcurrentHashMap<>();
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
 
     private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
@@ -239,10 +237,10 @@ public class FStreamManager
 
         for (Class<? extends FStream> item : classes)
         {
-            Collection<FStream> holder = mMapStream.get(item);
+            FStreamHolder holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new LinkedHashSet<>();
+                holder = new FStreamHolder();
                 mMapStream.put(item, holder);
             }
 
@@ -270,7 +268,7 @@ public class FStreamManager
 
         for (Class<? extends FStream> item : classes)
         {
-            final Collection<FStream> holder = mMapStream.get(item);
+            final FStreamHolder holder = mMapStream.get(item);
             if (holder == null)
                 continue;
 
@@ -481,8 +479,8 @@ public class FStreamManager
 
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
-            final Collection<FStream> holder = mManager.mMapStream.get(mClass);
-            List<FStream> listStream = null;
+            final FStreamHolder holder = mManager.mMapStream.get(mClass);
+            Collection<FStream> listStream = null;
 
             if (mManager.isDebug())
             {
@@ -511,13 +509,7 @@ public class FStreamManager
                 {
                     synchronized (mManager)
                     {
-                        final List<FStream> listEntry = new ArrayList<>(holder);
-                        Collections.sort(listEntry, mManager.newStreamComparator(mClass));
-
-                        holder.clear();
-                        holder.addAll(listEntry);
-
-                        listStream = listEntry;
+                        listStream = holder.sort(mManager.newStreamComparator(mClass));
 
                         if (mManager.isDebug())
                             Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
@@ -525,7 +517,7 @@ public class FStreamManager
                 }
 
                 if (listStream == null)
-                    listStream = new ArrayList<>(holder);
+                    listStream = holder.toCollection();
             }
 
             final boolean filterResult = mResultFilter != null && !isVoid;
