@@ -48,17 +48,21 @@ class FStreamHolder
 
     public Collection<FStream> toCollection()
     {
+        Collection<FStream> result = null;
+
         if (mIsNeedSort)
         {
-            mIsNeedSort = false;
             synchronized (mManager)
             {
-                return sort();
+                result = sort();
             }
+            mIsNeedSort = false;
         } else
         {
-            return new ArrayList<>(mStreamHolder);
+            result = new ArrayList<>(mStreamHolder);
         }
+
+        return result;
     }
 
     public void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
