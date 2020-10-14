@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-class FStreamHolder
+class StreamHolder
 {
     private final Class<? extends FStream> mClass;
     private final FStreamManager mManager;
@@ -22,7 +22,7 @@ class FStreamHolder
 
     private volatile boolean mIsPriorityChanged = false;
 
-    public FStreamHolder(Class<? extends FStream> clazz, FStreamManager manager)
+    public StreamHolder(Class<? extends FStream> clazz, FStreamManager manager)
     {
         mClass = clazz;
         mManager = manager;

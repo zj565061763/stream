@@ -37,7 +37,7 @@ public class FStreamManager
         return INSTANCE;
     }
 
-    private final Map<Class<? extends FStream>, FStreamHolder> mMapStream = new ConcurrentHashMap<>();
+    private final Map<Class<? extends FStream>, StreamHolder> mMapStream = new ConcurrentHashMap<>();
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
 
     private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
@@ -235,10 +235,10 @@ public class FStreamManager
 
         for (Class<? extends FStream> item : classes)
         {
-            FStreamHolder holder = mMapStream.get(item);
+            StreamHolder holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new FStreamHolder(item, FStreamManager.this);
+                holder = new StreamHolder(item, FStreamManager.this);
                 mMapStream.put(item, holder);
             }
 
@@ -266,7 +266,7 @@ public class FStreamManager
 
         for (Class<? extends FStream> item : classes)
         {
-            final FStreamHolder holder = mMapStream.get(item);
+            final StreamHolder holder = mMapStream.get(item);
             if (holder == null)
                 continue;
 
@@ -307,7 +307,7 @@ public class FStreamManager
         @Override
         protected void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
         {
-            final FStreamHolder holder = mMapStream.get(clazz);
+            final StreamHolder holder = mMapStream.get(clazz);
             if (holder != null)
                 holder.onPriorityChanged(priority, stream, clazz);
         }
@@ -445,7 +445,7 @@ public class FStreamManager
 
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
-            final FStreamHolder holder = mManager.mMapStream.get(mClass);
+            final StreamHolder holder = mManager.mMapStream.get(mClass);
             final int holderSize = holder == null ? 0 : holder.size();
 
             Collection<FStream> listStream = null;
