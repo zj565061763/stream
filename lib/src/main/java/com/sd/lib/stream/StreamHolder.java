@@ -106,14 +106,15 @@ class StreamHolder
 
     private boolean isNeedSort()
     {
-        if (!hasPriorityStream())
+        if (hasPriorityStream())
+        {
+            return mIsPriorityChanged || mHasDirtyStream;
+        } else
         {
             mIsPriorityChanged = false;
             mHasDirtyStream = false;
             return false;
         }
-
-        return mIsPriorityChanged || mHasDirtyStream;
     }
 
     private Collection<FStream> sort()
