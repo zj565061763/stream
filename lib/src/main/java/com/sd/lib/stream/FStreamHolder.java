@@ -12,9 +12,16 @@ class FStreamHolder
     private final Class<? extends FStream> mClass;
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
 
+    private volatile boolean mIsNeedSort = false;
+
     public FStreamHolder(Class<? extends FStream> clazz)
     {
         mClass = clazz;
+    }
+
+    public boolean isNeedSort()
+    {
+        return mIsNeedSort;
     }
 
     public boolean add(FStream stream)
@@ -45,7 +52,16 @@ class FStreamHolder
         mStreamHolder.clear();
         mStreamHolder.addAll(listEntry);
 
+        mIsNeedSort = false;
         return listEntry;
+    }
+
+    public void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
+    {
+        if (clazz != mClass)
+            return;
+
+        mIsNeedSort = true;
     }
 
     public Collection<FStream> toCollection()

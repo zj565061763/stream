@@ -41,7 +41,6 @@ public class FStreamManager
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
 
     private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
-    private final Map<Class<? extends FStream>, String> mMapDirtyClass = new ConcurrentHashMap<>();
 
     private boolean mIsDebug;
 
@@ -308,7 +307,10 @@ public class FStreamManager
         @Override
         protected void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
         {
-            mMapDirtyClass.put(clazz, "");
+            final FStreamHolder holder = mMapStream.get(clazz);
+            if (holder != null)
+                holder.onPriorityChanged(priority, stream, clazz);
+
             if (isDebug())
             {
                 Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
@@ -477,7 +479,7 @@ public class FStreamManager
                     Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
             } else
             {
-                if (mManager.mMapDirtyClass.remove(mClass) != null)
+                if (holder.isNeedSort())
                 {
                     synchronized (mManager)
                     {
@@ -486,10 +488,10 @@ public class FStreamManager
                         if (mManager.isDebug())
                             Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
                     }
-                }
-
-                if (listStream == null)
+                } else
+                {
                     listStream = holder.toCollection();
+                }
             }
 
             final boolean filterResult = mResultFilter != null && !isVoid;
