@@ -13,7 +13,6 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -240,7 +239,7 @@ public class FStreamManager
             FStreamHolder holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new FStreamHolder();
+                holder = new FStreamHolder(item);
                 mMapStream.put(item, holder);
             }
 
@@ -299,11 +298,6 @@ public class FStreamManager
         return mMapStreamConnection.get(stream);
     }
 
-    private Comparator<FStream> newStreamComparator(Class<? extends FStream> clazz)
-    {
-        return new InternalStreamComparator(clazz);
-    }
-
     private final class InternalStreamConnection extends StreamConnection
     {
         InternalStreamConnection(FStream stream, Class<? extends FStream>[] classes)
@@ -322,28 +316,6 @@ public class FStreamManager
                         + " clazz:" + clazz.getName()
                         + " stream:" + stream);
             }
-        }
-    }
-
-    private final class InternalStreamComparator implements Comparator<FStream>
-    {
-        private final Class<? extends FStream> nClass;
-
-        public InternalStreamComparator(Class<? extends FStream> clazz)
-        {
-            nClass = clazz;
-        }
-
-        @Override
-        public int compare(FStream o1, FStream o2)
-        {
-            final StreamConnection o1Connection = getConnection(o1);
-            final StreamConnection o2Connection = getConnection(o2);
-            if (o1Connection != null && o2Connection != null)
-            {
-                return o2Connection.getPriority(nClass) - o1Connection.getPriority(nClass);
-            }
-            return 0;
         }
     }
 
@@ -509,7 +481,7 @@ public class FStreamManager
                 {
                     synchronized (mManager)
                     {
-                        listStream = holder.sort(mManager.newStreamComparator(mClass));
+                        listStream = holder.sort();
 
                         if (mManager.isDebug())
                             Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());

@@ -9,7 +9,13 @@ import java.util.List;
 
 class FStreamHolder
 {
+    private final Class<? extends FStream> mClass;
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
+
+    public FStreamHolder(Class<? extends FStream> clazz)
+    {
+        mClass = clazz;
+    }
 
     public boolean add(FStream stream)
     {
@@ -31,13 +37,10 @@ class FStreamHolder
         return mStreamHolder.isEmpty();
     }
 
-    public Collection<FStream> sort(Comparator<FStream> comparator)
+    public Collection<FStream> sort()
     {
-        if (comparator == null)
-            return null;
-
         final List<FStream> listEntry = new ArrayList<>(mStreamHolder);
-        Collections.sort(listEntry, comparator);
+        Collections.sort(listEntry, new InternalStreamComparator());
 
         mStreamHolder.clear();
         mStreamHolder.addAll(listEntry);
@@ -48,5 +51,25 @@ class FStreamHolder
     public Collection<FStream> toCollection()
     {
         return new ArrayList<>(mStreamHolder);
+    }
+
+    private FStreamManager getManager()
+    {
+        return FStreamManager.getInstance();
+    }
+
+    private final class InternalStreamComparator implements Comparator<FStream>
+    {
+        @Override
+        public int compare(FStream o1, FStream o2)
+        {
+            final StreamConnection o1Connection = getManager().getConnection(o1);
+            final StreamConnection o2Connection = getManager().getConnection(o2);
+            if (o1Connection != null && o2Connection != null)
+            {
+                return o2Connection.getPriority(mClass) - o1Connection.getPriority(mClass);
+            }
+            return 0;
+        }
     }
 }
