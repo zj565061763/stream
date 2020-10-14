@@ -18,9 +18,8 @@ class StreamHolder
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
 
     private final Map<FStream, Integer> mPriorityStreamHolder = new ConcurrentHashMap<>();
-    private final Map<FStream, String> mDirtyStreamHolder = new ConcurrentHashMap<>();
-
     private volatile boolean mIsPriorityChanged = false;
+    private volatile boolean mHasDirtyStream = false;
 
     public StreamHolder(Class<? extends FStream> clazz, FStreamManager manager)
     {
@@ -37,10 +36,7 @@ class StreamHolder
         if (result)
         {
             if (hasPriorityStream())
-            {
-                // 标记新增的对象为dirty
-                mDirtyStreamHolder.put(stream, "");
-            }
+                mHasDirtyStream = true;
         }
         return result;
     }
@@ -51,8 +47,6 @@ class StreamHolder
             return false;
 
         final boolean result = mStreamHolder.remove(stream);
-
-        mDirtyStreamHolder.remove(stream);
         mPriorityStreamHolder.remove(stream);
 
         return result;
@@ -101,7 +95,6 @@ class StreamHolder
                     + " priority:" + priority
                     + " clazz:" + clazz.getName()
                     + " priorityStreamHolder size:" + mPriorityStreamHolder.size()
-                    + " dirtyStreamHolder size:" + mDirtyStreamHolder.size()
                     + " stream:" + stream);
         }
     }
@@ -113,7 +106,14 @@ class StreamHolder
 
     private boolean isNeedSort()
     {
-        return mIsPriorityChanged || mDirtyStreamHolder.size() > 0;
+        if (!hasPriorityStream())
+        {
+            mIsPriorityChanged = false;
+            mHasDirtyStream = false;
+            return false;
+        }
+
+        return mIsPriorityChanged || mHasDirtyStream;
     }
 
     private Collection<FStream> sort()
@@ -125,7 +125,7 @@ class StreamHolder
         mStreamHolder.addAll(listEntry);
 
         mIsPriorityChanged = false;
-        mDirtyStreamHolder.clear();
+        mHasDirtyStream = false;
 
         if (mManager.isDebug())
             Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
