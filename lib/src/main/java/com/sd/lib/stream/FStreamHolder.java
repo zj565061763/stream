@@ -26,12 +26,20 @@ class FStreamHolder
 
     public boolean add(FStream stream)
     {
-        return mStreamHolder.add(stream);
+        if (stream == null)
+            return false;
+
+        final boolean result = mStreamHolder.add(stream);
+        return result;
     }
 
     public boolean remove(FStream stream)
     {
-        return mStreamHolder.remove(stream);
+        if (stream == null)
+            return false;
+
+        final boolean result = mStreamHolder.remove(stream);
+        return result;
     }
 
     public int size()
