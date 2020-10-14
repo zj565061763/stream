@@ -1,7 +1,7 @@
 package com.sd.stream;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.sd.lib.stream.FStream;
 import com.sd.lib.stream.FStreamManager;
