@@ -1,11 +1,12 @@
 package com.sd.stream;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.fragment.app.Fragment;
 
 import com.sd.lib.stream.FStream;
 
@@ -37,8 +38,6 @@ public class TestFragment extends Fragment
                 @Override
                 public boolean afterDispatch(FStream stream, Method method, Object[] methodParams, Object methodResult)
                 {
-                    if ("2".equals(methodResult))
-                        return true;
                     return false;
                 }
             })
