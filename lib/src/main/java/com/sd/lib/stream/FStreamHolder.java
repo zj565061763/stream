@@ -59,7 +59,7 @@ class FStreamHolder
     public void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
     {
         if (clazz != mClass)
-            return;
+            throw new IllegalArgumentException("expect class:" + mClass + " but class:" + clazz);
 
         mIsNeedSort = true;
     }
