@@ -52,8 +52,8 @@ class StreamHolder
 
         final boolean result = mStreamHolder.remove(stream);
 
-        mPriorityStreamHolder.remove(stream);
         mDirtyStreamHolder.remove(stream);
+        mPriorityStreamHolder.remove(stream);
 
         return result;
     }
@@ -73,7 +73,6 @@ class StreamHolder
             {
                 result = sort();
             }
-
         } else
         {
             result = new ArrayList<>(mStreamHolder);
