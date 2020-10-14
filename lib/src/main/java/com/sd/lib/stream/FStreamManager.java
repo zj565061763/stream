@@ -238,7 +238,7 @@ public class FStreamManager
             FStreamHolder holder = mMapStream.get(item);
             if (holder == null)
             {
-                holder = new FStreamHolder(item);
+                holder = new FStreamHolder(item, FStreamManager.this);
                 mMapStream.put(item, holder);
             }
 
@@ -272,7 +272,7 @@ public class FStreamManager
 
             if (holder.remove(stream))
             {
-                if (holder.isEmpty())
+                if (holder.size() <= 0)
                     mMapStream.remove(item);
 
                 if (mIsDebug)
@@ -454,17 +454,19 @@ public class FStreamManager
         private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
         {
             final FStreamHolder holder = mManager.mMapStream.get(mClass);
+            final int holderSize = holder == null ? 0 : holder.size();
+
             Collection<FStream> listStream = null;
 
             if (mManager.isDebug())
             {
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args))
                         + " tag:" + mTag
-                        + " count:" + (holder == null ? 0 : holder.size()));
+                        + " count:" + holderSize);
             }
 
             boolean isDefaultStream = false;
-            if (holder == null || holder.isEmpty())
+            if (holderSize <= 0)
             {
                 final FStream stream = mManager.getDefaultStream(mClass);
                 if (stream == null)
@@ -479,19 +481,7 @@ public class FStreamManager
                     Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
             } else
             {
-                if (holder.isNeedSort())
-                {
-                    synchronized (mManager)
-                    {
-                        listStream = holder.sort();
-
-                        if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
-                    }
-                } else
-                {
-                    listStream = holder.toCollection();
-                }
+                listStream = holder.toCollection();
             }
 
             final boolean filterResult = mResultFilter != null && !isVoid;

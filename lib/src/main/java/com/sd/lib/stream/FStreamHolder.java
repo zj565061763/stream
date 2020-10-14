@@ -1,5 +1,7 @@
 package com.sd.lib.stream;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,18 +12,15 @@ import java.util.List;
 class FStreamHolder
 {
     private final Class<? extends FStream> mClass;
+    private final FStreamManager mManager;
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
 
     private volatile boolean mIsNeedSort = false;
 
-    public FStreamHolder(Class<? extends FStream> clazz)
+    public FStreamHolder(Class<? extends FStream> clazz, FStreamManager manager)
     {
         mClass = clazz;
-    }
-
-    public boolean isNeedSort()
-    {
-        return mIsNeedSort;
+        mManager = manager;
     }
 
     public boolean add(FStream stream)
@@ -47,21 +46,19 @@ class FStreamHolder
         return mStreamHolder.size();
     }
 
-    public boolean isEmpty()
+    public Collection<FStream> toCollection()
     {
-        return mStreamHolder.isEmpty();
-    }
-
-    public Collection<FStream> sort()
-    {
-        final List<FStream> listEntry = new ArrayList<>(mStreamHolder);
-        Collections.sort(listEntry, new InternalStreamComparator());
-
-        mStreamHolder.clear();
-        mStreamHolder.addAll(listEntry);
-
-        mIsNeedSort = false;
-        return listEntry;
+        if (mIsNeedSort)
+        {
+            mIsNeedSort = false;
+            synchronized (mManager)
+            {
+                return sort();
+            }
+        } else
+        {
+            return new ArrayList<>(mStreamHolder);
+        }
     }
 
     public void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
@@ -72,14 +69,18 @@ class FStreamHolder
         mIsNeedSort = true;
     }
 
-    public Collection<FStream> toCollection()
+    private Collection<FStream> sort()
     {
-        return new ArrayList<>(mStreamHolder);
-    }
+        final List<FStream> listEntry = new ArrayList<>(mStreamHolder);
+        Collections.sort(listEntry, new InternalStreamComparator());
 
-    private FStreamManager getManager()
-    {
-        return FStreamManager.getInstance();
+        mStreamHolder.clear();
+        mStreamHolder.addAll(listEntry);
+
+        if (mManager.isDebug())
+            Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
+
+        return listEntry;
     }
 
     private final class InternalStreamComparator implements Comparator<FStream>
@@ -87,8 +88,8 @@ class FStreamHolder
         @Override
         public int compare(FStream o1, FStream o2)
         {
-            final StreamConnection o1Connection = getManager().getConnection(o1);
-            final StreamConnection o2Connection = getManager().getConnection(o2);
+            final StreamConnection o1Connection = mManager.getConnection(o1);
+            final StreamConnection o2Connection = mManager.getConnection(o2);
             if (o1Connection != null && o2Connection != null)
             {
                 return o2Connection.getPriority(mClass) - o1Connection.getPriority(mClass);
