@@ -310,14 +310,6 @@ public class FStreamManager
             final FStreamHolder holder = mMapStream.get(clazz);
             if (holder != null)
                 holder.onPriorityChanged(priority, stream, clazz);
-
-            if (isDebug())
-            {
-                Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
-                        + " priority:" + priority
-                        + " clazz:" + clazz.getName()
-                        + " stream:" + stream);
-            }
         }
     }
 

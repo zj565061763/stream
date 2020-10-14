@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 class FStreamHolder
 {
@@ -15,7 +17,10 @@ class FStreamHolder
     private final FStreamManager mManager;
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
 
-    private volatile boolean mIsNeedSort = false;
+    private final Map<FStream, Integer> mPriorityStreamHolder = new ConcurrentHashMap<>();
+    private final Map<FStream, String> mDirtyStreamHolder = new ConcurrentHashMap<>();
+
+    private volatile boolean mIsPriorityChanged = false;
 
     public FStreamHolder(Class<? extends FStream> clazz, FStreamManager manager)
     {
@@ -29,6 +34,14 @@ class FStreamHolder
             return false;
 
         final boolean result = mStreamHolder.add(stream);
+        if (result)
+        {
+            if (hasPriorityStream())
+            {
+                // 标记新增的对象为dirty
+                mDirtyStreamHolder.put(stream, "");
+            }
+        }
         return result;
     }
 
@@ -38,6 +51,10 @@ class FStreamHolder
             return false;
 
         final boolean result = mStreamHolder.remove(stream);
+
+        mPriorityStreamHolder.remove(stream);
+        mDirtyStreamHolder.remove(stream);
+
         return result;
     }
 
@@ -50,13 +67,13 @@ class FStreamHolder
     {
         Collection<FStream> result = null;
 
-        if (mIsNeedSort)
+        if (isNeedSort())
         {
             synchronized (mManager)
             {
                 result = sort();
             }
-            mIsNeedSort = false;
+
         } else
         {
             result = new ArrayList<>(mStreamHolder);
@@ -70,7 +87,34 @@ class FStreamHolder
         if (clazz != mClass)
             throw new IllegalArgumentException("expect class:" + mClass + " but class:" + clazz);
 
-        mIsNeedSort = true;
+        if (priority == 0)
+        {
+            mPriorityStreamHolder.remove(stream);
+        } else
+        {
+            mPriorityStreamHolder.put(stream, priority);
+        }
+        mIsPriorityChanged = true;
+
+        if (mManager.isDebug())
+        {
+            Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
+                    + " priority:" + priority
+                    + " clazz:" + clazz.getName()
+                    + " priorityStreamHolder size:" + mPriorityStreamHolder.size()
+                    + " dirtyStreamHolder size:" + mDirtyStreamHolder.size()
+                    + " stream:" + stream);
+        }
+    }
+
+    private boolean hasPriorityStream()
+    {
+        return mPriorityStreamHolder.size() > 0;
+    }
+
+    private boolean isNeedSort()
+    {
+        return mIsPriorityChanged || mDirtyStreamHolder.size() > 0;
     }
 
     private Collection<FStream> sort()
@@ -80,6 +124,9 @@ class FStreamHolder
 
         mStreamHolder.clear();
         mStreamHolder.addAll(listEntry);
+
+        mIsPriorityChanged = false;
+        mDirtyStreamHolder.clear();
 
         if (mManager.isDebug())
             Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
