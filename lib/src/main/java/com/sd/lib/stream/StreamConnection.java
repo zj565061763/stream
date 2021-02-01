@@ -24,7 +24,7 @@ public abstract class StreamConnection
      * @param clazz
      * @return
      */
-    synchronized int getPriority(Class<? extends FStream> clazz)
+    int getPriority(Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
