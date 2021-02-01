@@ -12,7 +12,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class StreamTagManager
 {
+    private static StreamTagManager sDefault;
+
+    public static StreamTagManager getDefault()
+    {
+        if (sDefault != null)
+            return sDefault;
+
+        synchronized (StreamTagManager.class)
+        {
+            if (sDefault == null)
+                sDefault = new StreamTagManager();
+            return sDefault;
+        }
+    }
+
     private final Map<StreamTagHolder, ViewTree> mTagViewHolder = new ConcurrentHashMap<>();
+
+    public StreamTagManager()
+    {
+        // 构造方法保持public，可以不使用默认对象
+    }
 
     /**
      * 返回所有{@link StreamTagHolder}

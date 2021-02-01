@@ -5,7 +5,7 @@ import com.sd.lib.stream.FStream;
 public class DefaultFragmentCallback implements TestFragment.FragmentCallback
 {
     @Override
-    public String getActivityContent()
+    public String getDisplayContent()
     {
         return "default stream value";
     }

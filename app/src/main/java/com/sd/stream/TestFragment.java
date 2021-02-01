@@ -10,9 +10,6 @@ import androidx.fragment.app.Fragment;
 
 import com.sd.lib.stream.FStream;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 public class TestFragment extends Fragment
 {
     /**
@@ -23,35 +20,7 @@ public class TestFragment extends Fragment
              * 设置代理对象的tag，默认tag为null
              * 注意：只有tag和当前代理对象tag相等的流对象才会被通知到，tag比较相等的规则为 “==” 或者 “equals”
              */
-            .setTag(null)
-            /**
-             * 设置分发回调
-             */
-            .setDispatchCallback(new FStream.DispatchCallback()
-            {
-                @Override
-                public boolean beforeDispatch(FStream stream, Method method, Object[] methodParams)
-                {
-                    return false;
-                }
-
-                @Override
-                public boolean afterDispatch(FStream stream, Method method, Object[] methodParams, Object methodResult)
-                {
-                    return false;
-                }
-            })
-            /**
-             * 设置返回值过滤
-             */
-            .setResultFilter(new FStream.ResultFilter()
-            {
-                @Override
-                public Object filter(Method method, Object[] methodParams, List<Object> results)
-                {
-                    return results.get(0);
-                }
-            })
+            .setTag(MainActivity.class.getSimpleName())
             .build(FragmentCallback.class);
 
     @Override
@@ -64,11 +33,9 @@ public class TestFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                /**
-                 * 从Activity中获取内容
-                 */
-                final String activityContent = mCallback.getActivityContent();
-                button.setText(activityContent);
+                // 获取显示内容
+                final String content = mCallback.getDisplayContent();
+                button.setText(content);
             }
         });
 
@@ -80,6 +47,6 @@ public class TestFragment extends Fragment
      */
     public interface FragmentCallback extends FStream
     {
-        String getActivityContent();
+        String getDisplayContent();
     }
 }

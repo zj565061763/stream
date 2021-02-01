@@ -1,18 +1,25 @@
 package com.sd.stream;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.sd.lib.stream.FStream;
 import com.sd.lib.stream.FStreamManager;
+import com.sd.lib.stream.ext.tag.StreamTagLayout;
 
 public class MainActivity extends AppCompatActivity
 {
+    private StreamTagLayout view_tag_layout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        view_tag_layout = findViewById(R.id.view_tag_layout);
+        view_tag_layout.setStreamTag(MainActivity.class.getSimpleName());
+
         /**
          * 添加TestFragment
          */
@@ -31,11 +38,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public Object getTagForStream(Class<? extends FStream> clazz)
         {
-            return null;
+            return view_tag_layout.getStreamTag();
         }
 
         @Override
-        public String getActivityContent()
+        public String getDisplayContent()
         {
             return "1";
         }
@@ -46,11 +53,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public Object getTagForStream(Class<? extends FStream> clazz)
         {
-            return null;
+            return view_tag_layout.getStreamTag();
         }
 
         @Override
-        public String getActivityContent()
+        public String getDisplayContent()
         {
             return "2";
         }
@@ -61,11 +68,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public Object getTagForStream(Class<? extends FStream> clazz)
         {
-            return null;
+            return view_tag_layout.getStreamTag();
         }
 
         @Override
-        public String getActivityContent()
+        public String getDisplayContent()
         {
             return "3";
         }
