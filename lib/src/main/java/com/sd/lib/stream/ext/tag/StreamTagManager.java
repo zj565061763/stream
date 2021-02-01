@@ -81,10 +81,10 @@ public class StreamTagManager
             return getViewTree(tagHolder);
         }
 
-        for (Map.Entry<StreamTagHolder, ViewTree> item : mTagViewHolder.entrySet())
+        for (ViewTree item : mTagViewHolder.values())
         {
-            if (item.getValue().hasView(view))
-                return item.getValue();
+            if (item.hasView(view))
+                return item;
         }
         return null;
     }
