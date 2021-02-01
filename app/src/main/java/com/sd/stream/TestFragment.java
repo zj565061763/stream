@@ -20,14 +20,15 @@ public class TestFragment extends Fragment
              * 设置代理对象的tag，默认tag为null
              * 注意：只有tag和当前代理对象tag相等的流对象才会被通知到，tag比较相等的规则为 “==” 或者 “equals”
              */
-            .setTag(MainActivity.class.getSimpleName())
+            .setTag(null)
             .build(FragmentCallback.class);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         final Button button = new Button(container.getContext());
-        button.setText("button");
+        button.setAllCaps(false);
+        button.setText("click");
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override

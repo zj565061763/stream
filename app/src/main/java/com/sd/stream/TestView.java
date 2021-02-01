@@ -4,17 +4,16 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.sd.lib.stream.FStream;
 import com.sd.lib.stream.FStreamManager;
 
 public class TestView extends FrameLayout
 {
-    public TestView(@NonNull Context context, @Nullable AttributeSet attrs)
+    public TestView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+
+        // 绑定流对象到当前View，会自动注册和取消注册
         FStreamManager.getInstance().bindStream(mFragmentCallback, this);
     }
 
@@ -23,7 +22,7 @@ public class TestView extends FrameLayout
         @Override
         public String getDisplayContent()
         {
-            return "testView";
+            return "TestView";
         }
 
         @Override
