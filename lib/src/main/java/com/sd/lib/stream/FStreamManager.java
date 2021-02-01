@@ -301,7 +301,7 @@ public class FStreamManager
     {
         InternalStreamConnection(FStream stream, Class<? extends FStream>[] classes)
         {
-            super(stream, classes);
+            super(stream, classes, FStreamManager.this);
         }
 
         @Override

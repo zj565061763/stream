@@ -6,11 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class StreamConnection
 {
     private final FStream mStream;
+    private final FStreamManager mManager;
     private final Map<Class<? extends FStream>, ConnectionItem> mMapItem = new ConcurrentHashMap<>();
 
-    StreamConnection(FStream stream, Class<? extends FStream>[] classes)
+    StreamConnection(FStream stream, Class<? extends FStream>[] classes, FStreamManager manager)
     {
         mStream = stream;
+        mManager = manager;
+
         for (Class<? extends FStream> item : classes)
         {
             checkClassInterface(item);
@@ -49,22 +52,25 @@ public abstract class StreamConnection
      * @param priority
      * @param clazz
      */
-    public synchronized void setPriority(int priority, Class<? extends FStream> clazz)
+    public void setPriority(int priority, Class<? extends FStream> clazz)
     {
-        if (clazz == null)
+        synchronized (mManager)
         {
-            for (ConnectionItem item : mMapItem.values())
+            if (clazz == null)
             {
-                item.setPriority(priority);
-            }
-        } else
-        {
-            checkClassInterface(clazz);
-            checkClassAssignable(clazz);
+                for (ConnectionItem item : mMapItem.values())
+                {
+                    item.setPriority(priority);
+                }
+            } else
+            {
+                checkClassInterface(clazz);
+                checkClassAssignable(clazz);
 
-            final ConnectionItem item = mMapItem.get(clazz);
-            if (item != null)
-                item.setPriority(priority);
+                final ConnectionItem item = mMapItem.get(clazz);
+                if (item != null)
+                    item.setPriority(priority);
+            }
         }
     }
 
