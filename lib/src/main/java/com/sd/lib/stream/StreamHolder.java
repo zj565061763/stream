@@ -18,6 +18,7 @@ class StreamHolder
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
 
     private final Map<FStream, Integer> mPriorityStreamHolder = new ConcurrentHashMap<>();
+
     private volatile boolean mIsPriorityChanged = false;
     private volatile boolean mHasDirtyStream = false;
 
@@ -35,7 +36,8 @@ class StreamHolder
         final boolean result = mStreamHolder.add(stream);
         if (result)
         {
-            if (hasPriorityStream())
+            final int priorityStreamSize = mPriorityStreamHolder.size();
+            if (priorityStreamSize > 0)
                 mHasDirtyStream = true;
         }
         return result;
@@ -59,20 +61,38 @@ class StreamHolder
 
     public Collection<FStream> toCollection()
     {
-        Collection<FStream> result = null;
-
         if (isNeedSort())
         {
-            synchronized (mManager)
-            {
-                result = sort();
-            }
+            return sort();
         } else
         {
-            result = new ArrayList<>(mStreamHolder);
+            return new ArrayList<>(mStreamHolder);
         }
+    }
 
-        return result;
+    private boolean isNeedSort()
+    {
+        return mIsPriorityChanged || mHasDirtyStream;
+    }
+
+    private Collection<FStream> sort()
+    {
+        synchronized (mManager)
+        {
+            final List<FStream> listEntry = new ArrayList<>(mStreamHolder);
+            Collections.sort(listEntry, new InternalStreamComparator());
+
+            mStreamHolder.clear();
+            mStreamHolder.addAll(listEntry);
+
+            mIsPriorityChanged = false;
+            mHasDirtyStream = false;
+
+            if (mManager.isDebug())
+                Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
+
+            return listEntry;
+        }
     }
 
     public void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
@@ -97,41 +117,6 @@ class StreamHolder
                     + " priorityStreamHolder size:" + mPriorityStreamHolder.size()
                     + " stream:" + stream);
         }
-    }
-
-    private boolean hasPriorityStream()
-    {
-        return mPriorityStreamHolder.size() > 0;
-    }
-
-    private boolean isNeedSort()
-    {
-        if (hasPriorityStream())
-        {
-            return mIsPriorityChanged || mHasDirtyStream;
-        } else
-        {
-            mIsPriorityChanged = false;
-            mHasDirtyStream = false;
-            return false;
-        }
-    }
-
-    private Collection<FStream> sort()
-    {
-        final List<FStream> listEntry = new ArrayList<>(mStreamHolder);
-        Collections.sort(listEntry, new InternalStreamComparator());
-
-        mStreamHolder.clear();
-        mStreamHolder.addAll(listEntry);
-
-        mIsPriorityChanged = false;
-        mHasDirtyStream = false;
-
-        if (mManager.isDebug())
-            Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
-
-        return listEntry;
     }
 
     private final class InternalStreamComparator implements Comparator<FStream>
