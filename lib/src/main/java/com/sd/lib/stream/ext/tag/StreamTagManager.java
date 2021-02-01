@@ -106,7 +106,7 @@ public class StreamTagManager
     private final class ViewTree implements View.OnAttachStateChangeListener
     {
         private final StreamTagHolder nTagHolder;
-        private final Map<View, String> nViewHolder = new ConcurrentHashMap<>();
+        private final Map<View, String> nMapView = new ConcurrentHashMap<>();
 
         public ViewTree(StreamTagHolder tagHolder)
         {
@@ -127,7 +127,7 @@ public class StreamTagManager
             {
                 if (isAttached(view))
                 {
-                    final String put = nViewHolder.put(view, "");
+                    final String put = nMapView.put(view, "");
                     if (put == null)
                         view.addOnAttachStateChangeListener(this);
                 }
@@ -136,7 +136,7 @@ public class StreamTagManager
 
         public boolean hasView(View view)
         {
-            return nViewHolder.containsKey(view);
+            return nMapView.containsKey(view);
         }
 
         @Override
@@ -149,12 +149,12 @@ public class StreamTagManager
         public void onViewDetachedFromWindow(View v)
         {
             v.removeOnAttachStateChangeListener(this);
-            nViewHolder.remove(v);
+            nMapView.remove(v);
 
             synchronized (StreamTagManager.this)
             {
-                if (nViewHolder.isEmpty())
-                    mMapHolderViewTree.remove(nViewHolder);
+                if (nMapView.isEmpty())
+                    mMapHolderViewTree.remove(nMapView);
             }
         }
     }
