@@ -30,7 +30,7 @@ public class StreamTagManager
      * @param view
      * @return
      */
-    public synchronized String findStreamTag(View view)
+    public String findStreamTag(View view)
     {
         if (!isAttached(view))
             return null;
@@ -82,7 +82,7 @@ public class StreamTagManager
         return null;
     }
 
-    private ViewTree getViewTree(StreamTagHolder holder)
+    private synchronized ViewTree getViewTree(StreamTagHolder holder)
     {
         if (holder == null)
             throw new IllegalArgumentException("holder is null");
@@ -90,15 +90,29 @@ public class StreamTagManager
         ViewTree viewTree = mTagViewHolder.get(holder);
         if (viewTree == null)
         {
-            viewTree = new ViewTree();
+            viewTree = new ViewTree(holder);
             mTagViewHolder.put(holder, viewTree);
         }
         return viewTree;
     }
 
-    private static final class ViewTree implements View.OnAttachStateChangeListener
+    private synchronized void removeViewTree(StreamTagHolder holder)
     {
+        if (holder == null)
+            throw new IllegalArgumentException("holder is null");
+
+        mTagViewHolder.remove(holder);
+    }
+
+    private final class ViewTree implements View.OnAttachStateChangeListener
+    {
+        private final StreamTagHolder nTagHolder;
         private final Map<View, String> nViewHolder = new ConcurrentHashMap<>();
+
+        public ViewTree(StreamTagHolder tagHolder)
+        {
+            this.nTagHolder = tagHolder;
+        }
 
         public void addViews(List<View> views)
         {
@@ -129,6 +143,8 @@ public class StreamTagManager
         {
             v.removeOnAttachStateChangeListener(this);
             nViewHolder.remove(v);
+            if (nViewHolder.isEmpty())
+                removeViewTree(nTagHolder);
         }
     }
 
