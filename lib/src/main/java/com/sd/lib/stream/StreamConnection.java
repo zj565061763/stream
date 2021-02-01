@@ -79,14 +79,17 @@ public abstract class StreamConnection
      *
      * @param clazz
      */
-    public synchronized void breakDispatch(Class<? extends FStream> clazz)
+    public void breakDispatch(Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         checkClassAssignable(clazz);
 
-        final ConnectionItem item = mMapItem.get(clazz);
-        if (item != null)
-            item.breakDispatch();
+        synchronized (clazz)
+        {
+            final ConnectionItem item = mMapItem.get(clazz);
+            if (item != null)
+                item.breakDispatch();
+        }
     }
 
     /**
@@ -95,7 +98,7 @@ public abstract class StreamConnection
      * @param clazz
      * @return
      */
-    synchronized boolean shouldBreakDispatch(Class<? extends FStream> clazz)
+    boolean shouldBreakDispatch(Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
@@ -110,7 +113,7 @@ public abstract class StreamConnection
      *
      * @param clazz
      */
-    synchronized void resetBreakDispatch(Class<? extends FStream> clazz)
+    void resetBreakDispatch(Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
