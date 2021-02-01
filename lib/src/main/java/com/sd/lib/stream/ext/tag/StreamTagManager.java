@@ -103,14 +103,6 @@ public class StreamTagManager
         return viewTree;
     }
 
-    private synchronized void removeViewTree(StreamTagHolder holder)
-    {
-        if (holder == null)
-            throw new IllegalArgumentException("holder is null");
-
-        mTagViewHolder.remove(holder);
-    }
-
     private final class ViewTree implements View.OnAttachStateChangeListener
     {
         private final StreamTagHolder nTagHolder;
@@ -158,8 +150,12 @@ public class StreamTagManager
         {
             v.removeOnAttachStateChangeListener(this);
             nViewHolder.remove(v);
-            if (nViewHolder.isEmpty())
-                removeViewTree(nTagHolder);
+
+            synchronized (StreamTagManager.this)
+            {
+                if (nViewHolder.isEmpty())
+                    mTagViewHolder.remove(nViewHolder);
+            }
         }
     }
 
