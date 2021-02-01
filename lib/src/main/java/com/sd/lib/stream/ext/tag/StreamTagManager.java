@@ -4,7 +4,6 @@ import android.os.Build;
 import android.view.View;
 import android.view.ViewParent;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,16 +31,6 @@ public class StreamTagManager
     public StreamTagManager()
     {
         // 构造方法保持public，可以不使用默认对象
-    }
-
-    /**
-     * 返回所有{@link StreamTagHolder}
-     *
-     * @return
-     */
-    public Collection<StreamTagHolder> getStreamTagHolders()
-    {
-        return mTagViewHolder.keySet();
     }
 
     /**
