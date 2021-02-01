@@ -44,12 +44,12 @@ public class StreamTagManager
         if (!isAttached(view))
             return null;
 
-        final StreamTagHolder streamTagHolder = findStreamTagHolder(view);
-        if (streamTagHolder != null)
-            return streamTagHolder.getStreamTag();
+        ViewTree viewTree = findViewTree(view);
+        if (viewTree != null)
+            return viewTree.getStreamTag();
 
-        final List<View> listView = new LinkedList<>();
-        listView.add(view);
+        final List<View> listChild = new LinkedList<>();
+        listChild.add(view);
 
         ViewParent viewParent = view.getParent();
         while (viewParent != null && viewParent instanceof View)
@@ -58,15 +58,14 @@ public class StreamTagManager
             if (!isAttached(parent))
                 break;
 
-            final StreamTagHolder tagHolder = findStreamTagHolder(parent);
-            if (tagHolder != null)
+            viewTree = findViewTree(parent);
+            if (viewTree != null)
             {
-                final ViewTree viewTree = getViewTree(tagHolder);
-                viewTree.addViews(listView);
-                return tagHolder.getStreamTag();
+                viewTree.addViews(listChild);
+                return viewTree.getStreamTag();
             } else
             {
-                listView.add(parent);
+                listChild.add(parent);
                 viewParent = parent.getParent();
             }
         }
@@ -74,19 +73,18 @@ public class StreamTagManager
         return null;
     }
 
-    private StreamTagHolder findStreamTagHolder(View view)
+    private ViewTree findViewTree(View view)
     {
         if (view instanceof StreamTagHolder)
         {
             final StreamTagHolder tagHolder = (StreamTagHolder) view;
-            getViewTree(tagHolder);
-            return tagHolder;
+            return getViewTree(tagHolder);
         }
 
         for (Map.Entry<StreamTagHolder, ViewTree> item : mTagViewHolder.entrySet())
         {
             if (item.getValue().hasView(view))
-                return item.getKey();
+                return item.getValue();
         }
         return null;
     }
@@ -120,7 +118,15 @@ public class StreamTagManager
 
         public ViewTree(StreamTagHolder tagHolder)
         {
+            if (tagHolder == null)
+                throw new IllegalArgumentException("tagHolder is null");
+
             this.nTagHolder = tagHolder;
+        }
+
+        public String getStreamTag()
+        {
+            return nTagHolder.getStreamTag();
         }
 
         public void addViews(List<View> views)
