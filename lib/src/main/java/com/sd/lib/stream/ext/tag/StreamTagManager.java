@@ -26,7 +26,7 @@ public class StreamTagManager
         }
     }
 
-    private final Map<StreamTagHolder, ViewTree> mTagViewHolder = new ConcurrentHashMap<>();
+    private final Map<StreamTagHolder, ViewTree> mViewTreeHolder = new ConcurrentHashMap<>();
 
     public StreamTagManager()
     {
@@ -81,7 +81,7 @@ public class StreamTagManager
             return getViewTree(tagHolder);
         }
 
-        for (ViewTree item : mTagViewHolder.values())
+        for (ViewTree item : mViewTreeHolder.values())
         {
             if (item.hasView(view))
                 return item;
@@ -94,11 +94,11 @@ public class StreamTagManager
         if (holder == null)
             throw new IllegalArgumentException("holder is null");
 
-        ViewTree viewTree = mTagViewHolder.get(holder);
+        ViewTree viewTree = mViewTreeHolder.get(holder);
         if (viewTree == null)
         {
             viewTree = new ViewTree(holder);
-            mTagViewHolder.put(holder, viewTree);
+            mViewTreeHolder.put(holder, viewTree);
         }
         return viewTree;
     }
@@ -154,7 +154,7 @@ public class StreamTagManager
             synchronized (StreamTagManager.this)
             {
                 if (nViewHolder.isEmpty())
-                    mTagViewHolder.remove(nViewHolder);
+                    mViewTreeHolder.remove(nViewHolder);
             }
         }
     }
