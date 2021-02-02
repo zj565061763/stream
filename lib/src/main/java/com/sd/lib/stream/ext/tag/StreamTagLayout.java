@@ -20,7 +20,7 @@ public class StreamTagLayout extends FrameLayout implements StreamTagManager.Str
     }
 
     @Override
-    public synchronized void setStreamTag(String tag)
+    public void setStreamTag(String tag)
     {
         mStreamTag = tag;
     }
