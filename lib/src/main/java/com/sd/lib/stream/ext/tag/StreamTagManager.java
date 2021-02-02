@@ -102,6 +102,7 @@ public class StreamTagManager
         {
             viewTree = new ViewTree(tagView);
             mMapTagViewTree.put(tagView, viewTree);
+            initStreamTagView(tagView);
         }
         return viewTree;
     }
@@ -112,6 +113,26 @@ public class StreamTagManager
             throw new IllegalArgumentException("tagView is null");
 
         mMapTagViewTree.remove(tagView);
+    }
+
+    private void initStreamTagView(final StreamTagView tagView)
+    {
+        final View view = (View) tagView;
+        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener()
+        {
+            @Override
+            public void onViewAttachedToWindow(View v)
+            {
+                throw new RuntimeException("onViewAttachedToWindow ??? " + v);
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v)
+            {
+                v.removeOnAttachStateChangeListener(this);
+                removeViewTree(tagView);
+            }
+        });
     }
 
     private final class ViewTree implements View.OnAttachStateChangeListener
@@ -129,22 +150,21 @@ public class StreamTagManager
 
         public String getStreamTag()
         {
-            return nTagView.getStreamTag();
+            final View view = (View) nTagView;
+            final boolean isAttached = isAttached(view);
+            return isAttached ? nTagView.getStreamTag() : null;
         }
 
         public void addViews(List<View> views)
         {
-            synchronized (ViewTree.this)
+            for (View view : views)
             {
-                for (View view : views)
-                {
-                    if (isAttached(view))
-                    {
-                        final String put = nMapView.put(view, "");
-                        if (put == null)
-                            view.addOnAttachStateChangeListener(this);
-                    }
-                }
+                if (!isAttached(view))
+                    continue;
+
+                final String put = nMapView.put(view, "");
+                if (put == null)
+                    view.addOnAttachStateChangeListener(this);
             }
         }
 
@@ -163,12 +183,7 @@ public class StreamTagManager
         public void onViewDetachedFromWindow(View v)
         {
             v.removeOnAttachStateChangeListener(this);
-            synchronized (ViewTree.this)
-            {
-                nMapView.remove(v);
-                if (nMapView.isEmpty())
-                    removeViewTree(nTagView);
-            }
+            nMapView.remove(v);
         }
     }
 
