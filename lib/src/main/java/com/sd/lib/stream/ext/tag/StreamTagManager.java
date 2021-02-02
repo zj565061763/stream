@@ -31,6 +31,7 @@ public class StreamTagManager
     public static final String STREAM_TAG_EMPTY = UUID.randomUUID().toString();
 
     private final Map<IStreamTagView, ViewTree> mMapTagViewTree = new ConcurrentHashMap<>();
+    private final Map<View, ViewTree> mMapViewTreeCache = new ConcurrentHashMap<>();
 
     public StreamTagManager()
     {
@@ -55,6 +56,10 @@ public class StreamTagManager
             final String tag = tagView.getStreamTag();
             return tag;
         }
+
+        final ViewTree cacheTree = mMapViewTreeCache.get(view);
+        if (cacheTree != null)
+            return cacheTree.getStreamTag();
 
         final List<View> listChild = new LinkedList<>();
         listChild.add(view);
@@ -168,7 +173,10 @@ public class StreamTagManager
 
                 final String put = nMapView.put(view, "");
                 if (put == null)
+                {
                     view.addOnAttachStateChangeListener(this);
+                    mMapViewTreeCache.put(view, this);
+                }
             }
         }
 
@@ -187,6 +195,7 @@ public class StreamTagManager
         {
             v.removeOnAttachStateChangeListener(this);
             nMapView.remove(v);
+            mMapViewTreeCache.remove(v);
         }
     }
 
