@@ -53,11 +53,10 @@ public class StreamTagManager
         {
             // 直接返回tag，不创建ViewTree
             final IStreamTagView tagView = (IStreamTagView) view;
-            final String tag = tagView.getStreamTag();
-            return tag;
+            return tagView.getStreamTag();
         }
 
-        final ViewTree cacheTree = mMapViewTreeCache.get(view);
+        final ViewTree cacheTree = findViewTreeFromCache(view);
         if (cacheTree != null)
             return cacheTree.getStreamTag();
 
@@ -100,6 +99,11 @@ public class StreamTagManager
                 return item;
         }
         return null;
+    }
+
+    private ViewTree findViewTreeFromCache(View view)
+    {
+        return mMapViewTreeCache.get(view);
     }
 
     private synchronized ViewTree getViewTree(IStreamTagView tagView)
