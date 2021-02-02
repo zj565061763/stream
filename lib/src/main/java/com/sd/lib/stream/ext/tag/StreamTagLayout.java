@@ -6,11 +6,12 @@ import android.widget.FrameLayout;
 
 public class StreamTagLayout extends FrameLayout implements StreamTagManager.IStreamTagView
 {
-    private volatile String mStreamTag = StreamTagManager.STREAM_TAG_EMPTY;
+    private final String mStreamTag;
 
     public StreamTagLayout(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+        mStreamTag = createDefaultStreamTag(this);
     }
 
     @Override
@@ -19,9 +20,10 @@ public class StreamTagLayout extends FrameLayout implements StreamTagManager.ISt
         return mStreamTag;
     }
 
-    @Override
-    public void setStreamTag(String tag)
+    private static String createDefaultStreamTag(Object object)
     {
-        mStreamTag = tag;
+        final String className = object.getClass().getName();
+        final String hashCode = Integer.toHexString(System.identityHashCode(object));
+        return className + "@" + hashCode;
     }
 }

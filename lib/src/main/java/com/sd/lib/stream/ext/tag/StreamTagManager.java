@@ -195,8 +195,6 @@ public class StreamTagManager
     public interface IStreamTagView
     {
         String getStreamTag();
-
-        void setStreamTag(String tag);
     }
 
     private static boolean isAttached(View view)
