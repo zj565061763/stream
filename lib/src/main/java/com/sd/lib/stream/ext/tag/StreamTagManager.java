@@ -7,6 +7,7 @@ import android.view.ViewParent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class StreamTagManager
@@ -26,7 +27,9 @@ public class StreamTagManager
         }
     }
 
-    private static final String STREAM_TAG_EMPTY = "";
+    /** 空的Tag */
+    public static final String STREAM_TAG_EMPTY = UUID.randomUUID().toString();
+
     private final Map<StreamTagView, ViewTree> mMapTagViewTree = new ConcurrentHashMap<>();
 
     public StreamTagManager()
@@ -50,7 +53,7 @@ public class StreamTagManager
             // 直接返回tag，不创建ViewTree
             final StreamTagView tagView = (StreamTagView) view;
             final String tag = tagView.getStreamTag();
-            return tag != null ? tag : STREAM_TAG_EMPTY;
+            return tag;
         }
 
         final List<View> listChild = new LinkedList<>();

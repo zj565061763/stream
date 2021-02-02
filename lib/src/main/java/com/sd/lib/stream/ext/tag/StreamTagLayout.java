@@ -6,7 +6,7 @@ import android.widget.FrameLayout;
 
 public class StreamTagLayout extends FrameLayout implements StreamTagManager.StreamTagView
 {
-    private volatile String mStreamTag;
+    private volatile String mStreamTag = StreamTagManager.STREAM_TAG_EMPTY;
 
     public StreamTagLayout(Context context, AttributeSet attrs)
     {
