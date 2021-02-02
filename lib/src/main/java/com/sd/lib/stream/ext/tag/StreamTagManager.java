@@ -27,6 +27,7 @@ public class StreamTagManager
     }
 
     private final Map<StreamTagHolder, ViewTree> mMapHolderViewTree = new ConcurrentHashMap<>();
+    private final Map<ViewTree, String> mMapBusyTree = new ConcurrentHashMap<>();
 
     public StreamTagManager()
     {
@@ -44,9 +45,12 @@ public class StreamTagManager
         if (!isAttached(view))
             return null;
 
-        ViewTree viewTree = findViewTree(view);
-        if (viewTree != null)
-            return viewTree.getStreamTag();
+        if (view instanceof StreamTagHolder)
+        {
+            // 直接返回tag，不创建ViewTree
+            final StreamTagHolder tagHolder = (StreamTagHolder) view;
+            return tagHolder.getStreamTag();
+        }
 
         final List<View> listChild = new LinkedList<>();
         listChild.add(view);
@@ -58,9 +62,11 @@ public class StreamTagManager
             if (!isAttached(parent))
                 break;
 
-            viewTree = findViewTree(parent);
+            final ViewTree viewTree = findViewTree(parent);
             if (viewTree != null)
             {
+                mMapBusyTree.put(viewTree, "");
+
                 viewTree.addViews(listChild);
                 return viewTree.getStreamTag();
             } else
