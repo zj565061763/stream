@@ -49,16 +49,9 @@ public class StreamTagManager
         if (!isAttached(view))
             return STREAM_TAG_EMPTY;
 
-        if (view instanceof IStreamTagView)
-        {
-            // 直接返回tag，不创建ViewTree
-            final IStreamTagView tagView = (IStreamTagView) view;
-            return tagView.getStreamTag();
-        }
-
-        final ViewTree cacheTree = findViewTreeFromCache(view);
-        if (cacheTree != null)
-            return cacheTree.getStreamTag();
+        final ViewTree tree = findViewTree(view);
+        if (tree != null)
+            return tree.getStreamTag();
 
         final List<View> listChild = new LinkedList<>();
         listChild.add(view);
@@ -70,7 +63,7 @@ public class StreamTagManager
             if (!isAttached(parent))
                 break;
 
-            final ViewTree viewTree = getViewTree(parent);
+            final ViewTree viewTree = findViewTree(parent);
             if (viewTree != null)
             {
                 viewTree.addViews(listChild);
@@ -85,12 +78,12 @@ public class StreamTagManager
         return STREAM_TAG_EMPTY;
     }
 
-    private ViewTree getViewTree(View view)
+    private ViewTree findViewTree(View view)
     {
         if (view instanceof IStreamTagView)
         {
             final IStreamTagView tagView = (IStreamTagView) view;
-            return getViewTree(tagView);
+            return getOrCreateViewTree(tagView);
         }
 
         return findViewTreeFromCache(view);
@@ -101,7 +94,7 @@ public class StreamTagManager
         return mMapViewTreeCache.get(view);
     }
 
-    private synchronized ViewTree getViewTree(IStreamTagView tagView)
+    private synchronized ViewTree getOrCreateViewTree(IStreamTagView tagView)
     {
         if (tagView == null)
             throw new IllegalArgumentException("tagView is null");
