@@ -167,11 +167,6 @@ public class StreamTagManager
             }
         }
 
-        public boolean hasView(View view)
-        {
-            return nMapView.containsKey(view);
-        }
-
         @Override
         public void onViewAttachedToWindow(View v)
         {
