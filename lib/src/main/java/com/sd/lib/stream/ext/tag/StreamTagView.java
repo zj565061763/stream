@@ -4,14 +4,14 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
-public class StreamTagLayout extends FrameLayout implements StreamTagManager.IStreamTagView
+public class StreamTagView extends FrameLayout implements StreamTagManager.IStreamTagView
 {
     private final String mStreamTag;
 
-    public StreamTagLayout(Context context, AttributeSet attrs)
+    public StreamTagView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        mStreamTag = createDefaultStreamTag(this);
+        mStreamTag = createStreamTag(this);
     }
 
     @Override
@@ -20,7 +20,13 @@ public class StreamTagLayout extends FrameLayout implements StreamTagManager.ISt
         return mStreamTag;
     }
 
-    private static String createDefaultStreamTag(Object object)
+    /**
+     * 创建tag
+     *
+     * @param object
+     * @return
+     */
+    public static String createStreamTag(Object object)
     {
         final String className = object.getClass().getName();
         final String hashCode = Integer.toHexString(System.identityHashCode(object));
