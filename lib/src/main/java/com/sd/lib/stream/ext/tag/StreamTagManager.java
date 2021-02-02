@@ -160,7 +160,7 @@ public class StreamTagManager
         {
             final View view = (View) nTagView;
             final boolean isAttached = isAttached(view);
-            return isAttached ? nTagView.getStreamTag() : null;
+            return isAttached ? nTagView.getStreamTag() : STREAM_TAG_EMPTY;
         }
 
         public void addViews(List<View> views)
