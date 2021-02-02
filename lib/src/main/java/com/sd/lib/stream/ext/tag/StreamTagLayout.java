@@ -11,7 +11,6 @@ public class StreamTagLayout extends FrameLayout implements StreamTagManager.Str
     public StreamTagLayout(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        mStreamTag = createDefaultStreamTag(StreamTagLayout.this);
     }
 
     @Override
@@ -24,12 +23,5 @@ public class StreamTagLayout extends FrameLayout implements StreamTagManager.Str
     public synchronized void setStreamTag(String tag)
     {
         mStreamTag = tag;
-    }
-
-    private static String createDefaultStreamTag(Object object)
-    {
-        final String className = object.getClass().getName();
-        final String hashCode = Integer.toHexString(System.identityHashCode(object));
-        return className + "@" + hashCode;
     }
 }
