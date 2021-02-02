@@ -65,7 +65,8 @@ public class StreamTagManager
         if (mIsDebug)
         {
             Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag"
-                    + " view:" + getObjectId(view));
+                    + " view:" + getObjectId(view)
+                    + " ---------->");
         }
 
         final ViewTree tree = findViewTree(view);
@@ -73,9 +74,9 @@ public class StreamTagManager
         {
             if (mIsDebug)
             {
-                Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag success"
-                        + " viewTree:" + tree
-                        + " view:" + getObjectId(view));
+                Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag"
+                        + " view:" + getObjectId(view)
+                        + " viewTree:" + tree);
             }
 
             return tree.getStreamTag();
@@ -98,12 +99,13 @@ public class StreamTagManager
 
                 if (mIsDebug)
                 {
-                    Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag success"
-                            + " level:" + listChild.size()
+                    Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag"
+                            + " view:" + getObjectId(view)
                             + " viewTree:" + viewTree
+                            + " level:" + listChild.size()
                             + " viewTreeSize:" + mMapTagViewTree.size()
                             + " cacheTreeSize:" + mMapViewTreeCache.size()
-                            + " view:" + getObjectId(view));
+                    );
                 }
                 return viewTree.getStreamTag();
             } else
@@ -156,12 +158,13 @@ public class StreamTagManager
         if (tagView == null)
             throw new IllegalArgumentException("tagView is null");
 
-        mMapTagViewTree.remove(tagView);
+        final ViewTree viewTree = mMapTagViewTree.remove(tagView);
 
         if (mIsDebug)
         {
             Log.i(StreamTagManager.class.getSimpleName(), "remove ViewTree"
                     + " tagView:" + getObjectId(tagView)
+                    + " viewTree:" + viewTree
                     + " viewTreeSize:" + mMapTagViewTree.size()
                     + " cacheTreeSize:" + mMapViewTreeCache.size());
         }
