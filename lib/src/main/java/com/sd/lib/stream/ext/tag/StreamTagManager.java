@@ -44,7 +44,7 @@ public class StreamTagManager
      * @param view
      * @return
      */
-    public String findStreamTag(View view)
+    public synchronized String findStreamTag(View view)
     {
         if (!isAttached(view))
             return STREAM_TAG_EMPTY;
@@ -147,22 +147,21 @@ public class StreamTagManager
         public String getStreamTag()
         {
             final View view = (View) nTagView;
-            final boolean isAttached = isAttached(view);
-            return isAttached ? nTagView.getStreamTag() : STREAM_TAG_EMPTY;
+            return isAttached(view) ? nTagView.getStreamTag() : STREAM_TAG_EMPTY;
         }
 
         public void addViews(List<View> views)
         {
-            synchronized (ViewTree.this)
+            for (View view : views)
             {
-                for (View view : views)
+                if (isAttached(view))
                 {
-                    if (!isAttached(view))
-                        continue;
-
                     final String put = nMapView.put(view, "");
                     if (put == null)
+                    {
+                        mMapViewTreeCache.put(view, this);
                         view.addOnAttachStateChangeListener(this);
+                    }
                 }
             }
         }
@@ -176,11 +175,7 @@ public class StreamTagManager
         public void onViewDetachedFromWindow(View v)
         {
             v.removeOnAttachStateChangeListener(this);
-            synchronized (ViewTree.this)
-            {
-                nMapView.remove(v);
-            }
-
+            nMapView.remove(v);
             mMapViewTreeCache.remove(v);
         }
     }
