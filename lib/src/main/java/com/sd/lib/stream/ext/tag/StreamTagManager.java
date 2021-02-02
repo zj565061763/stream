@@ -26,6 +26,7 @@ public class StreamTagManager
         }
     }
 
+    private static final String STREAM_TAG_EMPTY = "";
     private final Map<StreamTagView, ViewTree> mMapTagViewTree = new ConcurrentHashMap<>();
 
     public StreamTagManager()
@@ -42,13 +43,14 @@ public class StreamTagManager
     public String findStreamTag(View view)
     {
         if (!isAttached(view))
-            return null;
+            return STREAM_TAG_EMPTY;
 
         if (view instanceof StreamTagView)
         {
             // 直接返回tag，不创建ViewTree
             final StreamTagView tagView = (StreamTagView) view;
-            return tagView.getStreamTag();
+            final String tag = tagView.getStreamTag();
+            return tag != null ? tag : STREAM_TAG_EMPTY;
         }
 
         final List<View> listChild = new LinkedList<>();
@@ -73,7 +75,7 @@ public class StreamTagManager
             }
         }
 
-        return null;
+        return STREAM_TAG_EMPTY;
     }
 
     private ViewTree findViewTree(View view)
