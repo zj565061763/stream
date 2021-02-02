@@ -30,7 +30,7 @@ public class StreamTagManager
     /** 空的Tag */
     public static final String STREAM_TAG_EMPTY = UUID.randomUUID().toString();
 
-    private final Map<StreamTagView, ViewTree> mMapTagViewTree = new ConcurrentHashMap<>();
+    private final Map<IStreamTagView, ViewTree> mMapTagViewTree = new ConcurrentHashMap<>();
 
     public StreamTagManager()
     {
@@ -48,10 +48,10 @@ public class StreamTagManager
         if (!isAttached(view))
             return STREAM_TAG_EMPTY;
 
-        if (view instanceof StreamTagView)
+        if (view instanceof IStreamTagView)
         {
             // 直接返回tag，不创建ViewTree
-            final StreamTagView tagView = (StreamTagView) view;
+            final IStreamTagView tagView = (IStreamTagView) view;
             final String tag = tagView.getStreamTag();
             return tag;
         }
@@ -83,9 +83,9 @@ public class StreamTagManager
 
     private ViewTree findViewTree(View view)
     {
-        if (view instanceof StreamTagView)
+        if (view instanceof IStreamTagView)
         {
-            final StreamTagView tagView = (StreamTagView) view;
+            final IStreamTagView tagView = (IStreamTagView) view;
             return getViewTree(tagView);
         }
 
@@ -97,7 +97,7 @@ public class StreamTagManager
         return null;
     }
 
-    private synchronized ViewTree getViewTree(StreamTagView tagView)
+    private synchronized ViewTree getViewTree(IStreamTagView tagView)
     {
         if (tagView == null)
             throw new IllegalArgumentException("tagView is null");
@@ -112,7 +112,7 @@ public class StreamTagManager
         return viewTree;
     }
 
-    private synchronized void removeViewTree(StreamTagView tagView)
+    private synchronized void removeViewTree(IStreamTagView tagView)
     {
         if (tagView == null)
             throw new IllegalArgumentException("tagView is null");
@@ -120,7 +120,7 @@ public class StreamTagManager
         mMapTagViewTree.remove(tagView);
     }
 
-    private void initStreamTagView(final StreamTagView tagView)
+    private void initStreamTagView(final IStreamTagView tagView)
     {
         final View view = (View) tagView;
         view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener()
@@ -142,10 +142,10 @@ public class StreamTagManager
 
     private final class ViewTree implements View.OnAttachStateChangeListener
     {
-        private final StreamTagView nTagView;
+        private final IStreamTagView nTagView;
         private final Map<View, String> nMapView = new ConcurrentHashMap<>();
 
-        public ViewTree(StreamTagView tagView)
+        public ViewTree(IStreamTagView tagView)
         {
             if (tagView == null)
                 throw new IllegalArgumentException("tagView is null");
@@ -192,7 +192,7 @@ public class StreamTagManager
         }
     }
 
-    public interface StreamTagView
+    public interface IStreamTagView
     {
         String getStreamTag();
 
