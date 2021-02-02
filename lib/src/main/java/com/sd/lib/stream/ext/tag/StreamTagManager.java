@@ -70,7 +70,7 @@ public class StreamTagManager
             if (!isAttached(parent))
                 break;
 
-            final ViewTree viewTree = findViewTree(parent);
+            final ViewTree viewTree = getViewTree(parent);
             if (viewTree != null)
             {
                 viewTree.addViews(listChild);
@@ -85,7 +85,7 @@ public class StreamTagManager
         return STREAM_TAG_EMPTY;
     }
 
-    private ViewTree findViewTree(View view)
+    private ViewTree getViewTree(View view)
     {
         if (view instanceof IStreamTagView)
         {
@@ -93,12 +93,7 @@ public class StreamTagManager
             return getViewTree(tagView);
         }
 
-        for (ViewTree item : mMapTagViewTree.values())
-        {
-            if (item.hasView(view))
-                return item;
-        }
-        return null;
+        return findViewTreeFromCache(view);
     }
 
     private ViewTree findViewTreeFromCache(View view)
