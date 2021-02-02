@@ -128,7 +128,6 @@ public class StreamTagManager
             @Override
             public void onViewAttachedToWindow(View v)
             {
-                throw new RuntimeException("onViewAttachedToWindow ??? " + v);
             }
 
             @Override
@@ -181,7 +180,6 @@ public class StreamTagManager
         @Override
         public void onViewAttachedToWindow(View v)
         {
-            throw new RuntimeException("onViewAttachedToWindow ??? " + v);
         }
 
         @Override
