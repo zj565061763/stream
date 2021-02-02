@@ -3,6 +3,7 @@ package com.sd.stream;
 import android.app.Application;
 
 import com.sd.lib.stream.FStreamManager;
+import com.sd.lib.stream.ext.tag.StreamTagManager;
 
 /**
  * Created by Administrator on 2018/2/9.
@@ -20,5 +21,8 @@ public class App extends Application
 
         // 注册默认的Stream
         FStreamManager.getInstance().registerDefaultStream(DefaultFragmentCallback.class);
+
+        // 打开调试模式
+        StreamTagManager.getDefault().setDebug(true);
     }
 }

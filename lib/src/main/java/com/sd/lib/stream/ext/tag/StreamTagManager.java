@@ -1,6 +1,7 @@
 package com.sd.lib.stream.ext.tag;
 
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
 
@@ -33,9 +34,21 @@ public class StreamTagManager
     private final Map<IStreamTagView, ViewTree> mMapTagViewTree = new ConcurrentHashMap<>();
     private final Map<View, ViewTree> mMapViewTreeCache = new ConcurrentHashMap<>();
 
+    private boolean mIsDebug;
+
     public StreamTagManager()
     {
         // 构造方法保持public，可以不使用默认对象
+    }
+
+    /**
+     * 设置是否调试模式
+     *
+     * @param debug
+     */
+    public void setDebug(boolean debug)
+    {
+        mIsDebug = debug;
     }
 
     /**
@@ -49,9 +62,21 @@ public class StreamTagManager
         if (!isAttached(view))
             return STREAM_TAG_EMPTY;
 
+        if (mIsDebug)
+            Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag view" + view);
+
         final ViewTree tree = findViewTree(view);
         if (tree != null)
+        {
+            if (mIsDebug)
+            {
+                Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag success"
+                        + " viewTree:" + tree
+                        + " view" + view);
+            }
+
             return tree.getStreamTag();
+        }
 
         final List<View> listChild = new LinkedList<>();
         listChild.add(view);
@@ -61,12 +86,20 @@ public class StreamTagManager
         {
             final View parent = (View) viewParent;
             if (!isAttached(parent))
-                break;
+                return STREAM_TAG_EMPTY;
 
             final ViewTree viewTree = findViewTree(parent);
             if (viewTree != null)
             {
                 viewTree.addViews(listChild);
+
+                if (mIsDebug)
+                {
+                    Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag success"
+                            + " level:" + listChild.size()
+                            + " viewTree:" + viewTree
+                            + " view" + view);
+                }
                 return viewTree.getStreamTag();
             } else
             {
@@ -75,7 +108,7 @@ public class StreamTagManager
             }
         }
 
-        return STREAM_TAG_EMPTY;
+        throw new RuntimeException(IStreamTagView.class.getSimpleName() + " was not found int view tree " + view);
     }
 
     private ViewTree findViewTree(View view)
@@ -100,6 +133,15 @@ public class StreamTagManager
             viewTree = new ViewTree(tagView);
             mMapTagViewTree.put(tagView, viewTree);
             initStreamTagView(tagView);
+
+            if (mIsDebug)
+            {
+                Log.i(StreamTagManager.class.getSimpleName(), "create ViewTree"
+                        + " tagView" + tagView
+                        + " viewTree:" + viewTree
+                        + " viewTreeSize" + mMapTagViewTree.size()
+                        + " cacheTreeSize" + mMapViewTreeCache.size());
+            }
         }
         return viewTree;
     }
@@ -110,6 +152,14 @@ public class StreamTagManager
             throw new IllegalArgumentException("tagView is null");
 
         mMapTagViewTree.remove(tagView);
+
+        if (mIsDebug)
+        {
+            Log.i(StreamTagManager.class.getSimpleName(), "remove ViewTree"
+                    + " tagView" + tagView
+                    + " viewTreeSize" + mMapTagViewTree.size()
+                    + " cacheTreeSize" + mMapViewTreeCache.size());
+        }
     }
 
     private void initStreamTagView(final IStreamTagView tagView)
