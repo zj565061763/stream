@@ -86,11 +86,6 @@ public class StreamTagManager
             return getOrCreateViewTree(tagView);
         }
 
-        return findViewTreeFromCache(view);
-    }
-
-    private ViewTree findViewTreeFromCache(View view)
-    {
         return mMapViewTreeCache.get(view);
     }
 
