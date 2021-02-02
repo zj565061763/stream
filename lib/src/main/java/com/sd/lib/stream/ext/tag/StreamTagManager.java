@@ -175,8 +175,11 @@ public class StreamTagManager
         public void onViewDetachedFromWindow(View v)
         {
             v.removeOnAttachStateChangeListener(this);
-            nMapView.remove(v);
-            mMapViewTreeCache.remove(v);
+            synchronized (StreamTagManager.this)
+            {
+                nMapView.remove(v);
+                mMapViewTreeCache.remove(v);
+            }
         }
     }
 
