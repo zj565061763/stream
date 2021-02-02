@@ -26,7 +26,7 @@ public class StreamTagManager
         }
     }
 
-    private final Map<StreamTagView, ViewTree> mMapHolderViewTree = new ConcurrentHashMap<>();
+    private final Map<StreamTagView, ViewTree> mMapTagViewTree = new ConcurrentHashMap<>();
 
     public StreamTagManager()
     {
@@ -84,7 +84,7 @@ public class StreamTagManager
             return getViewTree(tagHolder);
         }
 
-        for (ViewTree item : mMapHolderViewTree.values())
+        for (ViewTree item : mMapTagViewTree.values())
         {
             if (item.hasView(view))
                 return item;
@@ -97,11 +97,11 @@ public class StreamTagManager
         if (holder == null)
             throw new IllegalArgumentException("holder is null");
 
-        ViewTree viewTree = mMapHolderViewTree.get(holder);
+        ViewTree viewTree = mMapTagViewTree.get(holder);
         if (viewTree == null)
         {
             viewTree = new ViewTree(holder);
-            mMapHolderViewTree.put(holder, viewTree);
+            mMapTagViewTree.put(holder, viewTree);
         }
         return viewTree;
     }
@@ -111,7 +111,7 @@ public class StreamTagManager
         if (holder == null)
             throw new IllegalArgumentException("holder is null");
 
-        mMapHolderViewTree.remove(holder);
+        mMapTagViewTree.remove(holder);
     }
 
     private final class ViewTree implements View.OnAttachStateChangeListener
