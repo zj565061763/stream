@@ -166,16 +166,16 @@ public class StreamTagManager
 
         public void addViews(List<View> views)
         {
-            for (View view : views)
+            synchronized (ViewTree.this)
             {
-                if (!isAttached(view))
-                    continue;
-
-                final String put = nMapView.put(view, "");
-                if (put == null)
+                for (View view : views)
                 {
-                    view.addOnAttachStateChangeListener(this);
-                    mMapViewTreeCache.put(view, this);
+                    if (!isAttached(view))
+                        continue;
+
+                    final String put = nMapView.put(view, "");
+                    if (put == null)
+                        view.addOnAttachStateChangeListener(this);
                 }
             }
         }
@@ -194,7 +194,11 @@ public class StreamTagManager
         public void onViewDetachedFromWindow(View v)
         {
             v.removeOnAttachStateChangeListener(this);
-            nMapView.remove(v);
+            synchronized (ViewTree.this)
+            {
+                nMapView.remove(v);
+            }
+
             mMapViewTreeCache.remove(v);
         }
     }
