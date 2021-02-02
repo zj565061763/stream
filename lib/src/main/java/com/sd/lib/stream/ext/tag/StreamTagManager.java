@@ -63,7 +63,10 @@ public class StreamTagManager
             return STREAM_TAG_EMPTY;
 
         if (mIsDebug)
-            Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag view" + view);
+        {
+            Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag"
+                    + " view:" + getObjectId(view));
+        }
 
         final ViewTree tree = findViewTree(view);
         if (tree != null)
@@ -72,7 +75,7 @@ public class StreamTagManager
             {
                 Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag success"
                         + " viewTree:" + tree
-                        + " view" + view);
+                        + " view:" + getObjectId(view));
             }
 
             return tree.getStreamTag();
@@ -98,7 +101,9 @@ public class StreamTagManager
                     Log.i(StreamTagManager.class.getSimpleName(), "findStreamTag success"
                             + " level:" + listChild.size()
                             + " viewTree:" + viewTree
-                            + " view" + view);
+                            + " viewTreeSize:" + mMapTagViewTree.size()
+                            + " cacheTreeSize:" + mMapViewTreeCache.size()
+                            + " view:" + getObjectId(view));
                 }
                 return viewTree.getStreamTag();
             } else
@@ -137,10 +142,10 @@ public class StreamTagManager
             if (mIsDebug)
             {
                 Log.i(StreamTagManager.class.getSimpleName(), "create ViewTree"
-                        + " tagView" + tagView
+                        + " tagView:" + getObjectId(tagView)
                         + " viewTree:" + viewTree
-                        + " viewTreeSize" + mMapTagViewTree.size()
-                        + " cacheTreeSize" + mMapViewTreeCache.size());
+                        + " viewTreeSize:" + mMapTagViewTree.size()
+                        + " cacheTreeSize:" + mMapViewTreeCache.size());
             }
         }
         return viewTree;
@@ -156,9 +161,9 @@ public class StreamTagManager
         if (mIsDebug)
         {
             Log.i(StreamTagManager.class.getSimpleName(), "remove ViewTree"
-                    + " tagView" + tagView
-                    + " viewTreeSize" + mMapTagViewTree.size()
-                    + " cacheTreeSize" + mMapViewTreeCache.size());
+                    + " tagView:" + getObjectId(tagView)
+                    + " viewTreeSize:" + mMapTagViewTree.size()
+                    + " cacheTreeSize:" + mMapViewTreeCache.size());
         }
     }
 
@@ -247,5 +252,12 @@ public class StreamTagManager
             return view.isAttachedToWindow();
         else
             return view.getWindowToken() != null;
+    }
+
+    private static String getObjectId(Object object)
+    {
+        final String className = object.getClass().getName();
+        final String hashCode = Integer.toHexString(System.identityHashCode(object));
+        return className + "@" + hashCode;
     }
 }
