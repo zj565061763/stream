@@ -47,8 +47,8 @@ public class StreamTagManager
         if (view instanceof StreamTagView)
         {
             // 直接返回tag，不创建ViewTree
-            final StreamTagView tagHolder = (StreamTagView) view;
-            return tagHolder.getStreamTag();
+            final StreamTagView tagView = (StreamTagView) view;
+            return tagView.getStreamTag();
         }
 
         final List<View> listChild = new LinkedList<>();
@@ -80,8 +80,8 @@ public class StreamTagManager
     {
         if (view instanceof StreamTagView)
         {
-            final StreamTagView tagHolder = (StreamTagView) view;
-            return getViewTree(tagHolder);
+            final StreamTagView tagView = (StreamTagView) view;
+            return getViewTree(tagView);
         }
 
         for (ViewTree item : mMapTagViewTree.values())
@@ -92,44 +92,44 @@ public class StreamTagManager
         return null;
     }
 
-    private synchronized ViewTree getViewTree(StreamTagView holder)
+    private synchronized ViewTree getViewTree(StreamTagView tagView)
     {
-        if (holder == null)
-            throw new IllegalArgumentException("holder is null");
+        if (tagView == null)
+            throw new IllegalArgumentException("tagView is null");
 
-        ViewTree viewTree = mMapTagViewTree.get(holder);
+        ViewTree viewTree = mMapTagViewTree.get(tagView);
         if (viewTree == null)
         {
-            viewTree = new ViewTree(holder);
-            mMapTagViewTree.put(holder, viewTree);
+            viewTree = new ViewTree(tagView);
+            mMapTagViewTree.put(tagView, viewTree);
         }
         return viewTree;
     }
 
-    private synchronized void removeViewTree(StreamTagView holder)
+    private synchronized void removeViewTree(StreamTagView tagView)
     {
-        if (holder == null)
-            throw new IllegalArgumentException("holder is null");
+        if (tagView == null)
+            throw new IllegalArgumentException("tagView is null");
 
-        mMapTagViewTree.remove(holder);
+        mMapTagViewTree.remove(tagView);
     }
 
     private final class ViewTree implements View.OnAttachStateChangeListener
     {
-        private final StreamTagView nTagHolder;
+        private final StreamTagView nTagView;
         private final Map<View, String> nMapView = new ConcurrentHashMap<>();
 
-        public ViewTree(StreamTagView tagHolder)
+        public ViewTree(StreamTagView tagView)
         {
-            if (tagHolder == null)
-                throw new IllegalArgumentException("tagHolder is null");
+            if (tagView == null)
+                throw new IllegalArgumentException("tagView is null");
 
-            this.nTagHolder = tagHolder;
+            this.nTagView = tagView;
         }
 
         public String getStreamTag()
         {
-            return nTagHolder.getStreamTag();
+            return nTagView.getStreamTag();
         }
 
         public void addViews(List<View> views)
@@ -167,7 +167,7 @@ public class StreamTagManager
             {
                 nMapView.remove(v);
                 if (nMapView.isEmpty())
-                    removeViewTree(nTagHolder);
+                    removeViewTree(nTagView);
             }
         }
     }
