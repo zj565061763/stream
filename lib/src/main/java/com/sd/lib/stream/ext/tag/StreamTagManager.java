@@ -26,7 +26,7 @@ public class StreamTagManager
         }
     }
 
-    private final Map<StreamTagHolder, ViewTree> mMapHolderViewTree = new ConcurrentHashMap<>();
+    private final Map<StreamTagView, ViewTree> mMapHolderViewTree = new ConcurrentHashMap<>();
 
     public StreamTagManager()
     {
@@ -44,10 +44,10 @@ public class StreamTagManager
         if (!isAttached(view))
             return null;
 
-        if (view instanceof StreamTagHolder)
+        if (view instanceof StreamTagView)
         {
             // 直接返回tag，不创建ViewTree
-            final StreamTagHolder tagHolder = (StreamTagHolder) view;
+            final StreamTagView tagHolder = (StreamTagView) view;
             return tagHolder.getStreamTag();
         }
 
@@ -78,9 +78,9 @@ public class StreamTagManager
 
     private ViewTree findViewTree(View view)
     {
-        if (view instanceof StreamTagHolder)
+        if (view instanceof StreamTagView)
         {
-            final StreamTagHolder tagHolder = (StreamTagHolder) view;
+            final StreamTagView tagHolder = (StreamTagView) view;
             return getViewTree(tagHolder);
         }
 
@@ -92,7 +92,7 @@ public class StreamTagManager
         return null;
     }
 
-    private synchronized ViewTree getViewTree(StreamTagHolder holder)
+    private synchronized ViewTree getViewTree(StreamTagView holder)
     {
         if (holder == null)
             throw new IllegalArgumentException("holder is null");
@@ -106,7 +106,7 @@ public class StreamTagManager
         return viewTree;
     }
 
-    private synchronized void removeViewTree(StreamTagHolder holder)
+    private synchronized void removeViewTree(StreamTagView holder)
     {
         if (holder == null)
             throw new IllegalArgumentException("holder is null");
@@ -116,10 +116,10 @@ public class StreamTagManager
 
     private final class ViewTree implements View.OnAttachStateChangeListener
     {
-        private final StreamTagHolder nTagHolder;
+        private final StreamTagView nTagHolder;
         private final Map<View, String> nMapView = new ConcurrentHashMap<>();
 
-        public ViewTree(StreamTagHolder tagHolder)
+        public ViewTree(StreamTagView tagHolder)
         {
             if (tagHolder == null)
                 throw new IllegalArgumentException("tagHolder is null");
@@ -172,7 +172,7 @@ public class StreamTagManager
         }
     }
 
-    public interface StreamTagHolder
+    public interface StreamTagView
     {
         String getStreamTag();
 
