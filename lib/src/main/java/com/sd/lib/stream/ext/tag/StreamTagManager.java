@@ -27,7 +27,6 @@ public class StreamTagManager
     }
 
     private final Map<StreamTagHolder, ViewTree> mMapHolderViewTree = new ConcurrentHashMap<>();
-    private final Map<ViewTree, String> mMapBusyTree = new ConcurrentHashMap<>();
 
     public StreamTagManager()
     {
@@ -65,8 +64,6 @@ public class StreamTagManager
             final ViewTree viewTree = findViewTree(parent);
             if (viewTree != null)
             {
-                mMapBusyTree.put(viewTree, "");
-
                 viewTree.addViews(listChild);
                 return viewTree.getStreamTag();
             } else
