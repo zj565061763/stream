@@ -97,7 +97,7 @@ public interface FStream
          * @param methodParams 方法参数
          * @return true-停止分发，false-继续分发
          */
-        boolean beforeDispatch(@NonNull FStream stream, @NonNull Method method, Object[] methodParams);
+        boolean beforeDispatch(@NonNull FStream stream, @NonNull Method method, @Nullable Object[] methodParams);
 
         /**
          * 流对象的方法被通知之后触发
@@ -108,7 +108,7 @@ public interface FStream
          * @param methodResult 流对象方法被调用后的返回值
          * @return true-停止分发，false-继续分发
          */
-        boolean afterDispatch(@NonNull FStream stream, @NonNull Method method, Object[] methodParams, @Nullable Object methodResult);
+        boolean afterDispatch(@NonNull FStream stream, @NonNull Method method, @Nullable Object[] methodParams, @Nullable Object methodResult);
     }
 
     interface ResultFilter
@@ -121,6 +121,6 @@ public interface FStream
          * @param results      所有流对象的返回值
          * @return
          */
-        Object filter(@NonNull Method method, Object[] methodParams, List<Object> results);
+        Object filter(@NonNull Method method, @Nullable Object[] methodParams, @Nullable List<Object> results);
     }
 }
