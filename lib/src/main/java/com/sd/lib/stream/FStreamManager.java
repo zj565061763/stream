@@ -399,8 +399,11 @@ public class FStreamManager
         private final FStream.DispatchCallback mDispatchCallback;
         private final FStream.ResultFilter mResultFilter;
 
-        public ProxyInvocationHandler(FStreamManager manager, FStream.ProxyBuilder builder)
+        public ProxyInvocationHandler(@NonNull FStreamManager manager, @NonNull FStream.ProxyBuilder builder)
         {
+            if (manager == null || builder == null)
+                throw new IllegalArgumentException("null argument");
+
             mManager = manager;
 
             mClass = builder.mClass;
@@ -409,7 +412,7 @@ public class FStreamManager
             mResultFilter = builder.mResultFilter;
         }
 
-        private boolean checkTag(FStream stream)
+        private boolean checkTag(@NonNull FStream stream)
         {
             final Object tag = stream.getTagForStream(mClass);
             if (mTag == tag)
