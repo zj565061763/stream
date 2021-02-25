@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.sd.lib.stream.factory.DefaultStreamFactory;
 import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory;
@@ -300,20 +301,24 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    public StreamConnection getConnection(FStream stream)
+    @Nullable
+    public StreamConnection getConnection(@NonNull FStream stream)
     {
+        if (stream == null)
+            throw new IllegalArgumentException("null argument");
+
         return mMapStreamConnection.get(stream);
     }
 
     private final class InternalStreamConnection extends StreamConnection
     {
-        InternalStreamConnection(FStream stream, Class<? extends FStream>[] classes)
+        InternalStreamConnection(@NonNull FStream stream, @NonNull Class<? extends FStream>[] classes)
         {
             super(stream, classes, FStreamManager.this);
         }
 
         @Override
-        protected void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
+        protected void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz)
         {
             final StreamHolder holder = mMapStream.get(clazz);
             if (holder != null)
