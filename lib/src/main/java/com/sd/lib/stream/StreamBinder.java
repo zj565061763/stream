@@ -51,13 +51,7 @@ public abstract class StreamBinder<T>
         if (stream == null)
             return false;
 
-        final StreamConnection connection = FStreamManager.getInstance().registerInternal(stream);
-        if (connection == null)
-        {
-            destroy();
-            return false;
-        }
-
+        FStreamManager.getInstance().registerInternal(stream);
         return true;
     }
 

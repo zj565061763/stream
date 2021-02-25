@@ -222,22 +222,20 @@ public class FStreamManager
         unregisterInternal(stream);
     }
 
-    synchronized StreamConnection registerInternal(FStream stream)
+    @NonNull
+    synchronized StreamConnection registerInternal(@NonNull FStream stream)
     {
         if (stream == null)
             throw new IllegalArgumentException("null argument");
 
-        final Class<? extends FStream>[] classes = getStreamClass(stream);
-        if (classes.length <= 0)
-            return null;
-
         InternalStreamConnection streamConnection = mMapStreamConnection.get(stream);
-        if (streamConnection == null)
+        if (streamConnection != null)
         {
-            streamConnection = new InternalStreamConnection(stream, classes);
-            mMapStreamConnection.put(stream, streamConnection);
+            // 已经注册过了
+            return streamConnection;
         }
 
+        final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
             StreamHolder holder = mMapStream.get(item);
@@ -258,6 +256,9 @@ public class FStreamManager
                 }
             }
         }
+
+        streamConnection = new InternalStreamConnection(stream, classes);
+        mMapStreamConnection.put(stream, streamConnection);
         return streamConnection;
     }
 
