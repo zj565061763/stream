@@ -83,10 +83,7 @@ public class FStreamManager
      */
     public synchronized boolean bindStream(@NonNull FStream stream, @NonNull Activity target)
     {
-        if (stream == null || target == null)
-            throw new IllegalArgumentException("null argument");
-
-        if (!checkBindStream(stream))
+        if (!checkBindStream(stream, target))
             return false;
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
@@ -130,10 +127,7 @@ public class FStreamManager
      */
     public synchronized boolean bindStream(@NonNull FStream stream, @NonNull View target)
     {
-        if (stream == null || target == null)
-            throw new IllegalArgumentException("null argument");
-
-        if (!checkBindStream(stream))
+        if (!checkBindStream(stream, target))
             return false;
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
@@ -317,8 +311,11 @@ public class FStreamManager
         }
     }
 
-    private static boolean checkBindStream(@NonNull FStream stream)
+    private static boolean checkBindStream(@NonNull FStream stream, @NonNull Object target)
     {
+        if (stream == null || target == null)
+            throw new IllegalArgumentException("null argument");
+
         final Class<? extends FStream>[] classes = getStreamClass(stream, true);
         return classes.length > 0;
     }
