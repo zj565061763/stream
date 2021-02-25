@@ -262,17 +262,16 @@ public class FStreamManager
         return streamConnection;
     }
 
-    synchronized void unregisterInternal(FStream stream)
+    synchronized void unregisterInternal(@NonNull FStream stream)
     {
         if (stream == null)
             throw new IllegalArgumentException("null argument");
 
-        final Class<? extends FStream>[] classes = getStreamClass(stream);
-        if (classes.length <= 0)
+        final StreamConnection streamConnection = mMapStreamConnection.remove(stream);
+        if (streamConnection == null)
             return;
 
-        mMapStreamConnection.remove(stream);
-
+        final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes)
         {
             final StreamHolder holder = mMapStream.get(item);
