@@ -229,7 +229,7 @@ public class FStreamManager
             throw new IllegalArgumentException("null argument");
 
         final Class<? extends FStream>[] classes = getStreamClass(stream);
-        if (classes == null || classes.length <= 0)
+        if (classes.length <= 0)
             return null;
 
         InternalStreamConnection streamConnection = mMapStreamConnection.get(stream);
@@ -268,7 +268,7 @@ public class FStreamManager
             throw new IllegalArgumentException("null argument");
 
         final Class<? extends FStream>[] classes = getStreamClass(stream);
-        if (classes == null || classes.length <= 0)
+        if (classes.length <= 0)
             return;
 
         mMapStreamConnection.remove(stream);
