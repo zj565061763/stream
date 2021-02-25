@@ -457,7 +457,8 @@ public class FStreamManager
             return result;
         }
 
-        private Object processMainLogic(final boolean isVoid, final Method method, final Object[] args) throws Throwable
+        @Nullable
+        private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args) throws Throwable
         {
             final StreamHolder holder = mManager.mMapStream.get(mClass);
             final int holderSize = holder == null ? 0 : holder.size();
@@ -594,8 +595,11 @@ public class FStreamManager
      *
      * @param clazz
      */
-    public synchronized void registerDefaultStream(Class<? extends FStream> clazz)
+    public synchronized void registerDefaultStream(@NonNull Class<? extends FStream> clazz)
     {
+        if (clazz == null)
+            throw new IllegalArgumentException("null argument");
+
         if (clazz == FStream.class)
             throw new IllegalArgumentException("class must not be " + FStream.class);
 
@@ -614,8 +618,11 @@ public class FStreamManager
      *
      * @param clazz
      */
-    public synchronized void unregisterDefaultStream(Class<? extends FStream> clazz)
+    public synchronized void unregisterDefaultStream(@NonNull Class<? extends FStream> clazz)
     {
+        if (clazz == null)
+            throw new IllegalArgumentException("null argument");
+
         if (clazz == FStream.class)
             throw new IllegalArgumentException("class must not be " + FStream.class);
 
@@ -632,15 +639,25 @@ public class FStreamManager
     /**
      * 设置{@link DefaultStreamFactory}
      *
-     * @param defaultStreamFactory
+     * @param factory
      */
-    public synchronized void setDefaultStreamFactory(DefaultStreamFactory defaultStreamFactory)
+    public synchronized void setDefaultStreamFactory(@Nullable DefaultStreamFactory factory)
     {
-        mDefaultStreamFactory = defaultStreamFactory;
+        mDefaultStreamFactory = factory;
     }
 
-    private synchronized FStream getDefaultStream(Class<? extends FStream> clazz)
+    /**
+     * 返回默认的流对象
+     *
+     * @param clazz
+     * @return
+     */
+    @Nullable
+    private synchronized FStream getDefaultStream(@NonNull Class<? extends FStream> clazz)
     {
+        if (clazz == null)
+            throw new IllegalArgumentException("null argument");
+
         final Class<? extends FStream> defaultClass = mMapDefaultStreamClass.get(clazz);
         if (defaultClass == null)
             return null;
