@@ -1,5 +1,7 @@
 package com.sd.lib.stream;
 
+import androidx.annotation.NonNull;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,8 +11,11 @@ public abstract class StreamConnection
     private final FStreamManager mManager;
     private final Map<Class<? extends FStream>, ConnectionItem> mMapItem = new ConcurrentHashMap<>();
 
-    StreamConnection(FStream stream, Class<? extends FStream>[] classes, FStreamManager manager)
+    StreamConnection(@NonNull FStream stream, @NonNull Class<? extends FStream>[] classes, @NonNull FStreamManager manager)
     {
+        if (stream == null || classes == null || manager == null)
+            throw new IllegalArgumentException("null argument");
+
         mStream = stream;
         mManager = manager;
 
@@ -27,7 +32,7 @@ public abstract class StreamConnection
      * @param clazz
      * @return
      */
-    int getPriority(Class<? extends FStream> clazz)
+    int getPriority(@NonNull Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
@@ -52,7 +57,7 @@ public abstract class StreamConnection
      * @param priority
      * @param clazz
      */
-    public void setPriority(int priority, Class<? extends FStream> clazz)
+    public void setPriority(int priority, @NonNull Class<? extends FStream> clazz)
     {
         synchronized (mManager)
         {
@@ -79,7 +84,7 @@ public abstract class StreamConnection
      *
      * @param clazz
      */
-    public void breakDispatch(Class<? extends FStream> clazz)
+    public void breakDispatch(@NonNull Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         checkClassAssignable(clazz);
@@ -98,7 +103,7 @@ public abstract class StreamConnection
      * @param clazz
      * @return
      */
-    boolean shouldBreakDispatch(Class<? extends FStream> clazz)
+    boolean shouldBreakDispatch(@NonNull Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
@@ -113,7 +118,7 @@ public abstract class StreamConnection
      *
      * @param clazz
      */
-    void resetBreakDispatch(Class<? extends FStream> clazz)
+    void resetBreakDispatch(@NonNull Class<? extends FStream> clazz)
     {
         checkClassInterface(clazz);
         final ConnectionItem item = mMapItem.get(clazz);
@@ -121,13 +126,13 @@ public abstract class StreamConnection
             item.resetBreakDispatch();
     }
 
-    private void checkClassAssignable(Class<? extends FStream> clazz)
+    private void checkClassAssignable(@NonNull Class<? extends FStream> clazz)
     {
         if (!clazz.isAssignableFrom(mStream.getClass()))
             throw new IllegalArgumentException("class is not assignable from " + mStream.getClass().getName() + " class:" + clazz.getName());
     }
 
-    private static void checkClassInterface(Class<? extends FStream> clazz)
+    private static void checkClassInterface(@NonNull Class<? extends FStream> clazz)
     {
         if (!clazz.isInterface())
             throw new IllegalArgumentException("class must be an interface class:" + clazz.getName());
@@ -135,14 +140,22 @@ public abstract class StreamConnection
 
     private final class ConnectionItem
     {
+        @NonNull
         public final Class<? extends FStream> nClass;
-        /** 优先级 */
+        /**
+         * 优先级
+         */
         private volatile int nPriority;
-        /** 是否停止分发 */
+        /**
+         * 是否停止分发
+         */
         private volatile boolean nShouldBreakDispatch;
 
-        private ConnectionItem(Class<? extends FStream> clazz)
+        private ConnectionItem(@NonNull Class<? extends FStream> clazz)
         {
+            if (clazz == null)
+                throw new IllegalArgumentException("null argument");
+
             nClass = clazz;
         }
 
@@ -177,5 +190,5 @@ public abstract class StreamConnection
         }
     }
 
-    protected abstract void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz);
+    protected abstract void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz);
 }
