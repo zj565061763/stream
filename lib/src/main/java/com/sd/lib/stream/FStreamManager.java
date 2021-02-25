@@ -357,7 +357,7 @@ public class FStreamManager
 
             for (Class<?> item : clazz.getInterfaces())
             {
-                if (FStream.class.isAssignableFrom(item) && FStream.class != item)
+                if (FStream.class.isAssignableFrom(item))
                 {
                     set.add((Class<? extends FStream>) item);
                 }
