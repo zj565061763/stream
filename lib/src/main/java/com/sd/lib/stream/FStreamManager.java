@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -432,8 +433,9 @@ public class FStreamManager
             }
 
 
+            final String uuid = mManager.isDebug() ? UUID.randomUUID().toString() : null;
             final boolean isVoid = returnType == void.class || returnType == Void.class;
-            Object result = processMainLogic(isVoid, method, args);
+            Object result = processMainLogic(isVoid, method, args, uuid);
 
 
             if (isVoid)
@@ -447,18 +449,21 @@ public class FStreamManager
                     result = 0;
 
                 if (mManager.isDebug())
+                {
                     Log.i(FStream.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result
-                            + " class:" + mClass.getName());
+                            + " class:" + mClass.getName()
+                            + " uuid:" + uuid);
+                }
             }
 
             if (mManager.isDebug())
-                Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " class:" + mClass.getName());
+                Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " class:" + mClass.getName() + " uuid:" + uuid);
 
             return result;
         }
 
         @Nullable
-        private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args) throws Throwable
+        private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args, @Nullable String uuid) throws Throwable
         {
             final StreamHolder holder = mManager.mMapStream.get(mClass);
             final int holderSize = holder == null ? 0 : holder.size();
@@ -467,10 +472,12 @@ public class FStreamManager
 
             if (mManager.isDebug())
             {
+                uuid = UUID.randomUUID().toString();
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method
                         + " arg:" + (args == null ? "" : Arrays.toString(args))
                         + " tag:" + mTag
-                        + " count:" + holderSize);
+                        + " count:" + holderSize
+                        + " uuid:" + uuid);
             }
 
             boolean isDefaultStream = false;
@@ -486,7 +493,7 @@ public class FStreamManager
                 isDefaultStream = true;
 
                 if (mManager.isDebug())
-                    Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName());
+                    Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName() + " uuid:" + uuid);
             } else
             {
                 listStream = holder.toCollection();
@@ -517,7 +524,7 @@ public class FStreamManager
                     if (mDispatchCallback.beforeDispatch(item, method, args))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before class:" + mClass.getName());
+                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before class:" + mClass.getName() + " uuid:" + uuid);
                         break;
                     }
                 }
@@ -547,7 +554,8 @@ public class FStreamManager
                             + " index:" + index
                             + " return:" + (isVoid ? "" : itemResult)
                             + " stream:" + item
-                            + " shouldBreakDispatch:" + shouldBreakDispatch);
+                            + " shouldBreakDispatch:" + shouldBreakDispatch
+                            + " uuid:" + uuid);
                 }
 
                 result = itemResult;
@@ -560,7 +568,7 @@ public class FStreamManager
                     if (mDispatchCallback.afterDispatch(item, method, args, itemResult))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after class:" + mClass.getName());
+                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after class:" + mClass.getName() + " uuid:" + uuid);
                         break;
                     }
                 }
@@ -576,7 +584,7 @@ public class FStreamManager
                 result = mResultFilter.filter(method, args, listResult);
 
                 if (mManager.isDebug())
-                    Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " class:" + mClass.getName());
+                    Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " class:" + mClass.getName() + " uuid:" + uuid);
             }
 
             return result;
