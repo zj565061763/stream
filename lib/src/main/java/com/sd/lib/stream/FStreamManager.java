@@ -467,7 +467,8 @@ public class FStreamManager
 
             if (mManager.isDebug())
             {
-                Log.i(FStream.class.getSimpleName(), "notify -----> " + method + " " + (args == null ? "" : Arrays.toString(args))
+                Log.i(FStream.class.getSimpleName(), "notify -----> " + method
+                        + " arg:" + (args == null ? "" : Arrays.toString(args))
                         + " tag:" + mTag
                         + " count:" + holderSize);
             }
@@ -545,7 +546,6 @@ public class FStreamManager
                     Log.i(FStream.class.getSimpleName(), "notify"
                             + " index:" + index
                             + " return:" + (isVoid ? "" : itemResult)
-                            + " class:" + mClass.getName()
                             + " stream:" + item
                             + " shouldBreakDispatch:" + shouldBreakDispatch);
                 }
