@@ -24,7 +24,7 @@ class StreamHolder
     private volatile boolean mIsPriorityChanged = false;
     private volatile boolean mHasDirtyStream = false;
 
-    public StreamHolder(Class<? extends FStream> clazz, FStreamManager manager)
+    public StreamHolder(@NonNull Class<? extends FStream> clazz, @NonNull FStreamManager manager)
     {
         if (clazz == null || manager == null)
             throw new IllegalArgumentException("null argument");
