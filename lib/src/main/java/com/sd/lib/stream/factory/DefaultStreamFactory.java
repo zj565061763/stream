@@ -1,5 +1,7 @@
 package com.sd.lib.stream.factory;
 
+import androidx.annotation.NonNull;
+
 import com.sd.lib.stream.FStream;
 
 /**
@@ -15,21 +17,27 @@ public interface DefaultStreamFactory
      * @param param
      * @return
      */
-    FStream create(CreateParam param);
+    @NonNull
+    FStream create(@NonNull CreateParam param);
 
     class CreateParam
     {
         /**
          * 流接口
          */
+        @NonNull
         public final Class<? extends FStream> classStream;
         /**
          * 流接口实现类
          */
+        @NonNull
         public final Class<? extends FStream> classDefaultStream;
 
         public CreateParam(Class<? extends FStream> classStream, Class<? extends FStream> classDefaultStream)
         {
+            if (classStream == null || classDefaultStream == null)
+                throw new IllegalArgumentException("null argument");
+
             this.classStream = classStream;
             this.classDefaultStream = classDefaultStream;
         }
