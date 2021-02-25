@@ -2,6 +2,8 @@ package com.sd.lib.stream;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,14 +26,23 @@ class StreamHolder
 
     public StreamHolder(Class<? extends FStream> clazz, FStreamManager manager)
     {
+        if (clazz == null || manager == null)
+            throw new IllegalArgumentException("null argument");
+
         mClass = clazz;
         mManager = manager;
     }
 
-    public boolean add(FStream stream)
+    /**
+     * 添加流对象
+     *
+     * @param stream
+     * @return
+     */
+    public boolean add(@NonNull FStream stream)
     {
         if (stream == null)
-            return false;
+            throw new IllegalArgumentException("null argument");
 
         final boolean result = mStreamHolder.add(stream);
         if (result)
@@ -43,10 +54,16 @@ class StreamHolder
         return result;
     }
 
-    public boolean remove(FStream stream)
+    /**
+     * 移除流对象
+     *
+     * @param stream
+     * @return
+     */
+    public boolean remove(@NonNull FStream stream)
     {
         if (stream == null)
-            return false;
+            throw new IllegalArgumentException("null argument");
 
         final boolean result = mStreamHolder.remove(stream);
         mPriorityStreamHolder.remove(stream);
@@ -59,6 +76,12 @@ class StreamHolder
         return mStreamHolder.size();
     }
 
+    /**
+     * 返回流集合
+     *
+     * @return
+     */
+    @NonNull
     public Collection<FStream> toCollection()
     {
         if (isNeedSort())
@@ -75,6 +98,7 @@ class StreamHolder
         return mIsPriorityChanged || mHasDirtyStream;
     }
 
+    @NonNull
     private Collection<FStream> sort()
     {
         synchronized (mManager)
@@ -95,8 +119,18 @@ class StreamHolder
         }
     }
 
-    public void onPriorityChanged(int priority, FStream stream, Class<? extends FStream> clazz)
+    /**
+     * 优先级变化
+     *
+     * @param priority
+     * @param stream
+     * @param clazz
+     */
+    public void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz)
     {
+        if (stream == null || clazz == null)
+            throw new IllegalArgumentException("null argument");
+
         if (clazz != mClass)
             throw new IllegalArgumentException("expect class:" + mClass + " but class:" + clazz);
 
