@@ -1,11 +1,15 @@
 package com.sd.lib.stream.factory;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.sd.lib.stream.FStream;
 
 public abstract class CacheableDefaultStreamFactory extends SimpleDefaultStreamFactory
 {
+    @NonNull
     @Override
-    public FStream create(CreateParam param)
+    public FStream create(@NonNull CreateParam param)
     {
         FStream stream = getCache(param);
         if (stream != null)
@@ -18,7 +22,8 @@ public abstract class CacheableDefaultStreamFactory extends SimpleDefaultStreamF
         return stream;
     }
 
-    protected abstract FStream getCache(CreateParam param);
+    @Nullable
+    protected abstract FStream getCache(@NonNull CreateParam param);
 
-    protected abstract void setCache(CreateParam param, FStream stream);
+    protected abstract void setCache(@NonNull CreateParam param, @NonNull FStream stream);
 }
