@@ -60,7 +60,7 @@ public class FStreamManager
      * {@link #bindStream(FStream, Activity)}
      */
     @Deprecated
-    public void bindActivity(FStream stream, Activity target)
+    public void bindActivity(@NonNull FStream stream, @NonNull Activity target)
     {
         bindStream(stream, target);
     }
@@ -69,7 +69,7 @@ public class FStreamManager
      * {@link #bindStream(FStream, View)}
      */
     @Deprecated
-    public void bindView(FStream stream, View target)
+    public void bindView(@NonNull FStream stream, @NonNull View target)
     {
         bindStream(stream, target);
     }
@@ -81,10 +81,10 @@ public class FStreamManager
      * @param target
      * @return true-绑定成功或者已绑定；false-绑定失败
      */
-    public synchronized boolean bindStream(FStream stream, Activity target)
+    public synchronized boolean bindStream(@NonNull FStream stream, @NonNull Activity target)
     {
-        if (target == null)
-            return false;
+        if (stream == null || target == null)
+            throw new IllegalArgumentException("null argument");
 
         if (!checkBindStream(stream))
             return false;
@@ -98,6 +98,7 @@ public class FStreamManager
                 return true;
             } else
             {
+                // target发生变化，先取消绑定
                 unbindStream(stream);
             }
         }
@@ -127,10 +128,10 @@ public class FStreamManager
      * @param target
      * @return true-绑定成功或者已绑定；false-绑定失败
      */
-    public synchronized boolean bindStream(FStream stream, View target)
+    public synchronized boolean bindStream(@NonNull FStream stream, @NonNull View target)
     {
-        if (target == null)
-            return false;
+        if (stream == null || target == null)
+            throw new IllegalArgumentException("null argument");
 
         if (!checkBindStream(stream))
             return false;
@@ -144,6 +145,7 @@ public class FStreamManager
                 return true;
             } else
             {
+                // target发生变化，先取消绑定
                 unbindStream(stream);
             }
         }
