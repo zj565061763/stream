@@ -451,13 +451,12 @@ public class FStreamManager
                 if (mManager.isDebug())
                 {
                     Log.i(FStream.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result
-                            + " class:" + mClass.getName()
                             + " uuid:" + uuid);
                 }
             }
 
             if (mManager.isDebug())
-                Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " class:" + mClass.getName() + " uuid:" + uuid);
+                Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " uuid:" + uuid);
 
             return result;
         }
@@ -493,7 +492,7 @@ public class FStreamManager
                 isDefaultStream = true;
 
                 if (mManager.isDebug())
-                    Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " for class:" + mClass.getName() + " uuid:" + uuid);
+                    Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " uuid:" + uuid);
             } else
             {
                 listStream = holder.toCollection();
@@ -524,7 +523,7 @@ public class FStreamManager
                     if (mDispatchCallback.beforeDispatch(item, method, args))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before class:" + mClass.getName() + " uuid:" + uuid);
+                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before uuid:" + uuid);
                         break;
                     }
                 }
@@ -568,7 +567,7 @@ public class FStreamManager
                     if (mDispatchCallback.afterDispatch(item, method, args, itemResult))
                     {
                         if (mManager.isDebug())
-                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after class:" + mClass.getName() + " uuid:" + uuid);
+                            Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after uuid:" + uuid);
                         break;
                     }
                 }
@@ -584,7 +583,7 @@ public class FStreamManager
                 result = mResultFilter.filter(method, args, listResult);
 
                 if (mManager.isDebug())
-                    Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " class:" + mClass.getName() + " uuid:" + uuid);
+                    Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " uuid:" + uuid);
             }
 
             return result;
