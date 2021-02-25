@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Build;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 /**
  * 根据{@link View#isAttachedToWindow()}自动注册和取消注册流对象
  * <p>
@@ -14,7 +16,7 @@ import android.view.View;
  */
 class ViewStreamBinder extends StreamBinder<View>
 {
-    protected ViewStreamBinder(FStream stream, View target)
+    protected ViewStreamBinder(@NonNull FStream stream, @NonNull View target)
     {
         super(stream, target);
     }

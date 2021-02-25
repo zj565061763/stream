@@ -1,5 +1,8 @@
 package com.sd.lib.stream;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.lang.ref.WeakReference;
 
 public abstract class StreamBinder<T>
@@ -7,7 +10,7 @@ public abstract class StreamBinder<T>
     private final WeakReference<FStream> mStream;
     private final WeakReference<T> mTarget;
 
-    protected StreamBinder(FStream stream, T target)
+    protected StreamBinder(@NonNull FStream stream, @NonNull T target)
     {
         if (stream == null)
             throw new IllegalArgumentException("stream is null when create " + getClass().getName());
@@ -24,6 +27,7 @@ public abstract class StreamBinder<T>
      *
      * @return
      */
+    @Nullable
     public final T getTarget()
     {
         return mTarget.get();

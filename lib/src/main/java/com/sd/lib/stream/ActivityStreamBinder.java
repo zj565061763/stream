@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.view.View;
 import android.view.Window;
 
+import androidx.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -15,7 +17,7 @@ class ActivityStreamBinder extends StreamBinder<Activity>
 {
     private final WeakReference<View> mDecorView;
 
-    protected ActivityStreamBinder(FStream stream, Activity target)
+    protected ActivityStreamBinder(@NonNull FStream stream, @NonNull Activity target)
     {
         super(stream, target);
 
