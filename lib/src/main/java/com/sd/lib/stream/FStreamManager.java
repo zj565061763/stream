@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.sd.lib.stream.factory.DefaultStreamFactory;
 import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory;
@@ -84,8 +83,8 @@ public class FStreamManager
      */
     public synchronized boolean bindStream(@NonNull FStream stream, @NonNull Activity target)
     {
-        if (!checkBindStream(stream, target))
-            return false;
+        if (stream == null || target == null)
+            throw new IllegalArgumentException("null argument");
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
         if (oldBinder != null)
@@ -128,8 +127,8 @@ public class FStreamManager
      */
     public synchronized boolean bindStream(@NonNull FStream stream, @NonNull View target)
     {
-        if (!checkBindStream(stream, target))
-            return false;
+        if (stream == null || target == null)
+            throw new IllegalArgumentException("null argument");
 
         final StreamBinder oldBinder = mMapStreamBinder.get(stream);
         if (oldBinder != null)
@@ -322,35 +321,22 @@ public class FStreamManager
         }
     }
 
-    private static boolean checkBindStream(@NonNull FStream stream, @NonNull Object target)
-    {
-        if (stream == null || target == null)
-            throw new IllegalArgumentException("null argument");
-
-        final Class<? extends FStream>[] classes = getStreamClass(stream, true);
-        return classes.length > 0;
-    }
-
     @NonNull
     private static Class<? extends FStream>[] getStreamClass(@NonNull FStream stream)
-    {
-        return getStreamClass(stream, false);
-    }
-
-    @NonNull
-    private static Class<? extends FStream>[] getStreamClass(@NonNull FStream stream, boolean getOne)
     {
         if (stream == null)
             throw new IllegalArgumentException("null argument");
 
         final Class<?> sourceClass = stream.getClass();
+        final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass);
+        if (set.isEmpty())
+            throw new RuntimeException("stream class was not found in stream:" + stream);
 
-        final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass, getOne);
         return set.toArray(new Class[set.size()]);
     }
 
     @NonNull
-    private static Set<Class<? extends FStream>> findAllStreamClass(@NonNull Class<?> clazz, boolean getOne)
+    private static Set<Class<? extends FStream>> findAllStreamClass(@NonNull Class<?> clazz)
     {
         if (clazz == null)
             throw new IllegalArgumentException("null argument");
@@ -374,9 +360,6 @@ public class FStreamManager
                 if (FStream.class.isAssignableFrom(item) && FStream.class != item)
                 {
                     set.add((Class<? extends FStream>) item);
-
-                    if (getOne && set.size() > 0)
-                        return set;
                 }
             }
 
@@ -609,9 +592,10 @@ public class FStreamManager
      */
     public synchronized void registerDefaultStream(Class<? extends FStream> clazz)
     {
-        checkFStreamClass(clazz);
+        if (clazz == FStream.class)
+            throw new IllegalArgumentException("class must not be " + FStream.class);
 
-        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
+        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz);
         if (set.isEmpty())
             throw new IllegalArgumentException("stream class was not found in " + clazz);
 
@@ -628,9 +612,10 @@ public class FStreamManager
      */
     public synchronized void unregisterDefaultStream(Class<? extends FStream> clazz)
     {
-        checkFStreamClass(clazz);
+        if (clazz == FStream.class)
+            throw new IllegalArgumentException("class must not be " + FStream.class);
 
-        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz, false);
+        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz);
         if (set.isEmpty())
             return;
 
@@ -668,10 +653,4 @@ public class FStreamManager
     }
 
     //---------- default stream end ----------
-
-    private static void checkFStreamClass(Class<?> clazz)
-    {
-        if (clazz == FStream.class)
-            throw new IllegalArgumentException("class must not be " + FStream.class);
-    }
 }
