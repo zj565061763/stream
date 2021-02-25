@@ -2,6 +2,9 @@ package com.sd.lib.stream.factory;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.sd.lib.stream.FStream;
 import com.sd.lib.stream.FStreamManager;
 
@@ -26,8 +29,9 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
         return FStreamManager.getInstance().isDebug();
     }
 
+    @Nullable
     @Override
-    protected FStream getCache(CreateParam param)
+    protected FStream getCache(@NonNull CreateParam param)
     {
         final WeakReference<FStream> reference = mMapStream.get(param.classStream);
         final FStream stream = reference == null ? null : reference.get();
@@ -35,7 +39,7 @@ public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory
     }
 
     @Override
-    protected void setCache(CreateParam param, FStream stream)
+    protected void setCache(@NonNull CreateParam param, @NonNull FStream stream)
     {
         releaseReference();
 
