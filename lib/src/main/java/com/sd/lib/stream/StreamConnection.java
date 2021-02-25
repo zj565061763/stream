@@ -142,13 +142,9 @@ public abstract class StreamConnection
     {
         @NonNull
         public final Class<? extends FStream> nClass;
-        /**
-         * 优先级
-         */
+        /** 优先级 */
         private volatile int nPriority;
-        /**
-         * 是否停止分发
-         */
+        /** 是否停止分发 */
         private volatile boolean nShouldBreakDispatch;
 
         private ConnectionItem(@NonNull Class<? extends FStream> clazz)
