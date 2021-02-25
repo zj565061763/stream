@@ -511,7 +511,11 @@ public class FStreamManager
                 } else
                 {
                     if (connection == null)
+                    {
+                        if (mManager.isDebug())
+                            Log.e(FStream.class.getSimpleName(), StreamConnection.class.getSimpleName() + " is null uuid:" + uuid);
                         continue;
+                    }
                 }
 
                 if (!checkTag(item))
