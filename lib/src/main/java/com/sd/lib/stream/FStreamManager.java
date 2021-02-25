@@ -191,6 +191,9 @@ public class FStreamManager
 
     private void checkHasBound(@NonNull FStream stream)
     {
+        if (stream == null)
+            throw new IllegalArgumentException("null argument");
+
         final StreamBinder binder = mMapStreamBinder.get(stream);
         if (binder != null)
             throw new IllegalArgumentException("stream has bound. stream: " + stream + " target:" + binder.getTarget());
