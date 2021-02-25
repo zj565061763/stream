@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.sd.lib.stream.factory.DefaultStreamFactory;
 import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory;
 
@@ -313,28 +315,39 @@ public class FStreamManager
         }
     }
 
-    private static boolean checkBindStream(FStream stream)
+    private static boolean checkBindStream(@NonNull FStream stream)
     {
         final Class<? extends FStream>[] classes = getStreamClass(stream, true);
         return classes.length > 0;
     }
 
-    private static Class<? extends FStream>[] getStreamClass(FStream stream)
+    @NonNull
+    private static Class<? extends FStream>[] getStreamClass(@NonNull FStream stream)
     {
         return getStreamClass(stream, false);
     }
 
-    private static Class<? extends FStream>[] getStreamClass(FStream stream, boolean getOne)
+    @NonNull
+    private static Class<? extends FStream>[] getStreamClass(@NonNull FStream stream, boolean getOne)
     {
+        if (stream == null)
+            throw new IllegalArgumentException("null argument");
+
         final Class<?> sourceClass = stream.getClass();
 
         final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass, getOne);
         return set.toArray(new Class[set.size()]);
     }
 
-    private static Set<Class<? extends FStream>> findAllStreamClass(Class<?> clazz, boolean getOne)
+    @NonNull
+    private static Set<Class<? extends FStream>> findAllStreamClass(@NonNull Class<?> clazz, boolean getOne)
     {
-        checkProxyClass(clazz);
+        if (clazz == null)
+            throw new IllegalArgumentException("null argument");
+
+        if (Proxy.isProxyClass(clazz))
+            throw new IllegalArgumentException("proxy class is not supported");
+
         final Set<Class<? extends FStream>> set = new HashSet<>();
 
         while (true)
@@ -641,12 +654,6 @@ public class FStreamManager
     }
 
     //---------- default stream end ----------
-
-    private static void checkProxyClass(Class<?> clazz)
-    {
-        if (Proxy.isProxyClass(clazz))
-            throw new IllegalArgumentException("proxy class is not supported");
-    }
 
     private static void checkFStreamClass(Class<?> clazz)
     {
