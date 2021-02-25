@@ -346,12 +346,11 @@ public class FStreamManager
 
         final Set<Class<? extends FStream>> set = new HashSet<>();
 
-        while (true)
+        while (clazz != null)
         {
-            if (clazz == null)
-                break;
             if (!FStream.class.isAssignableFrom(clazz))
                 break;
+
             if (clazz.isInterface())
                 throw new RuntimeException("clazz must not be an interface");
 
