@@ -462,7 +462,7 @@ public class FStreamManager
         }
 
         @Nullable
-        private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args, @Nullable String uuid) throws Throwable
+        private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args, final @Nullable String uuid) throws Throwable
         {
             final StreamHolder holder = mManager.mMapStream.get(mClass);
             final int holderSize = holder == null ? 0 : holder.size();
@@ -471,7 +471,6 @@ public class FStreamManager
 
             if (mManager.isDebug())
             {
-                uuid = UUID.randomUUID().toString();
                 Log.i(FStream.class.getSimpleName(), "notify -----> " + method
                         + " arg:" + (args == null ? "" : Arrays.toString(args))
                         + " tag:" + mTag
