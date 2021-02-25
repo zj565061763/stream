@@ -382,7 +382,8 @@ public class FStreamManager
      * @param builder
      * @return
      */
-    FStream newProxyInstance(FStream.ProxyBuilder builder)
+    @NonNull
+    FStream newProxyInstance(@NonNull FStream.ProxyBuilder builder)
     {
         final Class<?> clazz = builder.mClass;
         final InvocationHandler handler = new FStreamManager.ProxyInvocationHandler(this, builder);
