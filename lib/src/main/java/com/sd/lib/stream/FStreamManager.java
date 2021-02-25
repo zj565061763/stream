@@ -168,24 +168,24 @@ public class FStreamManager
      * @param stream
      * @return
      */
-    public synchronized boolean unbindStream(FStream stream)
+    public synchronized boolean unbindStream(@NonNull FStream stream)
     {
+        if (stream == null)
+            throw new IllegalArgumentException("null argument");
+
         final StreamBinder binder = mMapStreamBinder.remove(stream);
-        if (binder != null)
+        if (binder == null)
+            return false;
+
+        binder.destroy();
+        if (mIsDebug)
         {
-            binder.destroy();
-
-            if (mIsDebug)
-            {
-                Log.i(FStream.class.getSimpleName(), "unbind"
-                        + " stream:" + stream
-                        + " target:" + binder.getTarget()
-                        + " size:" + mMapStreamBinder.size());
-            }
-
-            return true;
+            Log.i(FStream.class.getSimpleName(), "unbind"
+                    + " stream:" + stream
+                    + " target:" + binder.getTarget()
+                    + " size:" + mMapStreamBinder.size());
         }
-        return false;
+        return true;
     }
 
     private void checkHasBound(FStream stream)
