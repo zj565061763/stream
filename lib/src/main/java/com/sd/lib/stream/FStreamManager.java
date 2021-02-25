@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.sd.lib.stream.factory.DefaultStreamFactory;
 import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory;
@@ -188,7 +189,7 @@ public class FStreamManager
         return true;
     }
 
-    private void checkHasBound(FStream stream)
+    private void checkHasBound(@NonNull FStream stream)
     {
         final StreamBinder binder = mMapStreamBinder.get(stream);
         if (binder != null)
@@ -201,7 +202,8 @@ public class FStreamManager
      * @param stream
      * @return null-注册失败
      */
-    public synchronized StreamConnection register(FStream stream)
+    @NonNull
+    public synchronized StreamConnection register(@NonNull FStream stream)
     {
         checkHasBound(stream);
         return registerInternal(stream);
@@ -212,7 +214,7 @@ public class FStreamManager
      *
      * @param stream
      */
-    public synchronized void unregister(FStream stream)
+    public synchronized void unregister(@NonNull FStream stream)
     {
         checkHasBound(stream);
         unregisterInternal(stream);
@@ -220,6 +222,9 @@ public class FStreamManager
 
     synchronized StreamConnection registerInternal(FStream stream)
     {
+        if (stream == null)
+            throw new IllegalArgumentException("null argument");
+
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         if (classes == null || classes.length <= 0)
             return null;
@@ -256,6 +261,9 @@ public class FStreamManager
 
     synchronized void unregisterInternal(FStream stream)
     {
+        if (stream == null)
+            throw new IllegalArgumentException("null argument");
+
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         if (classes == null || classes.length <= 0)
             return;
