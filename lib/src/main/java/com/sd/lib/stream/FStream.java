@@ -1,5 +1,8 @@
 package com.sd.lib.stream;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -16,7 +19,8 @@ public interface FStream
      * @param clazz 哪个接口的代理对象方法被触发
      * @return
      */
-    Object getTagForStream(Class<? extends FStream> clazz);
+    @Nullable
+    Object getTagForStream(@NonNull Class<? extends FStream> clazz);
 
     class ProxyBuilder
     {
@@ -31,7 +35,7 @@ public interface FStream
          * @param tag
          * @return
          */
-        public ProxyBuilder setTag(Object tag)
+        public ProxyBuilder setTag(@Nullable Object tag)
         {
             mTag = tag;
             return this;
@@ -43,7 +47,7 @@ public interface FStream
          * @param callback
          * @return
          */
-        public ProxyBuilder setDispatchCallback(DispatchCallback callback)
+        public ProxyBuilder setDispatchCallback(@Nullable DispatchCallback callback)
         {
             mDispatchCallback = callback;
             return this;
@@ -55,7 +59,7 @@ public interface FStream
          * @param filter
          * @return
          */
-        public ProxyBuilder setResultFilter(ResultFilter filter)
+        public ProxyBuilder setResultFilter(@Nullable ResultFilter filter)
         {
             mResultFilter = filter;
             return this;
@@ -68,7 +72,8 @@ public interface FStream
          * @param <T>
          * @return
          */
-        public <T extends FStream> T build(Class<T> clazz)
+        @NonNull
+        public <T extends FStream> T build(@NonNull Class<T> clazz)
         {
             if (clazz == null)
                 throw new IllegalArgumentException("clazz is null");
@@ -92,7 +97,7 @@ public interface FStream
          * @param methodParams 方法参数
          * @return true-停止分发，false-继续分发
          */
-        boolean beforeDispatch(FStream stream, Method method, Object[] methodParams);
+        boolean beforeDispatch(@NonNull FStream stream, @NonNull Method method, Object[] methodParams);
 
         /**
          * 流对象的方法被通知之后触发
@@ -103,7 +108,7 @@ public interface FStream
          * @param methodResult 流对象方法被调用后的返回值
          * @return true-停止分发，false-继续分发
          */
-        boolean afterDispatch(FStream stream, Method method, Object[] methodParams, Object methodResult);
+        boolean afterDispatch(@NonNull FStream stream, @NonNull Method method, Object[] methodParams, @Nullable Object methodResult);
     }
 
     interface ResultFilter
@@ -116,6 +121,6 @@ public interface FStream
          * @param results      所有流对象的返回值
          * @return
          */
-        Object filter(Method method, Object[] methodParams, List<Object> results);
+        Object filter(@NonNull Method method, Object[] methodParams, List<Object> results);
     }
 }
