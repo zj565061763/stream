@@ -140,8 +140,7 @@ public abstract class StreamConnection
 
     private final class ConnectionItem
     {
-        @NonNull
-        public final Class<? extends FStream> nClass;
+        private final Class<? extends FStream> nClass;
         /** 优先级 */
         private volatile int nPriority;
         /** 是否停止分发 */
