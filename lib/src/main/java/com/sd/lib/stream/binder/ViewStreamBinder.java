@@ -1,4 +1,4 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream.binder;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.sd.lib.stream.FStream;
+
 /**
  * 根据{@link View#isAttachedToWindow()}自动注册和取消注册流对象
  * <p>
@@ -14,9 +16,9 @@ import androidx.annotation.NonNull;
  * 1.目标View对象的{@link View#onDetachedFromWindow()}方法<br>
  * 2.监听目标View对象的{@link View.OnAttachStateChangeListener#onViewDetachedFromWindow(View)}方法
  */
-class ViewStreamBinder extends StreamBinder<View>
+public class ViewStreamBinder extends StreamBinder<View>
 {
-    protected ViewStreamBinder(@NonNull FStream stream, @NonNull View target)
+    public ViewStreamBinder(@NonNull FStream stream, @NonNull View target)
     {
         super(stream, target);
     }

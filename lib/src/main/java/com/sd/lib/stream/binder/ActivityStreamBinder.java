@@ -1,10 +1,12 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream.binder;
 
 import android.app.Activity;
 import android.view.View;
 import android.view.Window;
 
 import androidx.annotation.NonNull;
+
+import com.sd.lib.stream.FStream;
 
 import java.lang.ref.WeakReference;
 
@@ -13,11 +15,11 @@ import java.lang.ref.WeakReference;
  * <p>
  * 在{@link Activity#getWindow()}对象的{@link Window#getDecorView()}被移除的时候取消注册流对象
  */
-class ActivityStreamBinder extends StreamBinder<Activity>
+public class ActivityStreamBinder extends StreamBinder<Activity>
 {
     private final WeakReference<View> mDecorView;
 
-    protected ActivityStreamBinder(@NonNull FStream stream, @NonNull Activity target)
+    public ActivityStreamBinder(@NonNull FStream stream, @NonNull Activity target)
     {
         super(stream, target);
 
