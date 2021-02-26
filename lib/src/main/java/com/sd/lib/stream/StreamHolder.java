@@ -47,9 +47,11 @@ class StreamHolder
         final boolean result = mStreamHolder.add(stream);
         if (result)
         {
-            final int priorityStreamSize = mPriorityStreamHolder.size();
-            if (priorityStreamSize > 0)
+            if (!mPriorityStreamHolder.isEmpty())
+            {
+                // 如果之前已经有流对象设置了优先级，则添加新流对象的时候标记为需要重新排序
                 mHasDirtyStream = true;
+            }
         }
         return result;
     }
