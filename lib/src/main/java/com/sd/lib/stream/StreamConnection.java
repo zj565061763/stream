@@ -1,6 +1,7 @@
 package com.sd.lib.stream;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +58,7 @@ public abstract class StreamConnection
      * @param priority
      * @param clazz
      */
-    public void setPriority(int priority, @NonNull Class<? extends FStream> clazz)
+    public void setPriority(int priority, @Nullable Class<? extends FStream> clazz)
     {
         synchronized (mManager)
         {
