@@ -3,7 +3,7 @@ apply plugin: 'maven-publish'
 
 def libArtifactId = "stream"
 def libVersionCode = 20210226
-def libVersionName = "1.3.0-beta9"
+def libVersionName = "1.3.0-beta10"
 
 android {
     compileSdkVersion 28
