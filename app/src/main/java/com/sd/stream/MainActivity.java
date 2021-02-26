@@ -18,9 +18,11 @@ public class MainActivity extends AppCompatActivity
         // 添加TestFragment
         getSupportFragmentManager().beginTransaction().add(R.id.framelayout, new TestFragment()).commit();
 
-        // 注册回调对象
+        // 注册流对象
         FStreamManager.getInstance().register(mCallback1);
-        FStreamManager.getInstance().register(mCallback2);
+
+        // 注册流对象，并设置优先级，数值越大越先被通知，默认优先级：0
+        FStreamManager.getInstance().register(mCallback2).setPriority(-1);
 
         // 绑定流对象，绑定之后会自动取消注册
         FStreamManager.getInstance().bindStream(mCallback3, this);
