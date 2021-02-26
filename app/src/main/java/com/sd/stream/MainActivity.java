@@ -21,7 +21,9 @@ public class MainActivity extends AppCompatActivity
         // 注册回调对象
         FStreamManager.getInstance().register(mCallback1);
         FStreamManager.getInstance().register(mCallback2);
-        FStreamManager.getInstance().register(mCallback3);
+
+        // 绑定流对象，绑定之后会自动取消注册
+        FStreamManager.getInstance().bindStream(mCallback3, this);
     }
 
     private final TestFragment.FragmentCallback mCallback1 = new TestFragment.FragmentCallback()
@@ -77,6 +79,5 @@ public class MainActivity extends AppCompatActivity
         // 要取消注册，否者流对象会一直被持有。
         FStreamManager.getInstance().unregister(mCallback1);
         FStreamManager.getInstance().unregister(mCallback2);
-        FStreamManager.getInstance().unregister(mCallback3);
     }
 }
