@@ -21,9 +21,8 @@ class StreamHolder
 
     /** 保存设置了优先级的流对象 */
     private final Map<FStream, Integer> mPriorityStreamHolder = new ConcurrentHashMap<>();
-
-    private volatile boolean mIsPriorityChanged = false;
-    private volatile boolean mHasDirtyStream = false;
+    /** 是否需要排序 */
+    private volatile boolean mIsNeedSort = false;
 
     public StreamHolder(@NonNull Class<? extends FStream> clazz, @NonNull FStreamManager manager)
     {
@@ -32,6 +31,16 @@ class StreamHolder
 
         mClass = clazz;
         mManager = manager;
+    }
+
+    /**
+     * 流对象数量
+     *
+     * @return
+     */
+    public int size()
+    {
+        return mStreamHolder.size();
     }
 
     /**
@@ -51,7 +60,7 @@ class StreamHolder
             if (!mPriorityStreamHolder.isEmpty())
             {
                 // 如果之前已经有流对象设置了优先级，则添加新流对象的时候标记为需要重新排序
-                mHasDirtyStream = true;
+                mIsNeedSort = true;
             }
         }
         return result;
@@ -74,11 +83,6 @@ class StreamHolder
         return result;
     }
 
-    public int size()
-    {
-        return mStreamHolder.size();
-    }
-
     /**
      * 返回流集合
      *
@@ -87,7 +91,7 @@ class StreamHolder
     @NonNull
     public Collection<FStream> toCollection()
     {
-        final boolean isNeedSort = mIsPriorityChanged || mHasDirtyStream;
+        final boolean isNeedSort = mIsNeedSort;
         if (isNeedSort)
         {
             return sort();
@@ -107,9 +111,7 @@ class StreamHolder
 
             mStreamHolder.clear();
             mStreamHolder.addAll(listEntry);
-
-            mIsPriorityChanged = false;
-            mHasDirtyStream = false;
+            mIsNeedSort = false;
 
             if (mManager.isDebug())
                 Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
@@ -134,13 +136,11 @@ class StreamHolder
             throw new IllegalArgumentException("expect class:" + mClass + " but class:" + clazz);
 
         if (priority == 0)
-        {
             mPriorityStreamHolder.remove(stream);
-        } else
-        {
+        else
             mPriorityStreamHolder.put(stream, priority);
-        }
-        mIsPriorityChanged = true;
+
+        mIsNeedSort = true;
 
         if (mManager.isDebug())
         {
