@@ -87,18 +87,14 @@ class StreamHolder
     @NonNull
     public Collection<FStream> toCollection()
     {
-        if (isNeedSort())
+        final boolean isNeedSort = mIsPriorityChanged || mHasDirtyStream;
+        if (isNeedSort)
         {
             return sort();
         } else
         {
             return new ArrayList<>(mStreamHolder);
         }
-    }
-
-    private boolean isNeedSort()
-    {
-        return mIsPriorityChanged || mHasDirtyStream;
     }
 
     @NonNull
