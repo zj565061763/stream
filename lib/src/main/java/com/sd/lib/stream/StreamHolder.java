@@ -19,6 +19,7 @@ class StreamHolder
     private final FStreamManager mManager;
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
 
+    /** 保存设置了优先级的流对象 */
     private final Map<FStream, Integer> mPriorityStreamHolder = new ConcurrentHashMap<>();
 
     private volatile boolean mIsPriorityChanged = false;
