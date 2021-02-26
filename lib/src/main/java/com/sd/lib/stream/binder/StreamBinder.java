@@ -1,5 +1,6 @@
 package com.sd.lib.stream.binder;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -15,11 +16,8 @@ public abstract class StreamBinder<T>
 
     public StreamBinder(@NonNull FStream stream, @NonNull T target)
     {
-        if (stream == null)
-            throw new IllegalArgumentException("stream is null when create " + getClass().getName());
-
-        if (target == null)
-            throw new IllegalArgumentException("target is null when create " + getClass().getName());
+        if (stream == null || target == null)
+            throw new IllegalArgumentException("null argument");
 
         mStream = new WeakReference<>(stream);
         mTarget = new WeakReference<>(target);
@@ -73,6 +71,7 @@ public abstract class StreamBinder<T>
     /**
      * 取消注册流对象，并解除绑定关系
      */
+    @CallSuper
     public void destroy()
     {
         unregisterStream();
