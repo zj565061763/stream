@@ -190,16 +190,6 @@ public class FStreamManager
         return true;
     }
 
-    private void checkHasBound(@NonNull FStream stream)
-    {
-        if (stream == null)
-            throw new IllegalArgumentException("null argument");
-
-        final StreamBinder binder = mMapStreamBinder.get(stream);
-        if (binder != null)
-            throw new IllegalArgumentException("stream has bound. stream: " + stream + " target:" + binder.getTarget());
-    }
-
     /**
      * 注册流对象
      *
@@ -209,7 +199,6 @@ public class FStreamManager
     @NonNull
     public synchronized StreamConnection register(@NonNull FStream stream)
     {
-        checkHasBound(stream);
         return registerInternal(stream);
     }
 
@@ -220,12 +209,11 @@ public class FStreamManager
      */
     public synchronized void unregister(@NonNull FStream stream)
     {
-        checkHasBound(stream);
         unregisterInternal(stream);
     }
 
     @NonNull
-    synchronized StreamConnection registerInternal(@NonNull FStream stream)
+    private StreamConnection registerInternal(@NonNull FStream stream)
     {
         if (stream == null)
             throw new IllegalArgumentException("null argument");
@@ -264,7 +252,7 @@ public class FStreamManager
         return streamConnection;
     }
 
-    synchronized void unregisterInternal(@NonNull FStream stream)
+    private void unregisterInternal(@NonNull FStream stream)
     {
         if (stream == null)
             throw new IllegalArgumentException("null argument");

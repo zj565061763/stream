@@ -51,7 +51,7 @@ public abstract class StreamBinder<T>
         if (stream == null)
             return false;
 
-        FStreamManager.getInstance().registerInternal(stream);
+        FStreamManager.getInstance().register(stream);
         return true;
     }
 
@@ -64,7 +64,7 @@ public abstract class StreamBinder<T>
         if (stream == null)
             return;
 
-        FStreamManager.getInstance().unregisterInternal(stream);
+        FStreamManager.getInstance().unregister(stream);
     }
 
     /**
