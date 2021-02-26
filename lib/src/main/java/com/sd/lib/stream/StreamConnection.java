@@ -62,6 +62,11 @@ public abstract class StreamConnection
     {
         synchronized (mManager)
         {
+            /**
+             * 由于{@link StreamHolder#sort()}方法中锁住{@link FStreamManager}对象后根据优先级排序，
+             * 所以这边更改优先级的时候也要锁住{@link FStreamManager}对象
+             */
+
             if (clazz == null)
             {
                 for (ConnectionItem item : mMapItem.values())
