@@ -78,7 +78,20 @@ class StickyInvokeManager
      */
     public synchronized void proxyInvoke(Class<? extends FStream> clazz, Object streamTag, Method method, Object[] args)
     {
-        if (args == null || args.length <= 0) return;
+        if (args == null || args.length <= 0)
+        {
+            // 参数为空，不保存
+            return;
+        }
+
+        final Class<?> returnType = method.getReturnType();
+        final boolean isVoid = returnType == void.class || returnType == Void.class;
+        if (!isVoid)
+        {
+            // 方法有返回值，不保存
+            return;
+        }
+
         if (!mMapProxyCount.containsKey(clazz)) return;
 
         Map<Object, InvokeInfo> holder = mMapInvokeInfo.get(clazz);

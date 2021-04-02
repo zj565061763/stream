@@ -34,6 +34,8 @@ class ProxyInvocationHandler implements InvocationHandler
         mTag = builder.mTag;
         mDispatchCallback = builder.mDispatchCallback;
         mResultFilter = builder.mResultFilter;
+
+        StickyInvokeManager.getInstance().proxyCreated(mClass);
     }
 
     private boolean checkTag(@NonNull FStream stream)
@@ -84,6 +86,7 @@ class ProxyInvocationHandler implements InvocationHandler
         if (mManager.isDebug())
             Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " uuid:" + uuid);
 
+        StickyInvokeManager.getInstance().proxyInvoke(mClass, mTag, method, args);
         return result;
     }
 
@@ -216,5 +219,12 @@ class ProxyInvocationHandler implements InvocationHandler
         }
 
         return result;
+    }
+
+    @Override
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        StickyInvokeManager.getInstance().proxyDestroyed(mClass);
     }
 }
