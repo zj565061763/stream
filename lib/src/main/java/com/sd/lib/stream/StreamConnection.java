@@ -28,6 +28,17 @@ public abstract class StreamConnection
     }
 
     /**
+     * 粘性触发方法
+     */
+    public void stickyInvoke()
+    {
+        for (Class<? extends FStream> clazz : mMapItem.keySet())
+        {
+            StickyInvokeManager.getInstance().stickyInvoke(mStream, clazz);
+        }
+    }
+
+    /**
      * 返回优先级
      *
      * @param clazz

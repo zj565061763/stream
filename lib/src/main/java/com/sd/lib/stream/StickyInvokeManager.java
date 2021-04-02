@@ -1,8 +1,10 @@
 package com.sd.lib.stream;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 class StickyInvokeManager
 {
@@ -24,7 +26,7 @@ class StickyInvokeManager
     }
 
     /** 保存方法调用信息 */
-    private final Map<Class<? extends FStream>, Map<Object, InvokeInfo>> mMapInvokeInfo = new HashMap<>();
+    private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapInvokeInfo = new HashMap<>();
 
     /** 代理对象数量 */
     private final Map<Class<? extends FStream>, Integer> mMapProxyCount = new HashMap<>();
@@ -94,29 +96,62 @@ class StickyInvokeManager
 
         if (!mMapProxyCount.containsKey(clazz)) return;
 
-        Map<Object, InvokeInfo> holder = mMapInvokeInfo.get(clazz);
+        Map<Object, MethodInfo> holder = mMapInvokeInfo.get(clazz);
         if (holder == null)
         {
             holder = new HashMap<>();
             mMapInvokeInfo.put(clazz, holder);
         }
 
-        InvokeInfo invokeInfo = holder.get(streamTag);
-        if (invokeInfo == null)
+        MethodInfo methodInfo = holder.get(streamTag);
+        if (methodInfo == null)
         {
-            invokeInfo = new InvokeInfo();
-            holder.put(streamTag, invokeInfo);
+            methodInfo = new MethodInfo();
+            holder.put(streamTag, methodInfo);
         }
-        invokeInfo.save(method, args);
+        methodInfo.save(method, args);
     }
 
-    private static final class InvokeInfo
+    public boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz)
     {
-        private final Map<Method, Object[]> mMethodInfo = new HashMap<>();
+        if (!clazz.isAssignableFrom(stream.getClass()))
+            throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
+
+        final Map<Object, MethodInfo> holder = mMapInvokeInfo.get(clazz);
+        if (holder == null || holder.isEmpty()) return false;
+
+        final Object streamTag = stream.getTagForStream(clazz);
+        final MethodInfo methodInfo = holder.get(streamTag);
+        if (methodInfo == null) return false;
+
+        try
+        {
+            methodInfo.invoke(stream);
+            return true;
+        } catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final class MethodInfo
+    {
+        private final Map<Method, Object[]> mMethodInfo = new ConcurrentHashMap<>();
 
         public void save(Method method, Object[] args)
         {
             mMethodInfo.put(method, args);
+        }
+
+        public void invoke(FStream stream) throws InvocationTargetException, IllegalAccessException
+        {
+            for (Map.Entry<Method, Object[]> item : mMethodInfo.entrySet())
+            {
+                final Method method = item.getKey();
+                final Object[] args = item.getValue();
+
+                method.invoke(stream, args);
+            }
         }
     }
 }
