@@ -25,11 +25,10 @@ class StickyInvokeManager
     {
     }
 
-    /** 保存方法调用信息 */
-    private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapMethodInfo = new HashMap<>();
-
     /** 代理对象数量 */
     private final Map<Class<? extends FStream>, Integer> mMapProxyCount = new HashMap<>();
+    /** 保存方法调用信息 */
+    private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapMethodInfo = new HashMap<>();
 
     /**
      * 代理对象创建触发
@@ -118,7 +117,7 @@ class StickyInvokeManager
         methodInfo.save(method, args);
     }
 
-    public boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz)
+    public synchronized boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz)
     {
         if (!clazz.isAssignableFrom(stream.getClass()))
             throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
