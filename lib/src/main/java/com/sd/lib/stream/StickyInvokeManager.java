@@ -26,7 +26,7 @@ class StickyInvokeManager
     }
 
     /** 保存方法调用信息 */
-    private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapInvokeInfo = new HashMap<>();
+    private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapMethodInfo = new HashMap<>();
 
     /** 代理对象数量 */
     private final Map<Class<? extends FStream>, Integer> mMapProxyCount = new HashMap<>();
@@ -38,6 +38,8 @@ class StickyInvokeManager
      */
     public synchronized void proxyCreated(Class<? extends FStream> clazz)
     {
+        if (clazz == null) throw new IllegalArgumentException("null argument");
+
         final Integer count = mMapProxyCount.get(clazz);
         if (count == null)
         {
@@ -55,6 +57,8 @@ class StickyInvokeManager
      */
     public synchronized void proxyDestroyed(Class<? extends FStream> clazz)
     {
+        if (clazz == null) throw new IllegalArgumentException("null argument");
+
         final Integer count = mMapProxyCount.get(clazz);
         if (count == null)
             throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
@@ -63,7 +67,7 @@ class StickyInvokeManager
         if (targetCount <= 0)
         {
             mMapProxyCount.remove(clazz);
-            mMapInvokeInfo.remove(clazz);
+            mMapMethodInfo.remove(clazz);
         } else
         {
             mMapProxyCount.put(clazz, targetCount);
@@ -80,6 +84,8 @@ class StickyInvokeManager
      */
     public synchronized void proxyInvoke(Class<? extends FStream> clazz, Object streamTag, Method method, Object[] args)
     {
+        if (clazz == null) throw new IllegalArgumentException("null argument");
+
         if (args == null || args.length <= 0)
         {
             // 参数为空，不保存
@@ -96,11 +102,11 @@ class StickyInvokeManager
 
         if (!mMapProxyCount.containsKey(clazz)) return;
 
-        Map<Object, MethodInfo> holder = mMapInvokeInfo.get(clazz);
+        Map<Object, MethodInfo> holder = mMapMethodInfo.get(clazz);
         if (holder == null)
         {
             holder = new HashMap<>();
-            mMapInvokeInfo.put(clazz, holder);
+            mMapMethodInfo.put(clazz, holder);
         }
 
         MethodInfo methodInfo = holder.get(streamTag);
@@ -117,7 +123,7 @@ class StickyInvokeManager
         if (!clazz.isAssignableFrom(stream.getClass()))
             throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
 
-        final Map<Object, MethodInfo> holder = mMapInvokeInfo.get(clazz);
+        final Map<Object, MethodInfo> holder = mMapMethodInfo.get(clazz);
         if (holder == null || holder.isEmpty()) return false;
 
         final Object streamTag = stream.getTagForStream(clazz);
