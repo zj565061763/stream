@@ -24,8 +24,7 @@ class ProxyInvocationHandler implements InvocationHandler {
     private final boolean mIsSticky;
 
     public ProxyInvocationHandler(@NonNull FStreamManager manager, @NonNull FStream.ProxyBuilder builder) {
-        if (manager == null || builder == null)
-            throw new IllegalArgumentException("null argument");
+        if (manager == null || builder == null) throw new IllegalArgumentException("null argument");
 
         mManager = manager;
 
@@ -117,8 +116,9 @@ class ProxyInvocationHandler implements InvocationHandler {
 
             isDefaultStream = true;
 
-            if (mManager.isDebug())
+            if (mManager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " uuid:" + uuid);
+            }
         } else {
             listStream = holder.toCollection();
         }
