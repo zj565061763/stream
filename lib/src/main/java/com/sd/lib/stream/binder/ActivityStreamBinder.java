@@ -22,10 +22,14 @@ public class ActivityStreamBinder extends StreamBinder<Activity> {
         super(stream, target);
 
         final Window window = target.getWindow();
-        if (window == null) throw new RuntimeException("Bind stream failed because activity's window is null");
+        if (window == null) {
+            throw new RuntimeException("Bind stream failed because activity's window is null");
+        }
 
         final View decorView = window.getDecorView();
-        if (decorView == null) throw new RuntimeException("Bind stream failed because activity's window DecorView is null");
+        if (decorView == null) {
+            throw new RuntimeException("Bind stream failed because activity's window DecorView is null");
+        }
 
         mDecorView = new WeakReference<>(decorView);
     }
