@@ -12,7 +12,9 @@ public abstract class StreamConnection {
     private final Map<Class<? extends FStream>, ConnectionItem> mMapItem = new ConcurrentHashMap<>();
 
     StreamConnection(@NonNull FStream stream, @NonNull Class<? extends FStream>[] classes, @NonNull FStreamManager manager) {
-        if (stream == null || classes == null || manager == null) throw new IllegalArgumentException("null argument");
+        if (stream == null || classes == null || manager == null) {
+            throw new IllegalArgumentException("null argument");
+        }
 
         mStream = stream;
         mManager = manager;
