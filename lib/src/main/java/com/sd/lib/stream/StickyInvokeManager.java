@@ -45,7 +45,9 @@ class StickyInvokeManager {
      * @param clazz
      */
     public void proxyCreated(Class<? extends FStream> clazz) {
-        if (clazz == null) throw new IllegalArgumentException("null argument");
+        if (clazz == null) {
+            throw new IllegalArgumentException("null argument");
+        }
 
         synchronized (clazz) {
             final Integer count = mMapProxyCount.get(clazz);
@@ -70,11 +72,15 @@ class StickyInvokeManager {
      * @param clazz
      */
     public void proxyDestroyed(Class<? extends FStream> clazz) {
-        if (clazz == null) throw new IllegalArgumentException("null argument");
+        if (clazz == null) {
+            throw new IllegalArgumentException("null argument");
+        }
 
         synchronized (clazz) {
             final Integer count = mMapProxyCount.get(clazz);
-            if (count == null) throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
+            if (count == null) {
+                throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
+            }
 
             final int targetCount = count - 1;
             if (targetCount <= 0) {
@@ -102,7 +108,9 @@ class StickyInvokeManager {
      * @param args
      */
     public void proxyInvoke(Class<? extends FStream> clazz, Object streamTag, Method method, Object[] args) {
-        if (clazz == null) throw new IllegalArgumentException("null argument");
+        if (clazz == null) {
+            throw new IllegalArgumentException("null argument");
+        }
 
         if (args == null || args.length <= 0) {
             // 参数为空，不保存
@@ -146,15 +154,21 @@ class StickyInvokeManager {
     }
 
     public boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz) {
-        if (!clazz.isAssignableFrom(stream.getClass())) throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
+        if (!clazz.isAssignableFrom(stream.getClass())) {
+            throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
+        }
 
         synchronized (clazz) {
             final Map<Object, MethodInfo> holder = mMapMethodInfo.get(clazz);
-            if (holder == null || holder.isEmpty()) return false;
+            if (holder == null || holder.isEmpty()) {
+                return false;
+            }
 
             final Object streamTag = stream.getTagForStream(clazz);
             final MethodInfo methodInfo = holder.get(streamTag);
-            if (methodInfo == null) return false;
+            if (methodInfo == null) {
+                return false;
+            }
 
             if (isDebug()) {
                 Log.i(TAG, "stickyInvoke"
