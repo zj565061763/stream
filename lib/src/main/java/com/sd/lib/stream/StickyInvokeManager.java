@@ -74,8 +74,7 @@ class StickyInvokeManager {
 
         synchronized (clazz) {
             final Integer count = mMapProxyCount.get(clazz);
-            if (count == null)
-                throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
+            if (count == null) throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
 
             final int targetCount = count - 1;
             if (targetCount <= 0) {
@@ -147,8 +146,7 @@ class StickyInvokeManager {
     }
 
     public boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz) {
-        if (!clazz.isAssignableFrom(stream.getClass()))
-            throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
+        if (!clazz.isAssignableFrom(stream.getClass())) throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
 
         synchronized (clazz) {
             final Map<Object, MethodInfo> holder = mMapMethodInfo.get(clazz);
