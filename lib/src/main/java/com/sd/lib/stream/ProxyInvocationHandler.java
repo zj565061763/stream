@@ -42,8 +42,9 @@ class ProxyInvocationHandler implements InvocationHandler {
 
     private boolean checkTag(@NonNull FStream stream) {
         final Object tag = stream.getTagForStream(mClass);
-        if (mTag == tag)
+        if (mTag == tag) {
             return true;
+        }
 
         return mTag != null && mTag.equals(tag);
     }
@@ -54,8 +55,7 @@ class ProxyInvocationHandler implements InvocationHandler {
         final Class<?> returnType = method.getReturnType();
 
         final Class<?>[] parameterTypes = method.getParameterTypes();
-        if ("getTagForStream".equals(methodName)
-                && parameterTypes.length == 1 && parameterTypes[0] == Class.class) {
+        if ("getTagForStream".equals(methodName) && parameterTypes.length == 1 && parameterTypes[0] == Class.class) {
             throw new RuntimeException(methodName + " method can not be called on proxy instance");
         }
 
@@ -68,10 +68,11 @@ class ProxyInvocationHandler implements InvocationHandler {
         if (isVoid) {
             result = null;
         } else if (returnType.isPrimitive() && result == null) {
-            if (boolean.class == returnType)
+            if (boolean.class == returnType) {
                 result = false;
-            else
+            } else {
                 result = 0;
+            }
 
             if (mManager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result
@@ -79,8 +80,9 @@ class ProxyInvocationHandler implements InvocationHandler {
             }
         }
 
-        if (mManager.isDebug())
+        if (mManager.isDebug()) {
             Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " uuid:" + uuid);
+        }
 
         if (mIsSticky) {
             StickyInvokeManager.getInstance().proxyInvoke(mClass, mTag, method, args);
@@ -106,8 +108,9 @@ class ProxyInvocationHandler implements InvocationHandler {
         boolean isDefaultStream = false;
         if (holderSize <= 0) {
             final FStream stream = mManager.getDefaultStream(mClass);
-            if (stream == null)
+            if (stream == null) {
                 return null;
+            }
 
             listStream = new ArrayList<>(1);
             listStream.add(stream);
@@ -131,21 +134,22 @@ class ProxyInvocationHandler implements InvocationHandler {
                 // 不判断
             } else {
                 if (connection == null) {
-                    if (mManager.isDebug())
+                    if (mManager.isDebug()) {
                         Log.e(FStream.class.getSimpleName(), StreamConnection.class.getSimpleName() + " is null uuid:" + uuid);
+                    }
                     continue;
                 }
             }
 
-            if (!checkTag(item))
+            if (!checkTag(item)) {
                 continue;
+            }
 
-            if (mDispatchCallback != null) {
-                if (mDispatchCallback.beforeDispatch(item, method, args)) {
-                    if (mManager.isDebug())
-                        Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before uuid:" + uuid);
-                    break;
+            if (mDispatchCallback != null && mDispatchCallback.beforeDispatch(item, method, args)) {
+                if (mManager.isDebug()) {
+                    Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before uuid:" + uuid);
                 }
+                break;
             }
 
             Object itemResult = null;
@@ -175,19 +179,20 @@ class ProxyInvocationHandler implements InvocationHandler {
 
             result = itemResult;
 
-            if (filterResult)
+            if (filterResult) {
                 listResult.add(itemResult);
-
-            if (mDispatchCallback != null) {
-                if (mDispatchCallback.afterDispatch(item, method, args, itemResult)) {
-                    if (mManager.isDebug())
-                        Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after uuid:" + uuid);
-                    break;
-                }
             }
 
-            if (shouldBreakDispatch)
+            if (mDispatchCallback != null && mDispatchCallback.afterDispatch(item, method, args, itemResult)) {
+                if (mManager.isDebug()) {
+                    Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after uuid:" + uuid);
+                }
                 break;
+            }
+
+            if (shouldBreakDispatch) {
+                break;
+            }
 
             index++;
         }
@@ -195,8 +200,9 @@ class ProxyInvocationHandler implements InvocationHandler {
         if (filterResult && !listResult.isEmpty()) {
             result = mResultFilter.filter(method, args, listResult);
 
-            if (mManager.isDebug())
+            if (mManager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " uuid:" + uuid);
+            }
         }
 
         return result;
