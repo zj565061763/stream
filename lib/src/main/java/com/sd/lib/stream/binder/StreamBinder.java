@@ -14,7 +14,9 @@ public abstract class StreamBinder<T> {
     private final WeakReference<T> mTarget;
 
     public StreamBinder(@NonNull FStream stream, @NonNull T target) {
-        if (stream == null || target == null) throw new IllegalArgumentException("null argument");
+        if (stream == null || target == null) {
+            throw new IllegalArgumentException("null argument");
+        }
 
         mStream = new WeakReference<>(stream);
         mTarget = new WeakReference<>(target);
