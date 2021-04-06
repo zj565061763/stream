@@ -24,7 +24,9 @@ class ProxyInvocationHandler implements InvocationHandler {
     private final boolean mIsSticky;
 
     public ProxyInvocationHandler(@NonNull FStreamManager manager, @NonNull FStream.ProxyBuilder builder) {
-        if (manager == null || builder == null) throw new IllegalArgumentException("null argument");
+        if (manager == null || builder == null) {
+            throw new IllegalArgumentException("null argument");
+        }
 
         mManager = manager;
 
