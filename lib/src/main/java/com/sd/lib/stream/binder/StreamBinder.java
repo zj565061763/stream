@@ -9,15 +9,12 @@ import com.sd.lib.stream.FStreamManager;
 
 import java.lang.ref.WeakReference;
 
-public abstract class StreamBinder<T>
-{
+public abstract class StreamBinder<T> {
     private final WeakReference<FStream> mStream;
     private final WeakReference<T> mTarget;
 
-    public StreamBinder(@NonNull FStream stream, @NonNull T target)
-    {
-        if (stream == null || target == null)
-            throw new IllegalArgumentException("null argument");
+    public StreamBinder(@NonNull FStream stream, @NonNull T target) {
+        if (stream == null || target == null) throw new IllegalArgumentException("null argument");
 
         mStream = new WeakReference<>(stream);
         mTarget = new WeakReference<>(target);
@@ -29,8 +26,7 @@ public abstract class StreamBinder<T>
      * @return
      */
     @Nullable
-    public final T getTarget()
-    {
+    public final T getTarget() {
         return mTarget.get();
     }
 
@@ -46,11 +42,11 @@ public abstract class StreamBinder<T>
      *
      * @return
      */
-    protected final boolean registerStream()
-    {
+    protected final boolean registerStream() {
         final FStream stream = mStream.get();
-        if (stream == null)
+        if (stream == null) {
             return false;
+        }
 
         FStreamManager.getInstance().register(stream);
         return true;
@@ -59,11 +55,11 @@ public abstract class StreamBinder<T>
     /**
      * 取消注册流对象
      */
-    protected final void unregisterStream()
-    {
+    protected final void unregisterStream() {
         final FStream stream = mStream.get();
-        if (stream == null)
+        if (stream == null) {
             return;
+        }
 
         FStreamManager.getInstance().unregister(stream);
     }
@@ -72,8 +68,7 @@ public abstract class StreamBinder<T>
      * 取消注册流对象，并解除绑定关系
      */
     @CallSuper
-    public void destroy()
-    {
+    public void destroy() {
         unregisterStream();
         mStream.clear();
     }
