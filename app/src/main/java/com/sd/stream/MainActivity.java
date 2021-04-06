@@ -71,23 +71,25 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private final TestFragment.FragmentStickyCallback mFragmentStickyCallback = new TestFragment.FragmentStickyCallback() {
-        @Override
-        public void onContent(String content) {
-            Log.i(TAG, "onContent:" + content);
-        }
-
-        @Nullable
-        @Override
-        public Object getTagForStream(@NonNull Class<? extends FStream> clazz) {
-            return null;
-        }
-    };
-
     @Override
     protected void onStop() {
         super.onStop();
-        final StreamConnection connection = FStreamManager.getInstance().register(mFragmentStickyCallback);
+
+        final TestFragment.FragmentStickyCallback stickyCallback = new TestFragment.FragmentStickyCallback() {
+            @Override
+            public void onContent(String content) {
+                FStreamManager.getInstance().unregister(this);
+                Log.i(TAG, "onContent:" + content);
+            }
+
+            @Nullable
+            @Override
+            public Object getTagForStream(@NonNull Class<? extends FStream> clazz) {
+                return null;
+            }
+        };
+
+        final StreamConnection connection = FStreamManager.getInstance().register(stickyCallback);
         /**
          * 粘性触发方法，用最后一次触发的参数触发方法
          */
@@ -101,6 +103,5 @@ public class MainActivity extends AppCompatActivity {
         // 要取消注册，否者流对象会一直被持有。
         FStreamManager.getInstance().unregister(mCallback1);
         FStreamManager.getInstance().unregister(mCallback2);
-        FStreamManager.getInstance().unregister(mFragmentStickyCallback);
     }
 }
