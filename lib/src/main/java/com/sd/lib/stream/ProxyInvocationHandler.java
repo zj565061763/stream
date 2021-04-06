@@ -21,6 +21,7 @@ class ProxyInvocationHandler implements InvocationHandler {
     private final Object mTag;
     private final FStream.DispatchCallback mDispatchCallback;
     private final FStream.ResultFilter mResultFilter;
+    private final boolean mIsSticky;
 
     public ProxyInvocationHandler(@NonNull FStreamManager manager, @NonNull FStream.ProxyBuilder builder) {
         if (manager == null || builder == null)
@@ -32,8 +33,11 @@ class ProxyInvocationHandler implements InvocationHandler {
         mTag = builder.mTag;
         mDispatchCallback = builder.mDispatchCallback;
         mResultFilter = builder.mResultFilter;
+        mIsSticky = builder.mIsSticky;
 
-        StickyInvokeManager.getInstance().proxyCreated(mClass);
+        if (mIsSticky) {
+            StickyInvokeManager.getInstance().proxyCreated(mClass);
+        }
     }
 
     private boolean checkTag(@NonNull FStream stream) {
@@ -78,7 +82,9 @@ class ProxyInvocationHandler implements InvocationHandler {
         if (mManager.isDebug())
             Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " uuid:" + uuid);
 
-        StickyInvokeManager.getInstance().proxyInvoke(mClass, mTag, method, args);
+        if (mIsSticky) {
+            StickyInvokeManager.getInstance().proxyInvoke(mClass, mTag, method, args);
+        }
         return result;
     }
 
@@ -199,6 +205,8 @@ class ProxyInvocationHandler implements InvocationHandler {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        StickyInvokeManager.getInstance().proxyDestroyed(mClass);
+        if (mIsSticky) {
+            StickyInvokeManager.getInstance().proxyDestroyed(mClass);
+        }
     }
 }
