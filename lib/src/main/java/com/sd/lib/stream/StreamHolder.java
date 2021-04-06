@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-class StreamHolder
-{
+class StreamHolder {
     private final Class<? extends FStream> mClass;
     private final FStreamManager mManager;
     private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
@@ -24,10 +23,10 @@ class StreamHolder
     /** 是否需要排序 */
     private volatile boolean mIsNeedSort = false;
 
-    public StreamHolder(@NonNull Class<? extends FStream> clazz, @NonNull FStreamManager manager)
-    {
-        if (clazz == null || manager == null)
+    public StreamHolder(@NonNull Class<? extends FStream> clazz, @NonNull FStreamManager manager) {
+        if (clazz == null || manager == null) {
             throw new IllegalArgumentException("null argument");
+        }
 
         mClass = clazz;
         mManager = manager;
@@ -38,8 +37,7 @@ class StreamHolder
      *
      * @return
      */
-    public int size()
-    {
+    public int size() {
         return mStreamHolder.size();
     }
 
@@ -49,16 +47,14 @@ class StreamHolder
      * @param stream
      * @return
      */
-    public boolean add(@NonNull FStream stream)
-    {
-        if (stream == null)
+    public boolean add(@NonNull FStream stream) {
+        if (stream == null) {
             throw new IllegalArgumentException("null argument");
+        }
 
         final boolean result = mStreamHolder.add(stream);
-        if (result)
-        {
-            if (!mPriorityStreamHolder.isEmpty())
-            {
+        if (result) {
+            if (!mPriorityStreamHolder.isEmpty()) {
                 // 如果之前已经有流对象设置了优先级，则添加新流对象的时候标记为需要重新排序
                 mIsNeedSort = true;
             }
@@ -72,10 +68,10 @@ class StreamHolder
      * @param stream
      * @return
      */
-    public boolean remove(@NonNull FStream stream)
-    {
-        if (stream == null)
+    public boolean remove(@NonNull FStream stream) {
+        if (stream == null) {
             throw new IllegalArgumentException("null argument");
+        }
 
         final boolean result = mStreamHolder.remove(stream);
         mPriorityStreamHolder.remove(stream);
@@ -89,23 +85,18 @@ class StreamHolder
      * @return
      */
     @NonNull
-    public Collection<FStream> toCollection()
-    {
+    public Collection<FStream> toCollection() {
         final boolean isNeedSort = mIsNeedSort;
-        if (isNeedSort)
-        {
+        if (isNeedSort) {
             return sort();
-        } else
-        {
+        } else {
             return new ArrayList<>(mStreamHolder);
         }
     }
 
     @NonNull
-    private Collection<FStream> sort()
-    {
-        synchronized (mManager)
-        {
+    private Collection<FStream> sort() {
+        synchronized (mManager) {
             final List<FStream> listEntry = new ArrayList<>(mStreamHolder);
             Collections.sort(listEntry, new InternalStreamComparator());
 
@@ -113,8 +104,9 @@ class StreamHolder
             mStreamHolder.addAll(listEntry);
             mIsNeedSort = false;
 
-            if (mManager.isDebug())
+            if (mManager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
+            }
 
             return listEntry;
         }
@@ -127,23 +119,24 @@ class StreamHolder
      * @param stream
      * @param clazz
      */
-    public void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz)
-    {
-        if (stream == null || clazz == null)
+    public void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz) {
+        if (stream == null || clazz == null) {
             throw new IllegalArgumentException("null argument");
+        }
 
-        if (clazz != mClass)
+        if (clazz != mClass) {
             throw new IllegalArgumentException("expect class:" + mClass + " but class:" + clazz);
+        }
 
-        if (priority == 0)
+        if (priority == 0) {
             mPriorityStreamHolder.remove(stream);
-        else
+        } else {
             mPriorityStreamHolder.put(stream, priority);
+        }
 
         mIsNeedSort = true;
 
-        if (mManager.isDebug())
-        {
+        if (mManager.isDebug()) {
             Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
                     + " priority:" + priority
                     + " clazz:" + clazz.getName()
@@ -152,15 +145,12 @@ class StreamHolder
         }
     }
 
-    private final class InternalStreamComparator implements Comparator<FStream>
-    {
+    private final class InternalStreamComparator implements Comparator<FStream> {
         @Override
-        public int compare(FStream o1, FStream o2)
-        {
+        public int compare(FStream o1, FStream o2) {
             final StreamConnection o1Connection = mManager.getConnection(o1);
             final StreamConnection o2Connection = mManager.getConnection(o2);
-            if (o1Connection != null && o2Connection != null)
-            {
+            if (o1Connection != null && o2Connection != null) {
                 return o2Connection.getPriority(mClass) - o1Connection.getPriority(mClass);
             }
             return 0;
