@@ -7,14 +7,10 @@ import com.sd.lib.stream.FStreamManager;
 /**
  * Created by Administrator on 2018/2/9.
  */
-
-public class App extends Application
-{
+public class App extends Application {
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
-
         // 打开调试模式
         FStreamManager.getInstance().setDebug(true);
 
