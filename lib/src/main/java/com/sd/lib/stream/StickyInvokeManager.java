@@ -1,12 +1,17 @@
 package com.sd.lib.stream;
 
+import android.util.Log;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 class StickyInvokeManager {
+    private static final String TAG = StickyInvokeManager.class.getSimpleName();
+
     private static StickyInvokeManager sInstance;
 
     public static StickyInvokeManager getInstance() {
@@ -30,6 +35,10 @@ class StickyInvokeManager {
     /** 保存方法调用信息 */
     private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapMethodInfo = new ConcurrentHashMap<>();
 
+    private boolean isDebug() {
+        return FStreamManager.getInstance().isDebug();
+    }
+
     /**
      * 代理对象创建触发
      *
@@ -44,6 +53,13 @@ class StickyInvokeManager {
                 mMapProxyCount.put(clazz, 1);
             } else {
                 mMapProxyCount.put(clazz, count + 1);
+            }
+
+            if (isDebug()) {
+                Log.i(TAG, "+++++ proxyCreated"
+                        + " class:" + clazz.getName()
+                        + " count:" + mMapProxyCount.get(clazz)
+                );
             }
         }
     }
@@ -67,6 +83,13 @@ class StickyInvokeManager {
                 mMapMethodInfo.remove(clazz);
             } else {
                 mMapProxyCount.put(clazz, targetCount);
+            }
+
+            if (isDebug()) {
+                Log.i(TAG, "----- proxyDestroyed"
+                        + " class:" + clazz.getName()
+                        + " count:" + mMapProxyCount.get(clazz)
+                );
             }
         }
     }
@@ -111,6 +134,15 @@ class StickyInvokeManager {
                 holder.put(streamTag, methodInfo);
             }
             methodInfo.save(method, args);
+
+            if (isDebug()) {
+                Log.i(TAG, "proxyInvoke"
+                        + " class:" + clazz.getName()
+                        + " tag:" + streamTag
+                        + " method:" + method
+                        + " args:" + Arrays.toString(args)
+                );
+            }
         }
     }
 
@@ -125,6 +157,14 @@ class StickyInvokeManager {
             final Object streamTag = stream.getTagForStream(clazz);
             final MethodInfo methodInfo = holder.get(streamTag);
             if (methodInfo == null) return false;
+
+            if (isDebug()) {
+                Log.i(TAG, "stickyInvoke"
+                        + " class:" + clazz.getName()
+                        + " stream:" + stream
+                        + " tag:" + streamTag
+                );
+            }
 
             try {
                 methodInfo.invoke(stream);
