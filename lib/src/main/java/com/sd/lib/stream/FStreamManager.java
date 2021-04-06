@@ -36,7 +36,6 @@ public class FStreamManager {
 
     private final Map<Class<? extends FStream>, StreamHolder> mMapStream = new ConcurrentHashMap<>();
     private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
-
     private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
 
     private boolean mIsDebug;
@@ -91,14 +90,12 @@ public class FStreamManager {
         final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
         if (binder.bind()) {
             mMapStreamBinder.put(stream, binder);
-
             if (mIsDebug) {
                 Log.i(FStream.class.getSimpleName(), "bind activity"
                         + " stream:" + stream
                         + " target:" + target
                         + " size:" + mMapStreamBinder.size());
             }
-
             return true;
         }
         return false;
@@ -130,14 +127,12 @@ public class FStreamManager {
         final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
         if (binder.bind()) {
             mMapStreamBinder.put(stream, binder);
-
             if (mIsDebug) {
                 Log.i(FStream.class.getSimpleName(), "bind view"
                         + " stream:" + stream
                         + " target:" + target
                         + " size:" + mMapStreamBinder.size());
             }
-
             return true;
         }
         return false;
@@ -271,7 +266,6 @@ public class FStreamManager {
         if (stream == null) {
             throw new IllegalArgumentException("null argument");
         }
-
         return mMapStreamConnection.get(stream);
     }
 
@@ -315,7 +309,6 @@ public class FStreamManager {
         }
 
         final Set<Class<? extends FStream>> set = new HashSet<>();
-
         while (clazz != null) {
             if (!FStream.class.isAssignableFrom(clazz)) {
                 break;
@@ -333,7 +326,6 @@ public class FStreamManager {
 
             clazz = clazz.getSuperclass();
         }
-
         return set;
     }
 
@@ -440,7 +432,6 @@ public class FStreamManager {
         if (stream == null) {
             throw new RuntimeException(mDefaultStreamFactory + " create null for param:" + param);
         }
-
         return stream;
     }
 
