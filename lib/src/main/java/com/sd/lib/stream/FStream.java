@@ -9,8 +9,7 @@ import java.util.List;
 /**
  * 流接口
  */
-public interface FStream
-{
+public interface FStream {
     /**
      * 返回当前流对象的tag
      * <p>
@@ -22,12 +21,12 @@ public interface FStream
     @Nullable
     Object getTagForStream(@NonNull Class<? extends FStream> clazz);
 
-    class ProxyBuilder
-    {
+    class ProxyBuilder {
         Class<? extends FStream> mClass;
         Object mTag;
         DispatchCallback mDispatchCallback;
         ResultFilter mResultFilter;
+        boolean mIsSticky;
 
         /**
          * 设置代理对象的tag
@@ -35,8 +34,7 @@ public interface FStream
          * @param tag
          * @return
          */
-        public ProxyBuilder setTag(@Nullable Object tag)
-        {
+        public ProxyBuilder setTag(@Nullable Object tag) {
             mTag = tag;
             return this;
         }
@@ -47,8 +45,7 @@ public interface FStream
          * @param callback
          * @return
          */
-        public ProxyBuilder setDispatchCallback(@Nullable DispatchCallback callback)
-        {
+        public ProxyBuilder setDispatchCallback(@Nullable DispatchCallback callback) {
             mDispatchCallback = callback;
             return this;
         }
@@ -59,9 +56,19 @@ public interface FStream
          * @param filter
          * @return
          */
-        public ProxyBuilder setResultFilter(@Nullable ResultFilter filter)
-        {
+        public ProxyBuilder setResultFilter(@Nullable ResultFilter filter) {
             mResultFilter = filter;
+            return this;
+        }
+
+        /**
+         * 设置是否支持粘性触发
+         *
+         * @param sticky
+         * @return
+         */
+        public ProxyBuilder setSticky(boolean sticky) {
+            mIsSticky = sticky;
             return this;
         }
 
@@ -73,22 +80,17 @@ public interface FStream
          * @return
          */
         @NonNull
-        public <T extends FStream> T build(@NonNull Class<T> clazz)
-        {
-            if (clazz == null)
-                throw new IllegalArgumentException("clazz is null");
-            if (!clazz.isInterface())
-                throw new IllegalArgumentException("clazz must be an interface");
-            if (clazz == FStream.class)
-                throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
+        public <T extends FStream> T build(@NonNull Class<T> clazz) {
+            if (clazz == null) throw new IllegalArgumentException("clazz is null");
+            if (!clazz.isInterface()) throw new IllegalArgumentException("clazz must be an interface");
+            if (clazz == FStream.class) throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
 
             mClass = clazz;
             return (T) FStreamManager.getInstance().newProxyInstance(this);
         }
     }
 
-    interface DispatchCallback
-    {
+    interface DispatchCallback {
         /**
          * 流对象的方法被通知之前触发
          *
@@ -111,8 +113,7 @@ public interface FStream
         boolean afterDispatch(@NonNull FStream stream, @NonNull Method method, @Nullable Object[] methodParams, @Nullable Object methodResult);
     }
 
-    interface ResultFilter
-    {
+    interface ResultFilter {
         /**
          * 过滤返回值
          *
