@@ -81,9 +81,15 @@ public interface FStream {
          */
         @NonNull
         public <T extends FStream> T build(@NonNull Class<T> clazz) {
-            if (clazz == null) throw new IllegalArgumentException("clazz is null");
-            if (!clazz.isInterface()) throw new IllegalArgumentException("clazz must be an interface");
-            if (clazz == FStream.class) throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
+            if (clazz == null) {
+                throw new IllegalArgumentException("clazz is null");
+            }
+            if (!clazz.isInterface()) {
+                throw new IllegalArgumentException("clazz must be an interface");
+            }
+            if (clazz == FStream.class) {
+                throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
+            }
 
             mClass = clazz;
             return (T) FStreamManager.getInstance().newProxyInstance(this);
