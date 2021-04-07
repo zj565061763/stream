@@ -57,7 +57,7 @@ class ProxyInvocationHandler implements InvocationHandler {
 
         final Class<?>[] parameterTypes = method.getParameterTypes();
         if ("getTagForStream".equals(methodName) && parameterTypes.length == 1 && parameterTypes[0] == Class.class) {
-            throw new RuntimeException(methodName + " method can not be called on proxy instance");
+            return mTag;
         }
 
 
