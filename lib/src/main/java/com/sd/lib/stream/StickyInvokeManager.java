@@ -175,7 +175,7 @@ class StickyInvokeManager {
             }
 
             try {
-                methodInfo.invoke(stream);
+                methodInfo.invoke(stream, clazz);
                 return true;
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -190,13 +190,14 @@ class StickyInvokeManager {
             mMethodInfo.put(method, args);
         }
 
-        public void invoke(FStream stream) throws InvocationTargetException, IllegalAccessException {
+        public void invoke(FStream stream, Class<? extends FStream> clazz) throws InvocationTargetException, IllegalAccessException {
             for (Map.Entry<Method, Object[]> item : mMethodInfo.entrySet()) {
                 final Method method = item.getKey();
                 final Object[] args = item.getValue();
 
                 if (isDebug()) {
                     Log.i(TAG, "invoke"
+                            + " class:" + clazz.getName()
                             + " stream:" + stream
                             + " method:" + method
                             + " args:" + Arrays.toString(args)
