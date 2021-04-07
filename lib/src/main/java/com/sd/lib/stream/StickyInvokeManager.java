@@ -35,10 +35,6 @@ class StickyInvokeManager {
     /** 保存方法调用信息 */
     private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapMethodInfo = new ConcurrentHashMap<>();
 
-    private boolean isDebug() {
-        return FStreamManager.getInstance().isDebug();
-    }
-
     /**
      * 代理对象创建触发
      *
@@ -199,8 +195,20 @@ class StickyInvokeManager {
                 final Method method = item.getKey();
                 final Object[] args = item.getValue();
 
+                if (isDebug()) {
+                    Log.i(TAG, "invoke"
+                            + " stream:" + stream
+                            + " method:" + method
+                            + " args:" + Arrays.toString(args)
+                    );
+                }
+
                 method.invoke(stream, args);
             }
         }
+    }
+
+    private static boolean isDebug() {
+        return FStreamManager.getInstance().isDebug();
     }
 }
