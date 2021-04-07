@@ -11,9 +11,7 @@ import androidx.fragment.app.Fragment;
 import com.sd.lib.stream.FStream;
 
 public class TestFragment extends Fragment {
-    /**
-     * 创建接口代理对象
-     */
+    /** 创建接口代理对象 */
     private final FragmentCallback mCallback = new FStream.ProxyBuilder()
             /**
              * 设置代理对象的tag，默认tag为null
@@ -21,6 +19,11 @@ public class TestFragment extends Fragment {
              */
             .setTag(null)
             .build(FragmentCallback.class);
+
+    /** 创建接口代理对象 */
+    private final FragmentStickyCallback mStickyCallback = new FStream.ProxyBuilder()
+            .setSticky(true) // 设置支持粘性触发
+            .build(FragmentStickyCallback.class);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,19 +37,13 @@ public class TestFragment extends Fragment {
                 final String content = mCallback.getDisplayContent();
                 button.setText(content);
 
-                final FragmentStickyCallback stickyCallback = new FStream.ProxyBuilder()
-                        .setSticky(true) // 设置支持粘性触发
-                        .build(FragmentStickyCallback.class);
-                stickyCallback.onContent(content);
+                mStickyCallback.onContent("test sticky invoke");
             }
         });
 
         return button;
     }
 
-    /**
-     * 接口继承流接口
-     */
     public interface FragmentCallback extends FStream {
         String getDisplayContent();
     }
