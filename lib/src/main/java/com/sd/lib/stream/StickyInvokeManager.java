@@ -40,7 +40,7 @@ class StickyInvokeManager {
      *
      * @param clazz
      */
-    public void proxyCreated(Class<? extends FStream> clazz) {
+    void proxyCreated(Class<? extends FStream> clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("null argument");
         }
@@ -67,7 +67,7 @@ class StickyInvokeManager {
      *
      * @param clazz
      */
-    public void proxyDestroyed(Class<? extends FStream> clazz) {
+    void proxyDestroyed(Class<? extends FStream> clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("null argument");
         }
@@ -75,7 +75,7 @@ class StickyInvokeManager {
         synchronized (clazz) {
             final Integer count = mMapProxyCount.get(clazz);
             if (count == null) {
-                throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
+                return;
             }
 
             final int targetCount = count - 1;
@@ -103,7 +103,7 @@ class StickyInvokeManager {
      * @param method
      * @param args
      */
-    public void proxyInvoke(Class<? extends FStream> clazz, Object streamTag, Method method, Object[] args) {
+    void proxyInvoke(Class<? extends FStream> clazz, Object streamTag, Method method, Object[] args) {
         if (clazz == null) {
             throw new IllegalArgumentException("null argument");
         }
@@ -149,7 +149,7 @@ class StickyInvokeManager {
         }
     }
 
-    public boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz) {
+    boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz) {
         if (!clazz.isAssignableFrom(stream.getClass())) {
             throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
         }
