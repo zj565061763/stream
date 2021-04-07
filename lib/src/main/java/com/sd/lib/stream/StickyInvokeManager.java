@@ -75,7 +75,7 @@ class StickyInvokeManager {
         synchronized (clazz) {
             final Integer count = mMapProxyCount.get(clazz);
             if (count == null) {
-                return;
+                throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
             }
 
             final int targetCount = count - 1;
