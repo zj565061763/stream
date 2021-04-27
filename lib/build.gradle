@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 def libArtifactId = "stream"
-def libVersionCode = 20210407
-def libVersionName = "1.3.0-beta11"
+def libVersionCode = 20210427
+def libVersionName = "1.3.0-beta12"
 
 android {
     compileSdkVersion 28
