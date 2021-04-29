@@ -209,7 +209,7 @@ public class FStreamManager {
                     Log.i(FStream.class.getSimpleName(), "+++++ register"
                             + " class:" + item.getName()
                             + " stream:" + stream
-                            + " count:" + (holder.size()));
+                            + " count:" + (holder.getSize()));
                 }
             }
         }
@@ -237,7 +237,7 @@ public class FStreamManager {
             }
 
             if (holder.remove(stream)) {
-                if (holder.size() <= 0) {
+                if (holder.getSize() <= 0) {
                     mMapStream.remove(item);
                 }
 
@@ -245,7 +245,7 @@ public class FStreamManager {
                     Log.i(FStream.class.getSimpleName(), "----- unregister"
                             + " class:" + item.getName()
                             + " stream:" + stream
-                            + " count:" + (holder.size()));
+                            + " count:" + (holder.getSize()));
                 }
             }
         }
