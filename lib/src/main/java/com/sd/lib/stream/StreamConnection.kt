@@ -1,36 +1,28 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import java.util.concurrent.ConcurrentHashMap
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+abstract class StreamConnection {
+    private val _manager: FStreamManager
+    private val _stream: FStream
+    private val _mapItem = ConcurrentHashMap<Class<out FStream>, ConnectionItem>()
 
-public abstract class StreamConnection {
-    private final FStreamManager _manager;
-    private final FStream _stream;
-    private final Map<Class<? extends FStream>, ConnectionItem> _mapItem = new ConcurrentHashMap<>();
+    internal constructor(stream: FStream, classes: Array<Class<out FStream>>, manager: FStreamManager) {
+        _stream = stream
+        _manager = manager
 
-    StreamConnection(@NonNull FStream stream, @NonNull Class<? extends FStream>[] classes, @NonNull FStreamManager manager) {
-        if (stream == null || classes == null || manager == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        _stream = stream;
-        _manager = manager;
-
-        for (Class<? extends FStream> item : classes) {
-            checkClassInterface(item);
-            _mapItem.put(item, new ConnectionItem(item));
+        for (item in classes) {
+            checkClassInterface(item)
+            _mapItem[item] = ConnectionItem(item)
         }
     }
 
     /**
      * 粘性触发方法
      */
-    public void stickyInvoke() {
-        for (Class<? extends FStream> clazz : _mapItem.keySet()) {
-            StickyInvokeManager.getInstance().stickyInvoke(_stream, clazz);
+    fun stickyInvoke() {
+        for (clazz in _mapItem.keys) {
+            StickyInvokeManager.getInstance().stickyInvoke(_stream, clazz)
         }
     }
 
@@ -40,22 +32,10 @@ public abstract class StreamConnection {
      * @param clazz
      * @return
      */
-    int getPriority(@NonNull Class<? extends FStream> clazz) {
-        checkClassInterface(clazz);
-        final ConnectionItem item = _mapItem.get(clazz);
-        if (item != null) {
-            return item.nPriority;
-        }
-        return 0;
-    }
-
-    /**
-     * 设置优先级
-     *
-     * @param priority
-     */
-    public void setPriority(int priority) {
-        setPriority(priority, null);
+    fun getPriority(clazz: Class<out FStream>): Int {
+        checkClassInterface(clazz)
+        val item = _mapItem[clazz]
+        return item?.iPriority ?: 0
     }
 
     /**
@@ -64,25 +44,23 @@ public abstract class StreamConnection {
      * @param priority
      * @param clazz
      */
-    public void setPriority(int priority, @Nullable Class<? extends FStream> clazz) {
-        synchronized (_manager) {
+    @JvmOverloads
+    fun setPriority(priority: Int, clazz: Class<out FStream>? = null) {
+        synchronized(_manager) {
             /**
-             * 由于{@link StreamHolder#sort()}方法中锁住{@link FStreamManager}对象后根据优先级排序，
-             * 所以这边更改优先级的时候也要锁住{@link FStreamManager}对象
+             * 由于[StreamHolder.sort]方法中锁住[FStreamManager]对象后根据优先级排序，
+             * 所以这边更改优先级的时候也要锁住[FStreamManager]对象
              */
-
             if (clazz == null) {
-                for (ConnectionItem item : _mapItem.values()) {
-                    item.setPriority(priority);
+                for (item in _mapItem.values) {
+                    item.setPriority(priority)
                 }
             } else {
-                checkClassInterface(clazz);
-                checkClassAssignable(clazz);
+                checkClassInterface(clazz)
+                checkClassAssignable(clazz)
 
-                final ConnectionItem item = _mapItem.get(clazz);
-                if (item != null) {
-                    item.setPriority(priority);
-                }
+                val item = _mapItem[clazz]
+                item?.setPriority(priority)
             }
         }
     }
@@ -92,15 +70,12 @@ public abstract class StreamConnection {
      *
      * @param clazz
      */
-    public void breakDispatch(@NonNull Class<? extends FStream> clazz) {
-        checkClassInterface(clazz);
-        checkClassAssignable(clazz);
-
-        synchronized (clazz) {
-            final ConnectionItem item = _mapItem.get(clazz);
-            if (item != null) {
-                item.breakDispatch();
-            }
+    fun breakDispatch(clazz: Class<out FStream>) {
+        checkClassInterface(clazz)
+        checkClassAssignable(clazz)
+        synchronized(clazz) {
+            val item = _mapItem[clazz]
+            item?.breakDispatch()
         }
     }
 
@@ -110,13 +85,10 @@ public abstract class StreamConnection {
      * @param clazz
      * @return
      */
-    boolean shouldBreakDispatch(@NonNull Class<? extends FStream> clazz) {
-        checkClassInterface(clazz);
-        final ConnectionItem item = _mapItem.get(clazz);
-        if (item != null) {
-            return item.nShouldBreakDispatch;
-        }
-        return false;
+    fun shouldBreakDispatch(clazz: Class<out FStream>): Boolean {
+        checkClassInterface(clazz)
+        val item = _mapItem[clazz]
+        return item?.iShouldBreakDispatch ?: false
     }
 
     /**
@@ -124,38 +96,35 @@ public abstract class StreamConnection {
      *
      * @param clazz
      */
-    void resetBreakDispatch(@NonNull Class<? extends FStream> clazz) {
-        checkClassInterface(clazz);
-        final ConnectionItem item = _mapItem.get(clazz);
-        if (item != null) {
-            item.resetBreakDispatch();
-        }
+    fun resetBreakDispatch(clazz: Class<out FStream>) {
+        checkClassInterface(clazz)
+        val item = _mapItem[clazz]
+        item?.resetBreakDispatch()
     }
 
-    private void checkClassAssignable(@NonNull Class<? extends FStream> clazz) {
-        if (!clazz.isAssignableFrom(_stream.getClass())) {
-            throw new IllegalArgumentException("class is not assignable from " + _stream.getClass().getName() + " class:" + clazz.getName());
-        }
+    private fun checkClassAssignable(clazz: Class<out FStream>) {
+        require(clazz.isAssignableFrom(_stream.javaClass)) { "class is not assignable from ${_stream.javaClass.name} class:${clazz.name}" }
     }
 
-    private static void checkClassInterface(@NonNull Class<? extends FStream> clazz) {
-        if (!clazz.isInterface()) {
-            throw new IllegalArgumentException("class must be an interface class:" + clazz.getName());
-        }
+    private fun checkClassInterface(clazz: Class<out FStream>) {
+        require(clazz.isInterface) { "class must be an interface class:${clazz.name}" }
     }
 
-    private final class ConnectionItem {
-        private final Class<? extends FStream> nClass;
-        /** 优先级 */
-        private volatile int nPriority;
-        /** 是否停止分发 */
-        private volatile boolean nShouldBreakDispatch;
+    private inner class ConnectionItem {
+        private val _iClass: Class<out FStream>
 
-        private ConnectionItem(@NonNull Class<? extends FStream> clazz) {
-            if (clazz == null) {
-                throw new IllegalArgumentException("null argument");
-            }
-            nClass = clazz;
+        /** 优先级  */
+        @Volatile
+        var iPriority = 0
+            private set
+
+        /** 是否停止分发  */
+        @Volatile
+        var iShouldBreakDispatch = false
+            private set
+
+        constructor(clazz: Class<out FStream>) {
+            _iClass = clazz
         }
 
         /**
@@ -163,27 +132,30 @@ public abstract class StreamConnection {
          *
          * @param priority
          */
-        public void setPriority(int priority) {
-            if (nPriority != priority) {
-                nPriority = priority;
-                StreamConnection.this.onPriorityChanged(priority, _stream, nClass);
+        fun setPriority(priority: Int) {
+            if (iPriority != priority) {
+                iPriority = priority
+                onPriorityChanged(priority, _stream, _iClass)
             }
         }
 
         /**
          * 设置停止分发
          */
-        public void breakDispatch() {
-            nShouldBreakDispatch = true;
+        fun breakDispatch() {
+            iShouldBreakDispatch = true
         }
 
         /**
          * 重置停止分发标志
          */
-        public void resetBreakDispatch() {
-            nShouldBreakDispatch = false;
+        fun resetBreakDispatch() {
+            iShouldBreakDispatch = false
         }
     }
 
-    protected abstract void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz);
+    /**
+     * 优先级变化回调
+     */
+    protected abstract fun onPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>)
 }
