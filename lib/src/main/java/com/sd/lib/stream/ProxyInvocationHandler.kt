@@ -96,18 +96,18 @@ internal class ProxyInvocationHandler : InvocationHandler {
         var listStream: Collection<FStream>? = null
         var isDefaultStream = false
 
-        if (holderSize <= 0) {
+        if (holderSize > 0) {
+            listStream = holder!!.toCollection()
+        } else {
+            // 尝试创建默认流对象
             val stream = _manager.getDefaultStream(_streamClass) ?: return null
 
-            listStream = ArrayList(1)
-            listStream.add(stream)
+            listStream = listOf(stream)
             isDefaultStream = true
 
             if (_manager.isDebug) {
                 Log.i(FStream::class.java.simpleName, "create default stream:$stream uuid:$uuid")
             }
-        } else {
-            listStream = holder!!.toCollection()
         }
 
         val filterResult = _resultFilter != null && !isVoid
