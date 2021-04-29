@@ -17,6 +17,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
 
     constructor(manager: FStreamManager, builder: ProxyBuilder) {
         _manager = manager
+
         _streamClass = builder.streamClass!!
         _tag = builder.tag
         _dispatchCallback = builder.dispatchCallback
@@ -38,11 +39,10 @@ internal class ProxyInvocationHandler : InvocationHandler {
 
     @Throws(Throwable::class)
     override fun invoke(proxy: Any, method: Method, args: Array<Any?>?): Any? {
-        val methodName = method.name
         val returnType = method.returnType
         val parameterTypes = method.parameterTypes
 
-        if ("getTagForStream" == methodName &&
+        if ("getTagForStream" == method.name &&
                 parameterTypes.size == 1 &&
                 parameterTypes[0] == Class::class.java) {
             return _tag
