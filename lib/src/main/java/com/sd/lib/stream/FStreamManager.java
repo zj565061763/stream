@@ -11,11 +11,10 @@ import com.sd.lib.stream.binder.ActivityStreamBinder;
 import com.sd.lib.stream.binder.StreamBinder;
 import com.sd.lib.stream.binder.ViewStreamBinder;
 import com.sd.lib.stream.factory.DefaultStreamFactory;
-import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory;
+import com.sd.lib.stream.utils.LibUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -273,44 +272,12 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final Class<?> sourceClass = stream.getClass();
-        final Set<Class<? extends FStream>> set = findAllStreamClass(sourceClass);
+        final Set<Class<? extends FStream>> set = LibUtils.findAllStreamClass(stream.getClass());
         if (set.isEmpty()) {
             throw new RuntimeException("stream class was not found in stream:" + stream);
         }
 
         return set.toArray(new Class[set.size()]);
-    }
-
-    @NonNull
-    private static Set<Class<? extends FStream>> findAllStreamClass(@NonNull Class<?> clazz) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        if (Proxy.isProxyClass(clazz)) {
-            throw new IllegalArgumentException("proxy class is not supported");
-        }
-
-        final Set<Class<? extends FStream>> set = new HashSet<>();
-        while (clazz != null) {
-            if (!FStream.class.isAssignableFrom(clazz)) {
-                break;
-            }
-
-            if (clazz.isInterface()) {
-                throw new RuntimeException("clazz must not be an interface");
-            }
-
-            for (Class<?> item : clazz.getInterfaces()) {
-                if (FStream.class.isAssignableFrom(item)) {
-                    set.add((Class<? extends FStream>) item);
-                }
-            }
-
-            clazz = clazz.getSuperclass();
-        }
-        return set;
     }
 
     /**
@@ -328,95 +295,16 @@ public class FStreamManager {
 
     //---------- default stream start ----------
 
-    private final Map<Class<? extends FStream>, Class<? extends FStream>> _mapDefaultStreamClass = new ConcurrentHashMap<>();
-    private DefaultStreamFactory _defaultStreamFactory;
-
-    /**
-     * 注册默认的流接口实现类
-     * <p>
-     * {@link DefaultStreamFactory}
-     *
-     * @param clazz
-     */
-    public synchronized void registerDefaultStream(@NonNull Class<? extends FStream> clazz) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        if (clazz == FStream.class) {
-            throw new IllegalArgumentException("class must not be " + FStream.class);
-        }
-
-        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz);
-        if (set.isEmpty()) {
-            throw new IllegalArgumentException("stream class was not found in " + clazz);
-        }
-
-        for (Class<? extends FStream> item : set) {
-            _mapDefaultStreamClass.put(item, clazz);
-        }
+    public void registerDefaultStream(@NonNull Class<? extends FStream> clazz) {
+        DefaultStreamManager.INSTANCE.registerDefaultStream(clazz);
     }
 
-    /**
-     * 取消注册默认的流接口实现类
-     *
-     * @param clazz
-     */
-    public synchronized void unregisterDefaultStream(@NonNull Class<? extends FStream> clazz) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        if (clazz == FStream.class) {
-            throw new IllegalArgumentException("class must not be " + FStream.class);
-        }
-
-        final Set<Class<? extends FStream>> set = findAllStreamClass(clazz);
-        if (set.isEmpty()) {
-            return;
-        }
-
-        for (Class<? extends FStream> item : set) {
-            _mapDefaultStreamClass.remove(item);
-        }
+    public void unregisterDefaultStream(@NonNull Class<? extends FStream> clazz) {
+        DefaultStreamManager.INSTANCE.unregisterDefaultStream(clazz);
     }
 
-    /**
-     * 设置{@link DefaultStreamFactory}
-     *
-     * @param factory
-     */
-    public synchronized void setDefaultStreamFactory(@Nullable DefaultStreamFactory factory) {
-        _defaultStreamFactory = factory;
-    }
-
-    /**
-     * 返回默认的流对象
-     *
-     * @param clazz
-     * @return
-     */
-    @Nullable
-    synchronized FStream getDefaultStream(@NonNull Class<? extends FStream> clazz) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        final Class<? extends FStream> defaultClass = _mapDefaultStreamClass.get(clazz);
-        if (defaultClass == null) {
-            return null;
-        }
-
-        if (_defaultStreamFactory == null) {
-            _defaultStreamFactory = new WeakCacheDefaultStreamFactory();
-        }
-
-        final DefaultStreamFactory.CreateParam param = new DefaultStreamFactory.CreateParam(clazz, defaultClass);
-        final FStream stream = _defaultStreamFactory.create(param);
-        if (stream == null) {
-            throw new RuntimeException(_defaultStreamFactory + " create null for param:" + param);
-        }
-        return stream;
+    public void setDefaultStreamFactory(@Nullable DefaultStreamFactory factory) {
+        DefaultStreamManager.INSTANCE.setDefaultStreamFactory(factory);
     }
 
     //---------- default stream end ----------
