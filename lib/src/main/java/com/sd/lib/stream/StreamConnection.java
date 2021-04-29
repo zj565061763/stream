@@ -7,21 +7,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class StreamConnection {
-    private final FStream mStream;
-    private final FStreamManager mManager;
-    private final Map<Class<? extends FStream>, ConnectionItem> mMapItem = new ConcurrentHashMap<>();
+    private final FStreamManager _manager;
+    private final FStream _stream;
+    private final Map<Class<? extends FStream>, ConnectionItem> _mapItem = new ConcurrentHashMap<>();
 
     StreamConnection(@NonNull FStream stream, @NonNull Class<? extends FStream>[] classes, @NonNull FStreamManager manager) {
         if (stream == null || classes == null || manager == null) {
             throw new IllegalArgumentException("null argument");
         }
 
-        mStream = stream;
-        mManager = manager;
+        _stream = stream;
+        _manager = manager;
 
         for (Class<? extends FStream> item : classes) {
             checkClassInterface(item);
-            mMapItem.put(item, new ConnectionItem(item));
+            _mapItem.put(item, new ConnectionItem(item));
         }
     }
 
@@ -29,8 +29,8 @@ public abstract class StreamConnection {
      * 粘性触发方法
      */
     public void stickyInvoke() {
-        for (Class<? extends FStream> clazz : mMapItem.keySet()) {
-            StickyInvokeManager.getInstance().stickyInvoke(mStream, clazz);
+        for (Class<? extends FStream> clazz : _mapItem.keySet()) {
+            StickyInvokeManager.getInstance().stickyInvoke(_stream, clazz);
         }
     }
 
@@ -42,7 +42,7 @@ public abstract class StreamConnection {
      */
     int getPriority(@NonNull Class<? extends FStream> clazz) {
         checkClassInterface(clazz);
-        final ConnectionItem item = mMapItem.get(clazz);
+        final ConnectionItem item = _mapItem.get(clazz);
         if (item != null) {
             return item.nPriority;
         }
@@ -65,21 +65,21 @@ public abstract class StreamConnection {
      * @param clazz
      */
     public void setPriority(int priority, @Nullable Class<? extends FStream> clazz) {
-        synchronized (mManager) {
+        synchronized (_manager) {
             /**
              * 由于{@link StreamHolder#sort()}方法中锁住{@link FStreamManager}对象后根据优先级排序，
              * 所以这边更改优先级的时候也要锁住{@link FStreamManager}对象
              */
 
             if (clazz == null) {
-                for (ConnectionItem item : mMapItem.values()) {
+                for (ConnectionItem item : _mapItem.values()) {
                     item.setPriority(priority);
                 }
             } else {
                 checkClassInterface(clazz);
                 checkClassAssignable(clazz);
 
-                final ConnectionItem item = mMapItem.get(clazz);
+                final ConnectionItem item = _mapItem.get(clazz);
                 if (item != null) {
                     item.setPriority(priority);
                 }
@@ -97,7 +97,7 @@ public abstract class StreamConnection {
         checkClassAssignable(clazz);
 
         synchronized (clazz) {
-            final ConnectionItem item = mMapItem.get(clazz);
+            final ConnectionItem item = _mapItem.get(clazz);
             if (item != null) {
                 item.breakDispatch();
             }
@@ -112,7 +112,7 @@ public abstract class StreamConnection {
      */
     boolean shouldBreakDispatch(@NonNull Class<? extends FStream> clazz) {
         checkClassInterface(clazz);
-        final ConnectionItem item = mMapItem.get(clazz);
+        final ConnectionItem item = _mapItem.get(clazz);
         if (item != null) {
             return item.nShouldBreakDispatch;
         }
@@ -126,15 +126,15 @@ public abstract class StreamConnection {
      */
     void resetBreakDispatch(@NonNull Class<? extends FStream> clazz) {
         checkClassInterface(clazz);
-        final ConnectionItem item = mMapItem.get(clazz);
+        final ConnectionItem item = _mapItem.get(clazz);
         if (item != null) {
             item.resetBreakDispatch();
         }
     }
 
     private void checkClassAssignable(@NonNull Class<? extends FStream> clazz) {
-        if (!clazz.isAssignableFrom(mStream.getClass())) {
-            throw new IllegalArgumentException("class is not assignable from " + mStream.getClass().getName() + " class:" + clazz.getName());
+        if (!clazz.isAssignableFrom(_stream.getClass())) {
+            throw new IllegalArgumentException("class is not assignable from " + _stream.getClass().getName() + " class:" + clazz.getName());
         }
     }
 
@@ -166,7 +166,7 @@ public abstract class StreamConnection {
         public void setPriority(int priority) {
             if (nPriority != priority) {
                 nPriority = priority;
-                StreamConnection.this.onPriorityChanged(priority, mStream, nClass);
+                StreamConnection.this.onPriorityChanged(priority, _stream, nClass);
             }
         }
 
