@@ -68,7 +68,7 @@ interface FStream {
          */
         fun <T : FStream> build(clazz: Class<T>): T {
             require(clazz.isInterface) { "clazz must be an interface" }
-            require(clazz != FStream::class.java) { "clazz must not be:" + FStream::class.java.name }
+            require(clazz != FStream::class.java) { "clazz must not be:${FStream::class.java.name}" }
 
             this.streamClass = clazz
             return FStreamManager.getInstance().newProxyInstance(this) as T
