@@ -1,77 +1,57 @@
-package com.sd.lib.stream.binder;
+package com.sd.lib.stream.binder
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Build;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-
-import com.sd.lib.stream.FStream;
+import android.app.Activity
+import android.os.Build
+import android.view.View
+import android.view.View.OnAttachStateChangeListener
+import com.sd.lib.stream.FStream
 
 /**
- * 根据{@link View#isAttachedToWindow()}自动注册和取消注册流对象
- * <p>
- * 注意：不要在以下两个地方绑定，否则有可能导致流对象没办法被自动取消注册<br>
- * 1.目标View对象的{@link View#onDetachedFromWindow()}方法<br>
- * 2.监听目标View对象的{@link View.OnAttachStateChangeListener#onViewDetachedFromWindow(View)}方法
+ * 监听[View.OnAttachStateChangeListener]自动注册和取消注册流对象
  */
-public class ViewStreamBinder extends StreamBinder<View> {
-    public ViewStreamBinder(@NonNull FStream stream, @NonNull View target) {
-        super(stream, target);
-    }
+class ViewStreamBinder : StreamBinder<View> {
+    constructor(stream: FStream, target: View) : super(stream, target)
 
-    @Override
-    public final boolean bind() {
-        final View target = getTarget();
-        if (target == null) {
-            return false;
+    override fun bind(): Boolean {
+        val target = target ?: return false
+
+        val context = target.context
+        if (context is Activity && context.isFinishing) {
+            return false
         }
 
-        final Context context = target.getContext();
-        if (context instanceof Activity) {
-            final Activity activity = (Activity) context;
-            if (activity.isFinishing()) {
-                return false;
-            }
-        }
-
-        target.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
-        target.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
+        target.removeOnAttachStateChangeListener(_onAttachStateChangeListener)
+        target.addOnAttachStateChangeListener(_onAttachStateChangeListener)
 
         if (isAttached(target)) {
-            return registerStream();
+            return registerStream()
         }
-
-        return true;
+        return true
     }
 
-    private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener() {
-        @Override
-        public void onViewAttachedToWindow(View v) {
-            registerStream();
+    private val _onAttachStateChangeListener: OnAttachStateChangeListener = object : OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View) {
+            registerStream()
         }
 
-        @Override
-        public void onViewDetachedFromWindow(View v) {
-            unregisterStream();
-        }
-    };
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        final View target = getTarget();
-        if (target != null) {
-            target.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
+        override fun onViewDetachedFromWindow(v: View) {
+            unregisterStream()
         }
     }
 
-    private static boolean isAttached(View view) {
-        if (Build.VERSION.SDK_INT >= 19) {
-            return view.isAttachedToWindow();
-        } else {
-            return view.getWindowToken() != null;
+    override fun destroy() {
+        super.destroy()
+        target?.removeOnAttachStateChangeListener(_onAttachStateChangeListener)
+    }
+
+    companion object {
+        @JvmStatic
+        private fun isAttached(view: View): Boolean {
+            return if (Build.VERSION.SDK_INT >= 19) {
+                view.isAttachedToWindow
+            } else {
+                view.windowToken != null
+            }
         }
     }
 }
