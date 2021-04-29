@@ -1,104 +1,90 @@
-package com.sd.lib.stream.factory;
+package com.sd.lib.stream.factory
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.sd.lib.stream.FStream;
-import com.sd.lib.stream.FStreamManager;
-
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
+import android.util.Log
+import com.sd.lib.stream.FStream
+import com.sd.lib.stream.FStreamManager
+import com.sd.lib.stream.factory.DefaultStreamFactory.CreateParam
+import java.lang.ref.ReferenceQueue
+import java.lang.ref.WeakReference
+import java.util.*
 
 /**
  * 用弱引用缓存流对象的工厂
  */
-public class WeakCacheDefaultStreamFactory extends CacheableDefaultStreamFactory {
-    private final Map<Class<? extends FStream>, WeakReference<FStream>> mMapStream = new HashMap<>();
-    private final ReferenceQueue<FStream> mReferenceQueue = new ReferenceQueue<>();
+class WeakCacheDefaultStreamFactory : CacheableDefaultStreamFactory() {
+    private val _referenceQueue = ReferenceQueue<FStream>()
 
-    private final Map<WeakReference<FStream>, Class<? extends FStream>> mMapReference = new HashMap<>();
+    private val _mapStream = HashMap<Class<out FStream>, WeakReference<FStream>>()
+    private val _mapReference = HashMap<WeakReference<FStream>, Class<out FStream>>()
 
-    private boolean isDebug() {
-        return FStreamManager.getInstance().isDebug();
+    private val _isDebug: Boolean
+        private get() = FStreamManager.getInstance().isDebug
+
+    override fun getCache(param: CreateParam): FStream? {
+        val reference = _mapStream[param.classStream]
+        return reference?.get()
     }
 
-    @Nullable
-    @Override
-    protected FStream getCache(@NonNull CreateParam param) {
-        final WeakReference<FStream> reference = mMapStream.get(param.classStream);
-        return reference == null ? null : reference.get();
-    }
+    override fun setCache(param: CreateParam, stream: FStream) {
+        releaseReference()
 
-    @Override
-    protected void setCache(@NonNull CreateParam param, @NonNull FStream stream) {
-        releaseReference();
-
-        final WeakReference<FStream> reference = new WeakReference<>(stream, mReferenceQueue);
-        final WeakReference<FStream> oldReference = mMapStream.put(param.classStream, reference);
+        val reference = WeakReference(stream, _referenceQueue)
+        val oldReference = _mapStream.put(param.classStream, reference)
         if (oldReference != null) {
             /**
              * 由于被回收的引用不一定会被及时的添加到ReferenceQueue中，
              * 所以这边判断一下旧的引用不为null的话，要移除掉
              */
-            mMapReference.remove(oldReference);
-
-            if (isDebug()) {
-                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "remove old reference:" + oldReference + getSizeLog());
+            _mapReference.remove(oldReference)
+            if (_isDebug) {
+                Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                        "remove old reference:${oldReference} ${_sizeLog}")
             }
         }
 
-        mMapReference.put(reference, param.classStream);
-
-        if (isDebug()) {
-            Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "+++++ setCache for class:" + param.classStream.getName() + " stream:" + stream + " reference:" + reference
-                    + getSizeLog());
+        _mapReference[reference] = param.classStream
+        if (_isDebug) {
+            Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                    "+++++ setCache for class:${param.classStream.name} stream:${stream} reference:${reference} ${_sizeLog}")
         }
     }
 
-    private void releaseReference() {
-        int count = 0;
+    private fun releaseReference() {
+        var count = 0
         while (true) {
-            final Reference<? extends FStream> reference = mReferenceQueue.poll();
-            if (reference == null) {
-                break;
-            }
+            val reference = _referenceQueue.poll() ?: break
 
-            final Class<? extends FStream> clazz = mMapReference.remove(reference);
+            val clazz = _mapReference.remove(reference)
             if (clazz == null) {
                 // 如果为null，说明这个引用已经被手动从map中移除
-                if (isDebug()) {
-                    Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference ghost reference was found:" + reference);
+                if (_isDebug) {
+                    Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                            "releaseReference ghost reference was found:$reference")
                 }
-                continue;
+                continue
             }
 
-            final WeakReference<FStream> streamReference = mMapStream.remove(clazz);
-            if (streamReference == reference) {
-                count++;
+            val streamReference = _mapStream.remove(clazz)
+            if (streamReference === reference) {
+                count++
             } else {
-                if (isDebug()) {
-                    Log.e(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference"
-                            + " class:" + clazz.getName()
-                            + " reference:" + reference
-                            + " streamReference:" + streamReference
-                    );
+                if (_isDebug) {
+                    Log.e(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                            "releaseReference  class:${clazz.name} reference:${reference} streamReference:${streamReference}")
                 }
             }
         }
 
         if (count > 0) {
-            if (isDebug()) {
-                Log.i(WeakCacheDefaultStreamFactory.class.getSimpleName(), "releaseReference count:" + count + getSizeLog());
+            if (_isDebug) {
+                Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                        "releaseReference count:${count} ${_sizeLog}")
             }
         }
     }
 
-    private String getSizeLog() {
-        return "\r\n" + "size:" + mMapStream.size() + "," + mMapReference.size();
-    }
+    private val _sizeLog: String
+        private get() = """
+            size:${_mapStream.size},${_mapReference.size}
+        """.trimIndent()
 }
