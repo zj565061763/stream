@@ -1,29 +1,30 @@
-package com.sd.lib.stream.factory;
+package com.sd.lib.stream.factory
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.sd.lib.stream.FStream
+import com.sd.lib.stream.factory.DefaultStreamFactory.CreateParam
 
-import com.sd.lib.stream.FStream;
+abstract class CacheableDefaultStreamFactory : SimpleDefaultStreamFactory() {
 
-public abstract class CacheableDefaultStreamFactory extends SimpleDefaultStreamFactory {
-    @NonNull
-    @Override
-    public FStream create(@NonNull CreateParam param) {
-        FStream stream = getCache(param);
+    override fun create(param: CreateParam): FStream {
+        var stream = getCache(param)
         if (stream != null) {
-            return stream;
+            return stream
         }
 
-        stream = super.create(param);
+        stream = super.create(param)
         if (stream != null) {
-            setCache(param, stream);
+            setCache(param, stream)
         }
-
-        return stream;
+        return stream
     }
 
-    @Nullable
-    protected abstract FStream getCache(@NonNull CreateParam param);
+    /**
+     * 获取缓存
+     */
+    protected abstract fun getCache(param: CreateParam): FStream?
 
-    protected abstract void setCache(@NonNull CreateParam param, @NonNull FStream stream);
+    /**
+     * 设置缓存
+     */
+    protected abstract fun setCache(param: CreateParam, stream: FStream)
 }
