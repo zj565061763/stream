@@ -21,9 +21,9 @@ public class TestFragment extends Fragment {
             .build(FragmentCallback.class);
 
     /** 创建接口代理对象 */
-    private final FragmentStickyCallback mStickyCallback = new FStream.ProxyBuilder()
+    private final StickyCallback mStickyCallback = new FStream.ProxyBuilder()
             .setSticky(true) // 设置支持粘性触发
-            .build(FragmentStickyCallback.class);
+            .build(StickyCallback.class);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class TestFragment extends Fragment {
         String getDisplayContent();
     }
 
-    public interface FragmentStickyCallback extends FStream {
+    public interface StickyCallback extends FStream {
         void onContent(String content);
     }
 }

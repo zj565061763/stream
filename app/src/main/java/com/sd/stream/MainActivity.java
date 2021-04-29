@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        final TestFragment.FragmentStickyCallback stickyCallback = new TestFragment.FragmentStickyCallback() {
+        final TestFragment.StickyCallback stickyCallback = new TestFragment.StickyCallback() {
             @Override
             public void onContent(String content) {
                 FStreamManager.getInstance().unregister(this);
