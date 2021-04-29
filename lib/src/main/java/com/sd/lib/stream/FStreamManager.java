@@ -293,21 +293,29 @@ public class FStreamManager {
         return (FStream) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, handler);
     }
 
-    //---------- default stream start ----------
-
+    /**
+     * {@link DefaultStreamManager#registerDefaultStream(Class)}
+     */
+    @Deprecated
     public void registerDefaultStream(@NonNull Class<? extends FStream> clazz) {
         DefaultStreamManager.INSTANCE.registerDefaultStream(clazz);
     }
 
+    /**
+     * {@link DefaultStreamManager#unregisterDefaultStream(Class)}
+     */
+    @Deprecated
     public void unregisterDefaultStream(@NonNull Class<? extends FStream> clazz) {
         DefaultStreamManager.INSTANCE.unregisterDefaultStream(clazz);
     }
 
+    /**
+     * {@link DefaultStreamManager#setDefaultStreamFactory(DefaultStreamFactory)}
+     */
+    @Deprecated
     public void setDefaultStreamFactory(@Nullable DefaultStreamFactory factory) {
         DefaultStreamManager.INSTANCE.setDefaultStreamFactory(factory);
     }
-
-    //---------- default stream end ----------
 
     /**
      * {@link #bindStream(FStream, Activity)}
