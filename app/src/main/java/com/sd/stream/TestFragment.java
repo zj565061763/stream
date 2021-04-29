@@ -37,7 +37,7 @@ public class TestFragment extends Fragment {
                 final String content = mCallback.getDisplayContent();
                 button.setText(content);
 
-                mStickyCallback.onContent("test sticky invoke");
+                mStickyCallback.onContent("hello sticky");
             }
         });
 
