@@ -1,220 +1,209 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream
 
-import android.util.Log;
+import android.util.Log
+import com.sd.lib.stream.FStream.*
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Method
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+internal class ProxyInvocationHandler : InvocationHandler {
+    private val _manager: FStreamManager
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+    private val _streamClass: Class<out FStream>
+    private val _tag: Any?
+    private val _dispatchCallback: DispatchCallback?
+    private val _resultFilter: ResultFilter?
+    private val _isSticky: Boolean
 
-class ProxyInvocationHandler implements InvocationHandler {
-    private final FStreamManager _manager;
-
-    private final Class<? extends FStream> _streamClass;
-    private final Object _tag;
-    private final FStream.DispatchCallback _dispatchCallback;
-    private final FStream.ResultFilter _resultFilter;
-    private final boolean _isSticky;
-
-    public ProxyInvocationHandler(@NonNull FStreamManager manager, @NonNull FStream.ProxyBuilder builder) {
-        if (manager == null || builder == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        _manager = manager;
-
-        _streamClass = builder.getStreamClass();
-        _tag = builder.getTag();
-        _dispatchCallback = builder.getDispatchCallback();
-        _resultFilter = builder.getResultFilter();
-        _isSticky = builder.isSticky();
+    constructor(manager: FStreamManager, builder: ProxyBuilder) {
+        _manager = manager
+        _streamClass = builder.streamClass!!
+        _tag = builder.tag
+        _dispatchCallback = builder.dispatchCallback
+        _resultFilter = builder.resultFilter
+        _isSticky = builder.isSticky
 
         if (_isSticky) {
-            StickyInvokeManager.INSTANCE.proxyCreated(_streamClass);
+            StickyInvokeManager.proxyCreated(_streamClass)
         }
     }
 
-    private boolean checkTag(@NonNull FStream stream) {
-        final Object tag = stream.getTagForStream(_streamClass);
-        if (_tag == tag) {
-            return true;
+    private fun checkTag(stream: FStream): Boolean {
+        val tag = stream.getTagForStream(_streamClass)
+        if (_tag === tag) {
+            return true
         }
-
-        return _tag != null && _tag.equals(tag);
+        return _tag != null && _tag == tag
     }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        final String methodName = method.getName();
-        final Class<?> returnType = method.getReturnType();
+    @Throws(Throwable::class)
+    override fun invoke(proxy: Any, method: Method, args: Array<Any?>?): Any? {
+        val methodName = method.name
+        val returnType = method.returnType
+        val parameterTypes = method.parameterTypes
 
-        final Class<?>[] parameterTypes = method.getParameterTypes();
-        if ("getTagForStream".equals(methodName) && parameterTypes.length == 1 && parameterTypes[0] == Class.class) {
-            return _tag;
+        if ("getTagForStream" == methodName &&
+                parameterTypes.size == 1 &&
+                parameterTypes[0] == Class::class.java) {
+            return _tag
         }
 
 
-        final String uuid = _manager.isDebug() ? UUID.randomUUID().toString() : null;
-        final boolean isVoid = returnType == void.class || returnType == Void.class;
-        Object result = processMainLogic(isVoid, method, args, uuid);
+        val uuid = if (_manager.isDebug) UUID.randomUUID().toString() else null
+        val isVoid = returnType == Void.TYPE || returnType == Void::class.java
+        var result = processMainLogic(isVoid, method, args, uuid)
 
 
         if (isVoid) {
-            result = null;
-        } else if (returnType.isPrimitive() && result == null) {
-            if (boolean.class == returnType) {
-                result = false;
+            result = null
+        } else if (returnType.isPrimitive && result == null) {
+            if (Boolean::class.javaPrimitiveType == returnType) {
+                result = false
             } else {
-                result = 0;
+                result = 0
             }
 
-            if (_manager.isDebug()) {
-                Log.i(FStream.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result
-                        + " uuid:" + uuid);
+            if (_manager.isDebug) {
+                Log.i(FStream::class.java.simpleName,
+                        "return type:${returnType} but method result is null, so set to ${result} uuid:${uuid}")
             }
         }
 
-        if (_manager.isDebug()) {
-            Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " uuid:" + uuid);
+        if (_manager.isDebug) {
+            Log.i(FStream::class.java.simpleName, "notify finish return:$result uuid:$uuid")
         }
 
         if (_isSticky) {
-            StickyInvokeManager.INSTANCE.proxyInvoke(_streamClass, _tag, method, args);
+            StickyInvokeManager.proxyInvoke(_streamClass, _tag, method, args)
         }
-        return result;
+        return result
     }
 
-    @Nullable
-    private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args, final @Nullable String uuid) throws Throwable {
-        final StreamHolder holder = _manager.getStreamHolder(_streamClass);
-        final int holderSize = holder == null ? 0 : holder.getSize();
+    @Throws(Throwable::class)
+    private fun processMainLogic(isVoid: Boolean, method: Method, args: Array<Any?>?, uuid: String?): Any? {
+        val holder = _manager.getStreamHolder(_streamClass)
+        val holderSize = holder?.size ?: 0
 
-        Collection<FStream> listStream = null;
-
-        if (_manager.isDebug()) {
-            Log.i(FStream.class.getSimpleName(), "notify -----> " + method
-                    + " arg:" + (args == null ? "" : Arrays.toString(args))
-                    + " tag:" + _tag
-                    + " count:" + holderSize
-                    + " uuid:" + uuid);
+        if (_manager.isDebug) {
+            Log.i(FStream::class.java.simpleName, "notify -----> ${method}"
+                    + " arg:${(if (args == null) "" else Arrays.toString(args))}"
+                    + " tag:${_tag}"
+                    + " count:${holderSize}"
+                    + " uuid:${uuid}"
+            )
         }
 
-        boolean isDefaultStream = false;
+        var listStream: Collection<FStream>? = null
+        var isDefaultStream = false
         if (holderSize <= 0) {
-            final FStream stream = _manager.getDefaultStream(_streamClass);
-            if (stream == null) {
-                return null;
-            }
+            val stream = _manager.getDefaultStream(_streamClass) ?: return null
 
-            listStream = new ArrayList<>(1);
-            listStream.add(stream);
+            listStream = ArrayList(1)
+            listStream.add(stream)
+            isDefaultStream = true
 
-            isDefaultStream = true;
-
-            if (_manager.isDebug()) {
-                Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " uuid:" + uuid);
+            if (_manager.isDebug) {
+                Log.i(FStream::class.java.simpleName, "create default stream:$stream uuid:$uuid")
             }
         } else {
-            listStream = holder.toCollection();
+            listStream = holder!!.toCollection()
         }
 
-        final boolean filterResult = _resultFilter != null && !isVoid;
-        final List<Object> listResult = filterResult ? new LinkedList<>() : null;
+        val filterResult = _resultFilter != null && !isVoid
+        val listResult: MutableList<Any?>? = if (filterResult) LinkedList() else null
 
-        Object result = null;
-        int index = 0;
-        for (FStream item : listStream) {
-            final StreamConnection connection = _manager.getConnection(item);
+        var result: Any? = null
+        var index = 0
+        for (item in listStream) {
+            val connection = _manager.getConnection(item)
             if (isDefaultStream) {
                 // 不判断
             } else {
                 if (connection == null) {
-                    if (_manager.isDebug()) {
-                        Log.e(FStream.class.getSimpleName(), StreamConnection.class.getSimpleName() + " is null uuid:" + uuid);
+                    if (_manager.isDebug) {
+                        Log.e(FStream::class.java.simpleName, "${StreamConnection::class.java.simpleName} is null uuid:${uuid}")
                     }
-                    continue;
+                    continue
                 }
             }
 
             if (!checkTag(item)) {
-                continue;
+                continue
             }
 
             if (_dispatchCallback != null && _dispatchCallback.beforeDispatch(item, method, args)) {
-                if (_manager.isDebug()) {
-                    Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before uuid:" + uuid);
+                if (_manager.isDebug) {
+                    Log.i(FStream::class.java.simpleName, "proxy broken dispatch before uuid:$uuid")
                 }
-                break;
+                break
             }
 
-            Object itemResult = null;
-            boolean shouldBreakDispatch = false;
+            var itemResult: Any? = null
+            var shouldBreakDispatch = false
 
             if (isDefaultStream) {
-                itemResult = method.invoke(item, args);
+                itemResult = if (args != null) {
+                    method.invoke(item, *args)
+                } else {
+                    method.invoke(item)
+                }
             } else {
-                synchronized (_streamClass) {
-                    connection.resetBreakDispatch(_streamClass);
+                synchronized(_streamClass) {
+                    connection!!.resetBreakDispatch(_streamClass)
 
-                    itemResult = method.invoke(item, args);
+                    // 调用流对象方法
+                    itemResult = if (args != null) {
+                        method.invoke(item, *args)
+                    } else {
+                        method.invoke(item)
+                    }
 
-                    shouldBreakDispatch = connection.shouldBreakDispatch(_streamClass);
-                    connection.resetBreakDispatch(_streamClass);
+                    shouldBreakDispatch = connection.shouldBreakDispatch(_streamClass)
+                    connection.resetBreakDispatch(_streamClass)
                 }
             }
 
-            if (_manager.isDebug()) {
-                Log.i(FStream.class.getSimpleName(), "notify"
-                        + " index:" + index
-                        + " return:" + (isVoid ? "" : itemResult)
-                        + " stream:" + item
-                        + " shouldBreakDispatch:" + shouldBreakDispatch
-                        + " uuid:" + uuid);
+            if (_manager.isDebug) {
+                Log.i(FStream::class.java.simpleName, "notify"
+                        + " index:${index}"
+                        + " return:${if (isVoid) "" else itemResult}"
+                        + " stream:$${item}"
+                        + " shouldBreakDispatch:${shouldBreakDispatch}"
+                        + " uuid:${uuid}"
+                )
             }
 
-            result = itemResult;
-
+            result = itemResult
             if (filterResult) {
-                listResult.add(itemResult);
+                listResult!!.add(itemResult)
             }
 
             if (_dispatchCallback != null && _dispatchCallback.afterDispatch(item, method, args, itemResult)) {
-                if (_manager.isDebug()) {
-                    Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after uuid:" + uuid);
+                if (_manager.isDebug) {
+                    Log.i(FStream::class.java.simpleName, "proxy broken dispatch after uuid:$uuid")
                 }
-                break;
+                break
             }
 
             if (shouldBreakDispatch) {
-                break;
+                break
             }
 
-            index++;
+            index++
         }
 
-        if (filterResult && !listResult.isEmpty()) {
-            result = _resultFilter.filter(method, args, listResult);
-
-            if (_manager.isDebug()) {
-                Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " uuid:" + uuid);
+        if (filterResult && listResult!!.isNotEmpty()) {
+            result = _resultFilter!!.filter(method, args, listResult)
+            if (_manager.isDebug) {
+                Log.i(FStream::class.java.simpleName, "proxy filter result: $result uuid:$uuid")
             }
         }
-
-        return result;
+        return result
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    protected fun finalize() {
         if (_isSticky) {
-            StickyInvokeManager.INSTANCE.proxyDestroyed(_streamClass);
+            StickyInvokeManager.proxyDestroyed(_streamClass)
         }
     }
 }
