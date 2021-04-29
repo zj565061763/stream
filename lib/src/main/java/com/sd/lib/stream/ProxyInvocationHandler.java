@@ -30,11 +30,11 @@ class ProxyInvocationHandler implements InvocationHandler {
 
         mManager = manager;
 
-        mClass = builder._class;
-        mTag = builder._tag;
-        mDispatchCallback = builder._dispatchCallback;
-        mResultFilter = builder._resultFilter;
-        mIsSticky = builder._isSticky;
+        mClass = builder.getStreamClass();
+        mTag = builder.getTag();
+        mDispatchCallback = builder.getDispatchCallback();
+        mResultFilter = builder.getResultFilter();
+        mIsSticky = builder.isSticky();
 
         if (mIsSticky) {
             StickyInvokeManager.INSTANCE.proxyCreated(mClass);

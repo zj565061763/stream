@@ -16,26 +16,26 @@ interface FStream {
     fun getTagForStream(clazz: Class<out FStream>): Any?
 
     class ProxyBuilder {
-        @JvmField
-        var _class: Class<out FStream>? = null
+        var streamClass: Class<out FStream>? = null
+            private set
 
-        @JvmField
-        var _tag: Any? = null
+        var tag: Any? = null
+            private set
 
-        @JvmField
-        var _dispatchCallback: DispatchCallback? = null
+        var dispatchCallback: DispatchCallback? = null
+            private set
 
-        @JvmField
-        var _resultFilter: ResultFilter? = null
+        var resultFilter: ResultFilter? = null
+            private set
 
-        @JvmField
-        var _isSticky = false
+        var isSticky = false
+            private set
 
         /**
          * 设置代理对象的tag
          */
         fun setTag(tag: Any?): ProxyBuilder {
-            _tag = tag
+            this.tag = tag
             return this
         }
 
@@ -43,7 +43,7 @@ interface FStream {
          * 设置流对象方法分发回调
          */
         fun setDispatchCallback(callback: DispatchCallback?): ProxyBuilder {
-            _dispatchCallback = callback
+            this.dispatchCallback = callback
             return this
         }
 
@@ -51,7 +51,7 @@ interface FStream {
          * 设置返回值过滤对象
          */
         fun setResultFilter(filter: ResultFilter?): ProxyBuilder {
-            _resultFilter = filter
+            this.resultFilter = filter
             return this
         }
 
@@ -59,7 +59,7 @@ interface FStream {
          * 设置是否支持粘性触发
          */
         fun setSticky(sticky: Boolean): ProxyBuilder {
-            _isSticky = sticky
+            this.isSticky = sticky
             return this
         }
 
@@ -69,7 +69,8 @@ interface FStream {
         fun <T : FStream> build(clazz: Class<T>): T {
             require(clazz.isInterface) { "clazz must be an interface" }
             require(clazz != FStream::class.java) { "clazz must not be:" + FStream::class.java.name }
-            _class = clazz
+
+            this.streamClass = clazz
             return FStreamManager.getInstance().newProxyInstance(this) as T
         }
     }
