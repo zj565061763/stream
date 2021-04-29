@@ -86,6 +86,7 @@ internal object StickyInvokeManager {
 
             var holder = _mapMethodInfo[clazz]
             if (holder == null) {
+                // holder用HashMap保存，允许key为null
                 holder = HashMap()
                 _mapMethodInfo[clazz] = holder
             }
