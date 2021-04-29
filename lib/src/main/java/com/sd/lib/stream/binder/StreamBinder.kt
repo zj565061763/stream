@@ -19,15 +19,13 @@ abstract class StreamBinder<T> {
 
     /**
      * 绑定
-     *
-     * @return
+     * @return true-成功  false-失败
      */
     abstract fun bind(): Boolean
 
     /**
      * 注册流对象
-     *
-     * @return
+     * @return true-成功  false-失败
      */
     protected fun registerStream(): Boolean {
         val stream = _stream.get() ?: return false
