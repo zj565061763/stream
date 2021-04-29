@@ -1,159 +1,118 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream
 
-import android.util.Log;
+import android.util.Log
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
-import androidx.annotation.NonNull;
+internal class StreamHolder {
+    private val _manager: FStreamManager
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+    /** 流接口 */
+    private val _class: Class<out FStream>
 
-class StreamHolder {
-    private final Class<? extends FStream> mClass;
-    private final FStreamManager mManager;
-    private final Collection<FStream> mStreamHolder = new LinkedHashSet<>();
+    /** 流接口对象 */
+    private val _streamHolder = LinkedHashSet<FStream>()
 
-    /** 保存设置了优先级的流对象 */
-    private final Map<FStream, Integer> mPriorityStreamHolder = new ConcurrentHashMap<>();
-    /** 是否需要排序 */
-    private volatile boolean mIsNeedSort = false;
+    /** 保存设置了优先级的流对象  */
+    private val _priorityStreamHolder = ConcurrentHashMap<FStream, Int>()
 
-    public StreamHolder(@NonNull Class<? extends FStream> clazz, @NonNull FStreamManager manager) {
-        if (clazz == null || manager == null) {
-            throw new IllegalArgumentException("null argument");
-        }
+    /** 是否需要排序  */
+    @Volatile
+    private var _isNeedSort = false
 
-        mClass = clazz;
-        mManager = manager;
-    }
+    /** 流对象数量 */
+    val size: Int
+        get() = _streamHolder.size
 
-    /**
-     * 流对象数量
-     *
-     * @return
-     */
-    public int size() {
-        return mStreamHolder.size();
+    constructor(clazz: Class<out FStream>, manager: FStreamManager) {
+        _class = clazz
+        _manager = manager
     }
 
     /**
      * 添加流对象
-     *
-     * @param stream
-     * @return
      */
-    public boolean add(@NonNull FStream stream) {
-        if (stream == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        final boolean result = mStreamHolder.add(stream);
+    fun add(stream: FStream): Boolean {
+        val result = _streamHolder.add(stream)
         if (result) {
-            if (!mPriorityStreamHolder.isEmpty()) {
+            if (_priorityStreamHolder.isNotEmpty()) {
                 // 如果之前已经有流对象设置了优先级，则添加新流对象的时候标记为需要重新排序
-                mIsNeedSort = true;
+                _isNeedSort = true
             }
         }
-        return result;
+        return result
     }
 
     /**
      * 移除流对象
-     *
-     * @param stream
-     * @return
      */
-    public boolean remove(@NonNull FStream stream) {
-        if (stream == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        final boolean result = mStreamHolder.remove(stream);
-        mPriorityStreamHolder.remove(stream);
-
-        return result;
+    fun remove(stream: FStream): Boolean {
+        val result = _streamHolder.remove(stream)
+        _priorityStreamHolder.remove(stream)
+        return result
     }
 
     /**
      * 返回流集合
-     *
-     * @return
      */
-    @NonNull
-    public Collection<FStream> toCollection() {
-        final boolean isNeedSort = mIsNeedSort;
-        if (isNeedSort) {
-            return sort();
+    fun toCollection(): Collection<FStream> {
+        if (_isNeedSort) {
+            return sort()
         } else {
-            return new ArrayList<>(mStreamHolder);
-        }
-    }
-
-    @NonNull
-    private Collection<FStream> sort() {
-        synchronized (mManager) {
-            final List<FStream> listEntry = new ArrayList<>(mStreamHolder);
-            Collections.sort(listEntry, new InternalStreamComparator());
-
-            mStreamHolder.clear();
-            mStreamHolder.addAll(listEntry);
-            mIsNeedSort = false;
-
-            if (mManager.isDebug()) {
-                Log.i(FStream.class.getSimpleName(), "sort stream for class:" + mClass.getName());
-            }
-
-            return listEntry;
+            return ArrayList(_streamHolder)
         }
     }
 
     /**
-     * 优先级变化
-     *
-     * @param priority
-     * @param stream
-     * @param clazz
+     * 排序
      */
-    public void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz) {
-        if (stream == null || clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
+    private fun sort(): Collection<FStream> {
+        synchronized(_manager) {
+            val listEntry = ArrayList(_streamHolder)
+            Collections.sort(listEntry, InternalStreamComparator())
 
-        if (clazz != mClass) {
-            throw new IllegalArgumentException("expect class:" + mClass + " but class:" + clazz);
-        }
+            _streamHolder.clear()
+            _streamHolder.addAll(listEntry)
+            _isNeedSort = false
 
-        if (priority == 0) {
-            mPriorityStreamHolder.remove(stream);
-        } else {
-            mPriorityStreamHolder.put(stream, priority);
-        }
-
-        mIsNeedSort = true;
-
-        if (mManager.isDebug()) {
-            Log.i(FStream.class.getSimpleName(), "onPriorityChanged"
-                    + " priority:" + priority
-                    + " clazz:" + clazz.getName()
-                    + " priorityStreamHolder size:" + mPriorityStreamHolder.size()
-                    + " stream:" + stream);
+            if (_manager.isDebug) {
+                Log.i(FStream::class.java.simpleName,
+                        "sort stream for class:" + _class.name)
+            }
+            return listEntry
         }
     }
 
-    private final class InternalStreamComparator implements Comparator<FStream> {
-        @Override
-        public int compare(FStream o1, FStream o2) {
-            final StreamConnection o1Connection = mManager.getConnection(o1);
-            final StreamConnection o2Connection = mManager.getConnection(o2);
+    /**
+     * 通知优先级变化
+     */
+    fun onPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>) {
+        require(clazz == _class) { "expect class:${_class} but class:${clazz}" }
+
+        if (priority == 0) {
+            _priorityStreamHolder.remove(stream)
+        } else {
+            _priorityStreamHolder[stream] = priority
+        }
+
+        _isNeedSort = true
+
+        if (_manager.isDebug) {
+            Log.i(FStream::class.java.simpleName,
+                    "onPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size}  stream:${stream}")
+        }
+    }
+
+    private inner class InternalStreamComparator : Comparator<FStream> {
+        override fun compare(o1: FStream, o2: FStream): Int {
+            val o1Connection = _manager.getConnection(o1)
+            val o2Connection = _manager.getConnection(o2)
+
             if (o1Connection != null && o2Connection != null) {
-                return o2Connection.getPriority(mClass) - o1Connection.getPriority(mClass);
+                return o2Connection.getPriority(_class) - o1Connection.getPriority(_class)
+            } else {
+                return 0
             }
-            return 0;
         }
     }
 }

@@ -94,7 +94,7 @@ class ProxyInvocationHandler implements InvocationHandler {
     @Nullable
     private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args, final @Nullable String uuid) throws Throwable {
         final StreamHolder holder = mManager.getStreamHolder(mClass);
-        final int holderSize = holder == null ? 0 : holder.size();
+        final int holderSize = holder == null ? 0 : holder.getSize();
 
         Collection<FStream> listStream = null;
 
