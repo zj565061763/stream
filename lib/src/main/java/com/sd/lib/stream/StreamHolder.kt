@@ -86,7 +86,7 @@ internal class StreamHolder {
     /**
      * 通知优先级变化
      */
-    fun onPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>) {
+    fun notifyPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>) {
         require(clazz == _class) { "expect class:${_class} but class:${clazz}" }
 
         if (priority == 0) {

@@ -278,7 +278,7 @@ public class FStreamManager {
         protected void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz) {
             final StreamHolder holder = mMapStream.get(clazz);
             if (holder != null) {
-                holder.onPriorityChanged(priority, stream, clazz);
+                holder.notifyPriorityChanged(priority, stream, clazz);
             }
         }
     }
