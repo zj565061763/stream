@@ -34,18 +34,18 @@ public class FStreamManager {
         return INSTANCE;
     }
 
-    private final Map<Class<? extends FStream>, StreamHolder> mMapStream = new ConcurrentHashMap<>();
-    private final Map<FStream, StreamBinder> mMapStreamBinder = new WeakHashMap<>();
-    private final Map<FStream, InternalStreamConnection> mMapStreamConnection = new ConcurrentHashMap<>();
+    private final Map<Class<? extends FStream>, StreamHolder> _mapStream = new ConcurrentHashMap<>();
+    private final Map<FStream, StreamBinder> _mapStreamBinder = new WeakHashMap<>();
+    private final Map<FStream, InternalStreamConnection> _mapStreamConnection = new ConcurrentHashMap<>();
 
-    private boolean mIsDebug;
+    private boolean _isDebug;
 
     public boolean isDebug() {
-        return mIsDebug;
+        return _isDebug;
     }
 
     public void setDebug(boolean debug) {
-        mIsDebug = debug;
+        _isDebug = debug;
     }
 
     /**
@@ -76,7 +76,7 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final StreamBinder oldBinder = mMapStreamBinder.get(stream);
+        final StreamBinder oldBinder = _mapStreamBinder.get(stream);
         if (oldBinder != null) {
             if (oldBinder.getTarget() == target) {
                 //  已经绑定过了
@@ -89,12 +89,12 @@ public class FStreamManager {
 
         final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
         if (binder.bind()) {
-            mMapStreamBinder.put(stream, binder);
-            if (mIsDebug) {
+            _mapStreamBinder.put(stream, binder);
+            if (_isDebug) {
                 Log.i(FStream.class.getSimpleName(), "bind activity"
                         + " stream:" + stream
                         + " target:" + target
-                        + " size:" + mMapStreamBinder.size());
+                        + " size:" + _mapStreamBinder.size());
             }
             return true;
         }
@@ -113,7 +113,7 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final StreamBinder oldBinder = mMapStreamBinder.get(stream);
+        final StreamBinder oldBinder = _mapStreamBinder.get(stream);
         if (oldBinder != null) {
             if (oldBinder.getTarget() == target) {
                 //  已经绑定过了
@@ -126,12 +126,12 @@ public class FStreamManager {
 
         final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
         if (binder.bind()) {
-            mMapStreamBinder.put(stream, binder);
-            if (mIsDebug) {
+            _mapStreamBinder.put(stream, binder);
+            if (_isDebug) {
                 Log.i(FStream.class.getSimpleName(), "bind view"
                         + " stream:" + stream
                         + " target:" + target
-                        + " size:" + mMapStreamBinder.size());
+                        + " size:" + _mapStreamBinder.size());
             }
             return true;
         }
@@ -149,17 +149,17 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final StreamBinder binder = mMapStreamBinder.remove(stream);
+        final StreamBinder binder = _mapStreamBinder.remove(stream);
         if (binder == null) {
             return false;
         }
 
         binder.destroy();
-        if (mIsDebug) {
+        if (_isDebug) {
             Log.i(FStream.class.getSimpleName(), "unbind"
                     + " stream:" + stream
                     + " target:" + binder.getTarget()
-                    + " size:" + mMapStreamBinder.size());
+                    + " size:" + _mapStreamBinder.size());
         }
         return true;
     }
@@ -190,7 +190,7 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        InternalStreamConnection streamConnection = mMapStreamConnection.get(stream);
+        InternalStreamConnection streamConnection = _mapStreamConnection.get(stream);
         if (streamConnection != null) {
             // 已经注册过了
             return streamConnection;
@@ -198,14 +198,14 @@ public class FStreamManager {
 
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes) {
-            StreamHolder holder = mMapStream.get(item);
+            StreamHolder holder = _mapStream.get(item);
             if (holder == null) {
                 holder = new StreamHolder(item, FStreamManager.this);
-                mMapStream.put(item, holder);
+                _mapStream.put(item, holder);
             }
 
             if (holder.add(stream)) {
-                if (mIsDebug) {
+                if (_isDebug) {
                     Log.i(FStream.class.getSimpleName(), "+++++ register"
                             + " class:" + item.getName()
                             + " stream:" + stream
@@ -215,7 +215,7 @@ public class FStreamManager {
         }
 
         streamConnection = new InternalStreamConnection(stream, classes);
-        mMapStreamConnection.put(stream, streamConnection);
+        _mapStreamConnection.put(stream, streamConnection);
         return streamConnection;
     }
 
@@ -224,24 +224,24 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final StreamConnection streamConnection = mMapStreamConnection.remove(stream);
+        final StreamConnection streamConnection = _mapStreamConnection.remove(stream);
         if (streamConnection == null) {
             return;
         }
 
         final Class<? extends FStream>[] classes = getStreamClass(stream);
         for (Class<? extends FStream> item : classes) {
-            final StreamHolder holder = mMapStream.get(item);
+            final StreamHolder holder = _mapStream.get(item);
             if (holder == null) {
                 continue;
             }
 
             if (holder.remove(stream)) {
                 if (holder.getSize() <= 0) {
-                    mMapStream.remove(item);
+                    _mapStream.remove(item);
                 }
 
-                if (mIsDebug) {
+                if (_isDebug) {
                     Log.i(FStream.class.getSimpleName(), "----- unregister"
                             + " class:" + item.getName()
                             + " stream:" + stream
@@ -252,7 +252,7 @@ public class FStreamManager {
     }
 
     StreamHolder getStreamHolder(@NonNull Class<? extends FStream> clazz) {
-        return mMapStream.get(clazz);
+        return _mapStream.get(clazz);
     }
 
     /**
@@ -266,7 +266,7 @@ public class FStreamManager {
         if (stream == null) {
             throw new IllegalArgumentException("null argument");
         }
-        return mMapStreamConnection.get(stream);
+        return _mapStreamConnection.get(stream);
     }
 
     private final class InternalStreamConnection extends StreamConnection {
@@ -276,7 +276,7 @@ public class FStreamManager {
 
         @Override
         protected void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz) {
-            final StreamHolder holder = mMapStream.get(clazz);
+            final StreamHolder holder = _mapStream.get(clazz);
             if (holder != null) {
                 holder.notifyPriorityChanged(priority, stream, clazz);
             }
@@ -344,8 +344,8 @@ public class FStreamManager {
 
     //---------- default stream start ----------
 
-    private final Map<Class<? extends FStream>, Class<? extends FStream>> mMapDefaultStreamClass = new ConcurrentHashMap<>();
-    private DefaultStreamFactory mDefaultStreamFactory;
+    private final Map<Class<? extends FStream>, Class<? extends FStream>> _mapDefaultStreamClass = new ConcurrentHashMap<>();
+    private DefaultStreamFactory _defaultStreamFactory;
 
     /**
      * 注册默认的流接口实现类
@@ -369,7 +369,7 @@ public class FStreamManager {
         }
 
         for (Class<? extends FStream> item : set) {
-            mMapDefaultStreamClass.put(item, clazz);
+            _mapDefaultStreamClass.put(item, clazz);
         }
     }
 
@@ -393,7 +393,7 @@ public class FStreamManager {
         }
 
         for (Class<? extends FStream> item : set) {
-            mMapDefaultStreamClass.remove(item);
+            _mapDefaultStreamClass.remove(item);
         }
     }
 
@@ -403,7 +403,7 @@ public class FStreamManager {
      * @param factory
      */
     public synchronized void setDefaultStreamFactory(@Nullable DefaultStreamFactory factory) {
-        mDefaultStreamFactory = factory;
+        _defaultStreamFactory = factory;
     }
 
     /**
@@ -418,19 +418,19 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final Class<? extends FStream> defaultClass = mMapDefaultStreamClass.get(clazz);
+        final Class<? extends FStream> defaultClass = _mapDefaultStreamClass.get(clazz);
         if (defaultClass == null) {
             return null;
         }
 
-        if (mDefaultStreamFactory == null) {
-            mDefaultStreamFactory = new WeakCacheDefaultStreamFactory();
+        if (_defaultStreamFactory == null) {
+            _defaultStreamFactory = new WeakCacheDefaultStreamFactory();
         }
 
         final DefaultStreamFactory.CreateParam param = new DefaultStreamFactory.CreateParam(clazz, defaultClass);
-        final FStream stream = mDefaultStreamFactory.create(param);
+        final FStream stream = _defaultStreamFactory.create(param);
         if (stream == null) {
-            throw new RuntimeException(mDefaultStreamFactory + " create null for param:" + param);
+            throw new RuntimeException(_defaultStreamFactory + " create null for param:" + param);
         }
         return stream;
     }
