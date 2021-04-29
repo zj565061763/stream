@@ -49,22 +49,6 @@ public class FStreamManager {
     }
 
     /**
-     * {@link #bindStream(FStream, Activity)}
-     */
-    @Deprecated
-    public void bindActivity(@NonNull FStream stream, @NonNull Activity target) {
-        bindStream(stream, target);
-    }
-
-    /**
-     * {@link #bindStream(FStream, View)}
-     */
-    @Deprecated
-    public void bindView(@NonNull FStream stream, @NonNull View target) {
-        bindStream(stream, target);
-    }
-
-    /**
      * {@link ActivityStreamBinder}
      *
      * @param stream
@@ -436,4 +420,20 @@ public class FStreamManager {
     }
 
     //---------- default stream end ----------
+
+    /**
+     * {@link #bindStream(FStream, Activity)}
+     */
+    @Deprecated
+    public void bindActivity(@NonNull FStream stream, @NonNull Activity target) {
+        bindStream(stream, target);
+    }
+
+    /**
+     * {@link #bindStream(FStream, View)}
+     */
+    @Deprecated
+    public void bindView(@NonNull FStream stream, @NonNull View target) {
+        bindStream(stream, target);
+    }
 }
