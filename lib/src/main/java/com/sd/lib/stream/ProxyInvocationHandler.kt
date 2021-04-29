@@ -95,6 +95,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
 
         var listStream: Collection<FStream>? = null
         var isDefaultStream = false
+
         if (holderSize <= 0) {
             val stream = _manager.getDefaultStream(_streamClass) ?: return null
 
