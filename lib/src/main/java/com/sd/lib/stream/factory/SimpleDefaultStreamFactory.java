@@ -9,7 +9,7 @@ public class SimpleDefaultStreamFactory implements DefaultStreamFactory {
     @Override
     public FStream create(@NonNull CreateParam param) {
         try {
-            return param.classDefaultStream.newInstance();
+            return param.classStreamDefault.newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
