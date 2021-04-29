@@ -74,7 +74,7 @@ abstract class StreamConnection {
     /**
      * 是否需要停止分发
      */
-    fun shouldBreakDispatch(clazz: Class<out FStream>): Boolean {
+    internal fun shouldBreakDispatch(clazz: Class<out FStream>): Boolean {
         checkClassInterface(clazz)
         val item = _mapItem[clazz]
         return item?.iShouldBreakDispatch ?: false
@@ -83,7 +83,7 @@ abstract class StreamConnection {
     /**
      * 重置停止分发标志
      */
-    fun resetBreakDispatch(clazz: Class<out FStream>) {
+    internal fun resetBreakDispatch(clazz: Class<out FStream>) {
         checkClassInterface(clazz)
         val item = _mapItem[clazz]
         item?.resetBreakDispatch()
