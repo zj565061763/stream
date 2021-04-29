@@ -15,7 +15,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
     private val _resultFilter: ResultFilter?
     private val _isSticky: Boolean
 
-    constructor(manager: FStreamManager, builder: ProxyBuilder) {
+    constructor(builder: ProxyBuilder, manager: FStreamManager) {
         _manager = manager
 
         _streamClass = builder.streamClass!!
