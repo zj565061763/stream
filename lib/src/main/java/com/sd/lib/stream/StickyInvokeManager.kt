@@ -5,7 +5,7 @@ import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-object StickyInvokeManager {
+internal object StickyInvokeManager {
     private val TAG = StickyInvokeManager::class.java.simpleName
 
     /** 代理对象数量  */
