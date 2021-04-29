@@ -1,77 +1,54 @@
-package com.sd.lib.stream.binder;
+package com.sd.lib.stream.binder
 
-import android.app.Activity;
-import android.view.View;
-import android.view.Window;
-
-import androidx.annotation.NonNull;
-
-import com.sd.lib.stream.FStream;
-
-import java.lang.ref.WeakReference;
+import android.app.Activity
+import android.view.View
+import android.view.View.OnAttachStateChangeListener
+import com.sd.lib.stream.FStream
+import java.lang.ref.WeakReference
 
 /**
- * 将流对象和Activity绑定
- * <p>
- * 在{@link Activity#getWindow()}对象的{@link Window#getDecorView()}被移除的时候取消注册流对象
+ * 将流对象和Activity绑定，在[Window.getDecorView]对象被移除的时候取消注册流对象
  */
-public class ActivityStreamBinder extends StreamBinder<Activity> {
-    private final WeakReference<View> mDecorView;
+class ActivityStreamBinder : StreamBinder<Activity> {
+    private val _decorView: WeakReference<View>
 
-    public ActivityStreamBinder(@NonNull FStream stream, @NonNull Activity target) {
-        super(stream, target);
+    constructor(stream: FStream, target: Activity) : super(stream, target) {
+        val window = target.window
+                ?: throw RuntimeException("Bind stream failed because activity's window is null")
+        val decorView = window.decorView
+                ?: throw RuntimeException("Bind stream failed because activity's window DecorView is null")
 
-        final Window window = target.getWindow();
-        if (window == null) {
-            throw new RuntimeException("Bind stream failed because activity's window is null");
-        }
-
-        final View decorView = window.getDecorView();
-        if (decorView == null) {
-            throw new RuntimeException("Bind stream failed because activity's window DecorView is null");
-        }
-
-        mDecorView = new WeakReference<>(decorView);
+        _decorView = WeakReference(decorView)
     }
 
-    @Override
-    public final boolean bind() {
-        final Activity activity = getTarget();
-        if (activity == null || activity.isFinishing()) {
-            return false;
+    override fun bind(): Boolean {
+        val activity = target
+        if (activity == null || activity.isFinishing) {
+            return false
         }
 
-        final View decorView = mDecorView.get();
-        if (decorView == null) {
-            return false;
-        }
+        val decorView = _decorView.get() ?: return false
 
         if (registerStream()) {
-            decorView.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
-            decorView.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
-            return true;
+            decorView.removeOnAttachStateChangeListener(_onAttachStateChangeListener)
+            decorView.addOnAttachStateChangeListener(_onAttachStateChangeListener)
+            return true
         }
-
-        return false;
+        return false
     }
 
-    private final View.OnAttachStateChangeListener mOnAttachStateChangeListener = new View.OnAttachStateChangeListener() {
-        @Override
-        public void onViewAttachedToWindow(View v) {
+    private val _onAttachStateChangeListener: OnAttachStateChangeListener = object : OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View) {
+
         }
 
-        @Override
-        public void onViewDetachedFromWindow(View v) {
-            destroy();
+        override fun onViewDetachedFromWindow(v: View) {
+            destroy()
         }
-    };
+    }
 
-    @Override
-    public void destroy() {
-        super.destroy();
-        final View decorView = mDecorView.get();
-        if (decorView != null) {
-            decorView.removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
-        }
+    override fun destroy() {
+        super.destroy()
+        _decorView.get()?.removeOnAttachStateChangeListener(_onAttachStateChangeListener)
     }
 }
