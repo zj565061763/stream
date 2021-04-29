@@ -28,9 +28,6 @@ abstract class StreamConnection {
 
     /**
      * 返回优先级
-     *
-     * @param clazz
-     * @return
      */
     fun getPriority(clazz: Class<out FStream>): Int {
         checkClassInterface(clazz)
@@ -40,9 +37,6 @@ abstract class StreamConnection {
 
     /**
      * 设置优先级
-     *
-     * @param priority
-     * @param clazz
      */
     @JvmOverloads
     fun setPriority(priority: Int, clazz: Class<out FStream>? = null) {
@@ -67,8 +61,6 @@ abstract class StreamConnection {
 
     /**
      * 停止分发
-     *
-     * @param clazz
      */
     fun breakDispatch(clazz: Class<out FStream>) {
         checkClassInterface(clazz)
@@ -81,9 +73,6 @@ abstract class StreamConnection {
 
     /**
      * 是否需要停止分发
-     *
-     * @param clazz
-     * @return
      */
     fun shouldBreakDispatch(clazz: Class<out FStream>): Boolean {
         checkClassInterface(clazz)
@@ -93,8 +82,6 @@ abstract class StreamConnection {
 
     /**
      * 重置停止分发标志
-     *
-     * @param clazz
      */
     fun resetBreakDispatch(clazz: Class<out FStream>) {
         checkClassInterface(clazz)
