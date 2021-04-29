@@ -15,11 +15,9 @@ interface DefaultStreamFactory {
 
     class CreateParam {
         /** 流接口 */
-        @JvmField
         val classStream: Class<out FStream>
 
         /** 流接口实现类 */
-        @JvmField
         val classStreamDefault: Class<out FStream>
 
         constructor(classStream: Class<out FStream>, classStreamDefault: Class<out FStream>) {
