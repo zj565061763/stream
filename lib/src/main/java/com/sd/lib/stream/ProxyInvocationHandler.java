@@ -15,39 +15,39 @@ import java.util.List;
 import java.util.UUID;
 
 class ProxyInvocationHandler implements InvocationHandler {
-    private final FStreamManager mManager;
+    private final FStreamManager _manager;
 
-    private final Class<? extends FStream> mClass;
-    private final Object mTag;
-    private final FStream.DispatchCallback mDispatchCallback;
-    private final FStream.ResultFilter mResultFilter;
-    private final boolean mIsSticky;
+    private final Class<? extends FStream> _streamClass;
+    private final Object _tag;
+    private final FStream.DispatchCallback _dispatchCallback;
+    private final FStream.ResultFilter _resultFilter;
+    private final boolean _isSticky;
 
     public ProxyInvocationHandler(@NonNull FStreamManager manager, @NonNull FStream.ProxyBuilder builder) {
         if (manager == null || builder == null) {
             throw new IllegalArgumentException("null argument");
         }
 
-        mManager = manager;
+        _manager = manager;
 
-        mClass = builder.getStreamClass();
-        mTag = builder.getTag();
-        mDispatchCallback = builder.getDispatchCallback();
-        mResultFilter = builder.getResultFilter();
-        mIsSticky = builder.isSticky();
+        _streamClass = builder.getStreamClass();
+        _tag = builder.getTag();
+        _dispatchCallback = builder.getDispatchCallback();
+        _resultFilter = builder.getResultFilter();
+        _isSticky = builder.isSticky();
 
-        if (mIsSticky) {
-            StickyInvokeManager.INSTANCE.proxyCreated(mClass);
+        if (_isSticky) {
+            StickyInvokeManager.INSTANCE.proxyCreated(_streamClass);
         }
     }
 
     private boolean checkTag(@NonNull FStream stream) {
-        final Object tag = stream.getTagForStream(mClass);
-        if (mTag == tag) {
+        final Object tag = stream.getTagForStream(_streamClass);
+        if (_tag == tag) {
             return true;
         }
 
-        return mTag != null && mTag.equals(tag);
+        return _tag != null && _tag.equals(tag);
     }
 
     @Override
@@ -57,11 +57,11 @@ class ProxyInvocationHandler implements InvocationHandler {
 
         final Class<?>[] parameterTypes = method.getParameterTypes();
         if ("getTagForStream".equals(methodName) && parameterTypes.length == 1 && parameterTypes[0] == Class.class) {
-            return mTag;
+            return _tag;
         }
 
 
-        final String uuid = mManager.isDebug() ? UUID.randomUUID().toString() : null;
+        final String uuid = _manager.isDebug() ? UUID.randomUUID().toString() : null;
         final boolean isVoid = returnType == void.class || returnType == Void.class;
         Object result = processMainLogic(isVoid, method, args, uuid);
 
@@ -75,40 +75,40 @@ class ProxyInvocationHandler implements InvocationHandler {
                 result = 0;
             }
 
-            if (mManager.isDebug()) {
+            if (_manager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "return type:" + returnType + " but method result is null, so set to " + result
                         + " uuid:" + uuid);
             }
         }
 
-        if (mManager.isDebug()) {
+        if (_manager.isDebug()) {
             Log.i(FStream.class.getSimpleName(), "notify finish return:" + result + " uuid:" + uuid);
         }
 
-        if (mIsSticky) {
-            StickyInvokeManager.INSTANCE.proxyInvoke(mClass, mTag, method, args);
+        if (_isSticky) {
+            StickyInvokeManager.INSTANCE.proxyInvoke(_streamClass, _tag, method, args);
         }
         return result;
     }
 
     @Nullable
     private Object processMainLogic(final boolean isVoid, @NonNull final Method method, @Nullable final Object[] args, final @Nullable String uuid) throws Throwable {
-        final StreamHolder holder = mManager.getStreamHolder(mClass);
+        final StreamHolder holder = _manager.getStreamHolder(_streamClass);
         final int holderSize = holder == null ? 0 : holder.getSize();
 
         Collection<FStream> listStream = null;
 
-        if (mManager.isDebug()) {
+        if (_manager.isDebug()) {
             Log.i(FStream.class.getSimpleName(), "notify -----> " + method
                     + " arg:" + (args == null ? "" : Arrays.toString(args))
-                    + " tag:" + mTag
+                    + " tag:" + _tag
                     + " count:" + holderSize
                     + " uuid:" + uuid);
         }
 
         boolean isDefaultStream = false;
         if (holderSize <= 0) {
-            final FStream stream = mManager.getDefaultStream(mClass);
+            final FStream stream = _manager.getDefaultStream(_streamClass);
             if (stream == null) {
                 return null;
             }
@@ -118,25 +118,25 @@ class ProxyInvocationHandler implements InvocationHandler {
 
             isDefaultStream = true;
 
-            if (mManager.isDebug()) {
+            if (_manager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "create default stream:" + stream + " uuid:" + uuid);
             }
         } else {
             listStream = holder.toCollection();
         }
 
-        final boolean filterResult = mResultFilter != null && !isVoid;
+        final boolean filterResult = _resultFilter != null && !isVoid;
         final List<Object> listResult = filterResult ? new LinkedList<>() : null;
 
         Object result = null;
         int index = 0;
         for (FStream item : listStream) {
-            final StreamConnection connection = mManager.getConnection(item);
+            final StreamConnection connection = _manager.getConnection(item);
             if (isDefaultStream) {
                 // 不判断
             } else {
                 if (connection == null) {
-                    if (mManager.isDebug()) {
+                    if (_manager.isDebug()) {
                         Log.e(FStream.class.getSimpleName(), StreamConnection.class.getSimpleName() + " is null uuid:" + uuid);
                     }
                     continue;
@@ -147,8 +147,8 @@ class ProxyInvocationHandler implements InvocationHandler {
                 continue;
             }
 
-            if (mDispatchCallback != null && mDispatchCallback.beforeDispatch(item, method, args)) {
-                if (mManager.isDebug()) {
+            if (_dispatchCallback != null && _dispatchCallback.beforeDispatch(item, method, args)) {
+                if (_manager.isDebug()) {
                     Log.i(FStream.class.getSimpleName(), "proxy broken dispatch before uuid:" + uuid);
                 }
                 break;
@@ -160,17 +160,17 @@ class ProxyInvocationHandler implements InvocationHandler {
             if (isDefaultStream) {
                 itemResult = method.invoke(item, args);
             } else {
-                synchronized (mClass) {
-                    connection.resetBreakDispatch(mClass);
+                synchronized (_streamClass) {
+                    connection.resetBreakDispatch(_streamClass);
 
                     itemResult = method.invoke(item, args);
 
-                    shouldBreakDispatch = connection.shouldBreakDispatch(mClass);
-                    connection.resetBreakDispatch(mClass);
+                    shouldBreakDispatch = connection.shouldBreakDispatch(_streamClass);
+                    connection.resetBreakDispatch(_streamClass);
                 }
             }
 
-            if (mManager.isDebug()) {
+            if (_manager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "notify"
                         + " index:" + index
                         + " return:" + (isVoid ? "" : itemResult)
@@ -185,8 +185,8 @@ class ProxyInvocationHandler implements InvocationHandler {
                 listResult.add(itemResult);
             }
 
-            if (mDispatchCallback != null && mDispatchCallback.afterDispatch(item, method, args, itemResult)) {
-                if (mManager.isDebug()) {
+            if (_dispatchCallback != null && _dispatchCallback.afterDispatch(item, method, args, itemResult)) {
+                if (_manager.isDebug()) {
                     Log.i(FStream.class.getSimpleName(), "proxy broken dispatch after uuid:" + uuid);
                 }
                 break;
@@ -200,9 +200,9 @@ class ProxyInvocationHandler implements InvocationHandler {
         }
 
         if (filterResult && !listResult.isEmpty()) {
-            result = mResultFilter.filter(method, args, listResult);
+            result = _resultFilter.filter(method, args, listResult);
 
-            if (mManager.isDebug()) {
+            if (_manager.isDebug()) {
                 Log.i(FStream.class.getSimpleName(), "proxy filter result: " + result + " uuid:" + uuid);
             }
         }
@@ -213,8 +213,8 @@ class ProxyInvocationHandler implements InvocationHandler {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        if (mIsSticky) {
-            StickyInvokeManager.INSTANCE.proxyDestroyed(mClass);
+        if (_isSticky) {
+            StickyInvokeManager.INSTANCE.proxyDestroyed(_streamClass);
         }
     }
 }
