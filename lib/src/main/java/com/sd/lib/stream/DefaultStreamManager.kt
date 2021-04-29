@@ -6,6 +6,9 @@ import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory
 import com.sd.lib.stream.utils.LibUtils
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * 默认流接口管理
+ */
 object DefaultStreamManager {
     private val _mapDefaultStreamClass: MutableMap<Class<out FStream>, Class<out FStream>> = ConcurrentHashMap()
     private var _defaultStreamFactory: DefaultStreamFactory? = null
