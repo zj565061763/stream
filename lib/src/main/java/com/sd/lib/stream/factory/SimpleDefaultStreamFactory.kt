@@ -1,17 +1,15 @@
-package com.sd.lib.stream.factory;
+package com.sd.lib.stream.factory
 
-import androidx.annotation.NonNull;
+import com.sd.lib.stream.FStream
+import com.sd.lib.stream.factory.DefaultStreamFactory.CreateParam
 
-import com.sd.lib.stream.FStream;
+open class SimpleDefaultStreamFactory : DefaultStreamFactory {
 
-public class SimpleDefaultStreamFactory implements DefaultStreamFactory {
-    @NonNull
-    @Override
-    public FStream create(@NonNull CreateParam param) {
+    override fun create(param: CreateParam): FStream {
         try {
-            return param.classStreamDefault.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            return param.classStreamDefault.newInstance()
+        } catch (e: Exception) {
+            throw RuntimeException(e)
         }
     }
 }
