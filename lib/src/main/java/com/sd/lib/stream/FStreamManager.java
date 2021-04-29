@@ -13,8 +13,6 @@ import com.sd.lib.stream.binder.ViewStreamBinder;
 import com.sd.lib.stream.factory.DefaultStreamFactory;
 import com.sd.lib.stream.utils.LibUtils;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -278,19 +276,6 @@ public class FStreamManager {
         }
 
         return set.toArray(new Class[set.size()]);
-    }
-
-    /**
-     * 生成代理对象
-     *
-     * @param builder
-     * @return
-     */
-    @NonNull
-    FStream newProxyInstance(@NonNull FStream.ProxyBuilder builder) {
-        final Class<?> clazz = builder.getStreamClass();
-        final InvocationHandler handler = new ProxyInvocationHandler(builder, this);
-        return (FStream) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, handler);
     }
 
     /**

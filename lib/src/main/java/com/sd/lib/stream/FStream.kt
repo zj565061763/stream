@@ -1,6 +1,7 @@
 package com.sd.lib.stream
 
 import java.lang.reflect.Method
+import java.lang.reflect.Proxy
 
 /**
  * 流接口
@@ -71,7 +72,10 @@ interface FStream {
             require(clazz != FStream::class.java) { "clazz must not be:${FStream::class.java.name}" }
 
             this.streamClass = clazz
-            return FStreamManager.getInstance().newProxyInstance(this) as T
+
+            val handler = ProxyInvocationHandler(this, FStreamManager.getInstance())
+            val proxy = Proxy.newProxyInstance(clazz.classLoader, arrayOf<Class<*>>(clazz), handler)
+            return proxy as T
         }
     }
 
