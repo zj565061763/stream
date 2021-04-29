@@ -19,7 +19,7 @@ object DefaultStreamManager {
     @Synchronized
     fun registerDefaultStream(clazz: Class<out FStream>) {
         val set = LibUtils.findAllStreamClass(clazz)
-        require(!set.isEmpty()) { "stream class was not found in $clazz" }
+        require(set.isNotEmpty()) { "stream class was not found in $clazz" }
         for (item in set) {
             _mapDefaultStreamClass[item] = clazz
         }
