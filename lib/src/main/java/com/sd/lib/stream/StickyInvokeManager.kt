@@ -108,7 +108,7 @@ internal object StickyInvokeManager {
     fun stickyInvoke(stream: FStream, clazz: Class<out FStream>): Boolean {
         require(clazz.isAssignableFrom(stream.javaClass)) { "${clazz.name} is not assignable from stream:${stream}" }
         synchronized(clazz) {
-            val holder: Map<Any?, MethodInfo>? = _mapMethodInfo[clazz]
+            val holder = _mapMethodInfo[clazz]
             if (holder == null || holder.isEmpty()) {
                 return false
             }
