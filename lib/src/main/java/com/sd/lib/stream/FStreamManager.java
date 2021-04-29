@@ -35,14 +35,14 @@ public class FStreamManager {
     private final Map<FStream, StreamBinder> _mapStreamBinder = new WeakHashMap<>();
     private final Map<FStream, InternalStreamConnection> _mapStreamConnection = new ConcurrentHashMap<>();
 
-    private boolean _isDebug;
+    private boolean isDebug;
 
     public boolean isDebug() {
-        return _isDebug;
+        return isDebug;
     }
 
     public void setDebug(boolean debug) {
-        _isDebug = debug;
+        isDebug = debug;
     }
 
     /**
@@ -71,7 +71,7 @@ public class FStreamManager {
         final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
         if (binder.bind()) {
             _mapStreamBinder.put(stream, binder);
-            if (_isDebug) {
+            if (isDebug) {
                 Log.i(FStream.class.getSimpleName(), "bind activity"
                         + " stream:" + stream
                         + " target:" + target
@@ -108,7 +108,7 @@ public class FStreamManager {
         final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
         if (binder.bind()) {
             _mapStreamBinder.put(stream, binder);
-            if (_isDebug) {
+            if (isDebug) {
                 Log.i(FStream.class.getSimpleName(), "bind view"
                         + " stream:" + stream
                         + " target:" + target
@@ -136,7 +136,7 @@ public class FStreamManager {
         }
 
         binder.destroy();
-        if (_isDebug) {
+        if (isDebug) {
             Log.i(FStream.class.getSimpleName(), "unbind"
                     + " stream:" + stream
                     + " target:" + binder.getTarget()
@@ -186,7 +186,7 @@ public class FStreamManager {
             }
 
             if (holder.add(stream)) {
-                if (_isDebug) {
+                if (isDebug) {
                     Log.i(FStream.class.getSimpleName(), "+++++ register"
                             + " class:" + item.getName()
                             + " stream:" + stream
@@ -222,7 +222,7 @@ public class FStreamManager {
                     _mapStream.remove(item);
                 }
 
-                if (_isDebug) {
+                if (isDebug) {
                     Log.i(FStream.class.getSimpleName(), "----- unregister"
                             + " class:" + item.getName()
                             + " stream:" + stream
