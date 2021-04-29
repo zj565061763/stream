@@ -337,7 +337,7 @@ public class FStreamManager {
      */
     @NonNull
     FStream newProxyInstance(@NonNull FStream.ProxyBuilder builder) {
-        final Class<?> clazz = builder.mClass;
+        final Class<?> clazz = builder._class;
         final InvocationHandler handler = new ProxyInvocationHandler(this, builder);
         return (FStream) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, handler);
     }

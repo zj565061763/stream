@@ -1,98 +1,76 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.lang.reflect.Method;
-import java.util.List;
+import java.lang.reflect.Method
 
 /**
  * 流接口
  */
-public interface FStream {
+interface FStream {
     /**
      * 返回当前流对象的tag
-     * <p>
+     *
      * 代理对象方法被触发的时候，会调用流对象的这个方法返回一个tag用于和代理对象的tag比较，tag相等的流对象才会被通知
      *
      * @param clazz 哪个接口的代理对象方法被触发
-     * @return
      */
-    @Nullable
-    Object getTagForStream(@NonNull Class<? extends FStream> clazz);
+    fun getTagForStream(clazz: Class<out FStream>): Any?
 
     class ProxyBuilder {
-        Class<? extends FStream> mClass;
-        Object mTag;
-        DispatchCallback mDispatchCallback;
-        ResultFilter mResultFilter;
-        boolean mIsSticky;
+        @JvmField
+        var _class: Class<out FStream>? = null
+
+        @JvmField
+        var _tag: Any? = null
+
+        @JvmField
+        var _dispatchCallback: DispatchCallback? = null
+
+        @JvmField
+        var _resultFilter: ResultFilter? = null
+
+        @JvmField
+        var _isSticky = false
 
         /**
          * 设置代理对象的tag
-         *
-         * @param tag
-         * @return
          */
-        public ProxyBuilder setTag(@Nullable Object tag) {
-            mTag = tag;
-            return this;
+        fun setTag(tag: Any?): ProxyBuilder {
+            _tag = tag
+            return this
         }
 
         /**
          * 设置流对象方法分发回调
-         *
-         * @param callback
-         * @return
          */
-        public ProxyBuilder setDispatchCallback(@Nullable DispatchCallback callback) {
-            mDispatchCallback = callback;
-            return this;
+        fun setDispatchCallback(callback: DispatchCallback?): ProxyBuilder {
+            _dispatchCallback = callback
+            return this
         }
 
         /**
          * 设置返回值过滤对象
-         *
-         * @param filter
-         * @return
          */
-        public ProxyBuilder setResultFilter(@Nullable ResultFilter filter) {
-            mResultFilter = filter;
-            return this;
+        fun setResultFilter(filter: ResultFilter?): ProxyBuilder {
+            _resultFilter = filter
+            return this
         }
 
         /**
          * 设置是否支持粘性触发
-         *
-         * @param sticky
-         * @return
          */
-        public ProxyBuilder setSticky(boolean sticky) {
-            mIsSticky = sticky;
-            return this;
+        fun setSticky(sticky: Boolean): ProxyBuilder {
+            _isSticky = sticky
+            return this
         }
 
         /**
          * 创建代理对象
-         *
-         * @param clazz
-         * @param <T>
-         * @return
          */
-        @NonNull
-        public <T extends FStream> T build(@NonNull Class<T> clazz) {
-            if (clazz == null) {
-                throw new IllegalArgumentException("clazz is null");
-            }
-            if (!clazz.isInterface()) {
-                throw new IllegalArgumentException("clazz must be an interface");
-            }
-            if (clazz == FStream.class) {
-                throw new IllegalArgumentException("clazz must not be:" + FStream.class.getName());
-            }
-
-            mClass = clazz;
-            return (T) FStreamManager.getInstance().newProxyInstance(this);
+        fun <T : FStream> build(clazz: Class<T>): T {
+            require(clazz.isInterface) { "clazz must be an interface" }
+            require(clazz != FStream::class.java) { "clazz must not be:" + FStream::class.java.name }
+            _class = clazz
+            return FStreamManager.getInstance().newProxyInstance(this) as T
         }
     }
 
@@ -105,7 +83,7 @@ public interface FStream {
          * @param methodParams 方法参数
          * @return true-停止分发，false-继续分发
          */
-        boolean beforeDispatch(@NonNull FStream stream, @NonNull Method method, @Nullable Object[] methodParams);
+        fun beforeDispatch(stream: FStream, method: Method, methodParams: Array<Any?>?): Boolean
 
         /**
          * 流对象的方法被通知之后触发
@@ -116,7 +94,7 @@ public interface FStream {
          * @param methodResult 流对象方法被调用后的返回值
          * @return true-停止分发，false-继续分发
          */
-        boolean afterDispatch(@NonNull FStream stream, @NonNull Method method, @Nullable Object[] methodParams, @Nullable Object methodResult);
+        fun afterDispatch(stream: FStream, method: Method, methodParams: Array<Any?>?, methodResult: Any?): Boolean
     }
 
     interface ResultFilter {
@@ -128,6 +106,6 @@ public interface FStream {
          * @param results      所有流对象的返回值
          * @return
          */
-        Object filter(@NonNull Method method, @Nullable Object[] methodParams, @Nullable List<Object> results);
+        fun filter(method: Method, methodParams: Array<Any?>?, results: List<Any?>): Any?
     }
 }
