@@ -22,7 +22,7 @@ abstract class StreamConnection {
      */
     fun stickyInvoke() {
         for (clazz in _mapItem.keys) {
-            StickyInvokeManager.getInstance().stickyInvoke(_stream, clazz)
+            StickyInvokeManager.stickyInvoke(_stream, clazz)
         }
     }
 

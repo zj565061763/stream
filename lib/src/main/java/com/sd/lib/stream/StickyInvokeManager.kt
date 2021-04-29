@@ -1,63 +1,35 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream
 
-import android.util.Log;
+import android.util.Log
+import java.lang.reflect.Method
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+object StickyInvokeManager {
+    private val TAG = StickyInvokeManager::class.java.simpleName
 
-class StickyInvokeManager {
-    private static final String TAG = StickyInvokeManager.class.getSimpleName();
+    /** 代理对象数量  */
+    private val _mapProxyCount = ConcurrentHashMap<Class<out FStream>, Int>()
 
-    private static StickyInvokeManager sInstance;
-
-    public static StickyInvokeManager getInstance() {
-        if (sInstance != null) {
-            return sInstance;
-        }
-
-        synchronized (StickyInvokeManager.class) {
-            if (sInstance == null) {
-                sInstance = new StickyInvokeManager();
-            }
-            return sInstance;
-        }
-    }
-
-    private StickyInvokeManager() {
-    }
-
-    /** 代理对象数量 */
-    private final Map<Class<? extends FStream>, Integer> mMapProxyCount = new ConcurrentHashMap<>();
-    /** 保存方法调用信息 */
-    private final Map<Class<? extends FStream>, Map<Object, MethodInfo>> mMapMethodInfo = new ConcurrentHashMap<>();
+    /** 保存方法调用信息  */
+    private val _mapMethodInfo = ConcurrentHashMap<Class<out FStream>, MutableMap<Any?, MethodInfo>>()
 
     /**
      * 代理对象创建触发
      *
      * @param clazz
      */
-    void proxyCreated(Class<? extends FStream> clazz) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        synchronized (clazz) {
-            final Integer count = mMapProxyCount.get(clazz);
+    fun proxyCreated(clazz: Class<out FStream>) {
+        synchronized(clazz) {
+            val count = _mapProxyCount[clazz]
             if (count == null) {
-                mMapProxyCount.put(clazz, 1);
+                _mapProxyCount[clazz] = 1
             } else {
-                mMapProxyCount.put(clazz, count + 1);
+                _mapProxyCount[clazz] = count + 1
             }
 
-            if (isDebug()) {
-                Log.i(TAG, "+++++ proxyCreated"
-                        + " class:" + clazz.getName()
-                        + " count:" + mMapProxyCount.get(clazz)
-                );
+            if (_isDebug) {
+                Log.i(TAG, "+++++ proxyCreated class:${clazz.name}  count:${_mapProxyCount[clazz]}")
             }
         }
     }
@@ -67,30 +39,21 @@ class StickyInvokeManager {
      *
      * @param clazz
      */
-    void proxyDestroyed(Class<? extends FStream> clazz) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
+    fun proxyDestroyed(clazz: Class<out FStream>) {
+        synchronized(clazz) {
+            val count = _mapProxyCount[clazz]
+                    ?: throw RuntimeException("count is null when destroy proxy:" + clazz.name)
 
-        synchronized (clazz) {
-            final Integer count = mMapProxyCount.get(clazz);
-            if (count == null) {
-                throw new RuntimeException("count is null when destroy proxy:" + clazz.getName());
-            }
-
-            final int targetCount = count - 1;
+            val targetCount = count - 1
             if (targetCount <= 0) {
-                mMapProxyCount.remove(clazz);
-                mMapMethodInfo.remove(clazz);
+                _mapProxyCount.remove(clazz)
+                _mapMethodInfo.remove(clazz)
             } else {
-                mMapProxyCount.put(clazz, targetCount);
+                _mapProxyCount[clazz] = targetCount
             }
 
-            if (isDebug()) {
-                Log.i(TAG, "----- proxyDestroyed"
-                        + " class:" + clazz.getName()
-                        + " count:" + mMapProxyCount.get(clazz)
-                );
+            if (_isDebug) {
+                Log.i(TAG, "----- proxyDestroyed class:${clazz.name}  count:${_mapProxyCount[clazz]}")
             }
         }
     }
@@ -103,113 +66,87 @@ class StickyInvokeManager {
      * @param method
      * @param args
      */
-    void proxyInvoke(Class<? extends FStream> clazz, Object streamTag, Method method, Object[] args) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        if (args == null || args.length <= 0) {
+    fun proxyInvoke(clazz: Class<out FStream>, streamTag: Any?, method: Method, args: Array<Any?>?) {
+        if (args == null || args.isEmpty()) {
             // 参数为空，不保存
-            return;
+            return
         }
 
-        final Class<?> returnType = method.getReturnType();
-        final boolean isVoid = returnType == void.class || returnType == Void.class;
+        val returnType = method.returnType
+        val isVoid = returnType == Void.TYPE || returnType == Void::class.java
         if (!isVoid) {
             // 方法有返回值，不保存
-            return;
+            return
         }
 
-        synchronized (clazz) {
-            if (!mMapProxyCount.containsKey(clazz)) {
-                return;
+        synchronized(clazz) {
+            if (!_mapProxyCount.containsKey(clazz)) {
+                return
             }
 
-            Map<Object, MethodInfo> holder = mMapMethodInfo.get(clazz);
+            var holder = _mapMethodInfo[clazz]
             if (holder == null) {
-                holder = new HashMap<>();
-                mMapMethodInfo.put(clazz, holder);
+                holder = HashMap()
+                _mapMethodInfo[clazz] = holder
             }
 
-            MethodInfo methodInfo = holder.get(streamTag);
+            var methodInfo = holder[streamTag]
             if (methodInfo == null) {
-                methodInfo = new MethodInfo();
-                holder.put(streamTag, methodInfo);
+                methodInfo = MethodInfo()
+                holder[streamTag] = methodInfo
             }
-            methodInfo.save(method, args);
 
-            if (isDebug()) {
-                Log.i(TAG, "proxyInvoke"
-                        + " class:" + clazz.getName()
-                        + " tag:" + streamTag
-                        + " method:" + method
-                        + " args:" + Arrays.toString(args)
-                );
+            methodInfo.save(method, args)
+
+            if (_isDebug) {
+                Log.i(TAG, "proxyInvoke class:${clazz.name} tag:${streamTag} method:${method} args:${Arrays.toString(args)}")
             }
         }
     }
 
-    boolean stickyInvoke(FStream stream, Class<? extends FStream> clazz) {
-        if (!clazz.isAssignableFrom(stream.getClass())) {
-            throw new IllegalArgumentException(clazz.getName() + " is not assignable from stream:" + stream);
-        }
-
-        synchronized (clazz) {
-            final Map<Object, MethodInfo> holder = mMapMethodInfo.get(clazz);
+    fun stickyInvoke(stream: FStream, clazz: Class<out FStream>): Boolean {
+        require(clazz.isAssignableFrom(stream.javaClass)) { "${clazz.name} is not assignable from stream:${stream}" }
+        synchronized(clazz) {
+            val holder: Map<Any?, MethodInfo>? = _mapMethodInfo[clazz]
             if (holder == null || holder.isEmpty()) {
-                return false;
+                return false
             }
 
-            final Object streamTag = stream.getTagForStream(clazz);
-            final MethodInfo methodInfo = holder.get(streamTag);
-            if (methodInfo == null) {
-                return false;
+            val streamTag = stream.getTagForStream(clazz)
+            val methodInfo = holder[streamTag] ?: return false
+
+            if (_isDebug) {
+                Log.i(TAG, "stickyInvoke class:${clazz.name} stream:${stream} tag:${streamTag}")
             }
 
-            if (isDebug()) {
-                Log.i(TAG, "stickyInvoke"
-                        + " class:" + clazz.getName()
-                        + " stream:" + stream
-                        + " tag:" + streamTag
-                );
-            }
-
-            try {
-                methodInfo.invoke(stream, clazz);
-                return true;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            methodInfo.invoke(stream, clazz)
+            return true
         }
     }
 
-    private static final class MethodInfo {
-        private final Map<Method, Object[]> mMethodInfo = new ConcurrentHashMap<>();
+    private class MethodInfo {
+        private val _iMethodInfo = ConcurrentHashMap<Method, Array<Any?>>()
 
-        public void save(Method method, Object[] args) {
-            mMethodInfo.put(method, args);
+        /**
+         * 保存方法调用信息
+         */
+        fun save(method: Method, args: Array<Any?>) {
+            _iMethodInfo[method] = args
         }
 
-        public void invoke(FStream stream, Class<? extends FStream> clazz) throws InvocationTargetException, IllegalAccessException {
-            for (Map.Entry<Method, Object[]> item : mMethodInfo.entrySet()) {
-                final Method method = item.getKey();
-                final Object[] args = item.getValue();
-
-                if (isDebug()) {
-                    Log.i(TAG, "invoke"
-                            + " class:" + clazz.getName()
-                            + " stream:" + stream
-                            + " method:" + method
-                            + " args:" + Arrays.toString(args)
-                    );
+        /**
+         * 用保存的方法信息触发流对象的方法
+         */
+        fun invoke(stream: FStream, clazz: Class<out FStream>) {
+            for ((method, args) in _iMethodInfo) {
+                if (_isDebug) {
+                    Log.i(TAG, "invoke class:${clazz.name} stream:${stream} method:${method} args:${Arrays.toString(args)}")
                 }
-
-                method.invoke(stream, args);
+                method.invoke(stream, *args)
             }
         }
     }
 
-    private static boolean isDebug() {
-        return FStreamManager.getInstance().isDebug();
-    }
+    private val _isDebug: Boolean
+        private get() = FStreamManager.getInstance().isDebug
 }

@@ -37,7 +37,7 @@ class ProxyInvocationHandler implements InvocationHandler {
         mIsSticky = builder.mIsSticky;
 
         if (mIsSticky) {
-            StickyInvokeManager.getInstance().proxyCreated(mClass);
+            StickyInvokeManager.INSTANCE.proxyCreated(mClass);
         }
     }
 
@@ -86,7 +86,7 @@ class ProxyInvocationHandler implements InvocationHandler {
         }
 
         if (mIsSticky) {
-            StickyInvokeManager.getInstance().proxyInvoke(mClass, mTag, method, args);
+            StickyInvokeManager.INSTANCE.proxyInvoke(mClass, mTag, method, args);
         }
         return result;
     }
@@ -214,7 +214,7 @@ class ProxyInvocationHandler implements InvocationHandler {
     protected void finalize() throws Throwable {
         super.finalize();
         if (mIsSticky) {
-            StickyInvokeManager.getInstance().proxyDestroyed(mClass);
+            StickyInvokeManager.INSTANCE.proxyDestroyed(mClass);
         }
     }
 }
