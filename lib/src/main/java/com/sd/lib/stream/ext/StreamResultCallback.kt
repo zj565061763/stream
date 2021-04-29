@@ -1,13 +1,11 @@
-package com.sd.lib.stream.ext;
+package com.sd.lib.stream.ext
 
-import androidx.annotation.Nullable;
+interface StreamResultCallback<T> {
+    fun onSuccess(result: T?)
 
-public interface StreamResultCallback<T> {
-    void onSuccess(@Nullable T result);
-
-    void onError(@Nullable String desc);
+    fun onError(desc: String?)
 
     interface Cancelable {
-        void cancel();
+        fun cancel()
     }
 }
