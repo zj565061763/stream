@@ -6,15 +6,13 @@ import com.sd.lib.stream.factory.DefaultStreamFactory.CreateParam
 abstract class CacheableDefaultStreamFactory : SimpleDefaultStreamFactory() {
 
     override fun create(param: CreateParam): FStream {
-        var stream = getCache(param)
-        if (stream != null) {
-            return stream
+        val cache = getCache(param)
+        if (cache != null) {
+            return cache
         }
 
-        stream = super.create(param)
-        if (stream != null) {
-            setCache(param, stream)
-        }
+        val stream = super.create(param)
+        setCache(param, stream)
         return stream
     }
 
