@@ -279,27 +279,27 @@ public class FStreamManager {
     }
 
     /**
-     * {@link DefaultStreamManager#registerDefaultStream(Class)}
+     * {@link DefaultStreamManager#register(Class)}
      */
     @Deprecated
     public void registerDefaultStream(@NonNull Class<? extends FStream> clazz) {
-        DefaultStreamManager.INSTANCE.registerDefaultStream(clazz);
+        DefaultStreamManager.INSTANCE.register(clazz);
     }
 
     /**
-     * {@link DefaultStreamManager#unregisterDefaultStream(Class)}
+     * {@link DefaultStreamManager#unregister(Class)}
      */
     @Deprecated
     public void unregisterDefaultStream(@NonNull Class<? extends FStream> clazz) {
-        DefaultStreamManager.INSTANCE.unregisterDefaultStream(clazz);
+        DefaultStreamManager.INSTANCE.unregister(clazz);
     }
 
     /**
-     * {@link DefaultStreamManager#setDefaultStreamFactory(DefaultStreamFactory)}
+     * {@link DefaultStreamManager#setStreamFactory(DefaultStreamFactory)}
      */
     @Deprecated
     public void setDefaultStreamFactory(@Nullable DefaultStreamFactory factory) {
-        DefaultStreamManager.INSTANCE.setDefaultStreamFactory(factory);
+        DefaultStreamManager.INSTANCE.setStreamFactory(factory);
     }
 
     /**
