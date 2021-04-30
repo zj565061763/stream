@@ -2,6 +2,7 @@ package com.sd.stream;
 
 import android.app.Application;
 
+import com.sd.lib.stream.DefaultStreamManager;
 import com.sd.lib.stream.FStreamManager;
 
 /**
@@ -15,6 +16,6 @@ public class App extends Application {
         FStreamManager.getInstance().setDebug(true);
 
         // 注册默认的Stream
-        FStreamManager.getInstance().registerDefaultStream(DefaultFragmentCallback.class);
+        DefaultStreamManager.INSTANCE.register(DefaultFragmentCallback.class);
     }
 }
