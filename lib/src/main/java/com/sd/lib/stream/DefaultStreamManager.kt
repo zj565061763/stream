@@ -48,7 +48,7 @@ object DefaultStreamManager {
      * 返回默认的流对象
      */
     @Synchronized
-    internal fun getDefaultStream(clazz: Class<out FStream>): FStream? {
+    internal fun getStream(clazz: Class<out FStream>): FStream? {
         val defaultClass = _mapDefaultStreamClass[clazz] ?: return null
 
         if (_defaultStreamFactory == null) {

@@ -100,7 +100,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
             listStream = holder!!.toCollection()
         } else {
             // 尝试创建默认流对象
-            val stream = DefaultStreamManager.getDefaultStream(_streamClass) ?: return null
+            val stream = DefaultStreamManager.getStream(_streamClass) ?: return null
 
             listStream = listOf(stream)
             isDefaultStream = true
