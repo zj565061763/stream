@@ -141,7 +141,7 @@ internal object StickyInvokeManager {
         fun invoke(stream: FStream, clazz: Class<out FStream>) {
             for ((method, args) in _iMethodInfo) {
                 if (_isDebug) {
-                    Log.i(TAG, "invoke class:${clazz.name} stream:${stream} method:${method} args:${Arrays.toString(args)}")
+                    Log.i(TAG, "invoke class:${clazz.name} method:${method} args:${Arrays.toString(args)} stream:${stream}")
                 }
                 method.invoke(stream, *args)
             }
