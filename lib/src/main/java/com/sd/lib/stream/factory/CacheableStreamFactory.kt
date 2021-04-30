@@ -3,7 +3,7 @@ package com.sd.lib.stream.factory
 import com.sd.lib.stream.FStream
 import com.sd.lib.stream.factory.DefaultStreamFactory.CreateParam
 
-abstract class CacheableDefaultStreamFactory : SimpleDefaultStreamFactory() {
+abstract class CacheableStreamFactory : SimpleStreamFactory() {
 
     override fun create(param: CreateParam): FStream {
         val cache = getCache(param)

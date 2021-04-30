@@ -11,7 +11,7 @@ import java.util.*
 /**
  * 用弱引用缓存流对象的工厂
  */
-class WeakCacheDefaultStreamFactory : CacheableDefaultStreamFactory() {
+class WeakCacheStreamFactory : CacheableStreamFactory() {
     private val _referenceQueue = ReferenceQueue<FStream>()
 
     private val _mapStream = HashMap<Class<out FStream>, WeakReference<FStream>>()
@@ -37,14 +37,14 @@ class WeakCacheDefaultStreamFactory : CacheableDefaultStreamFactory() {
              */
             _mapReference.remove(oldReference)
             if (_isDebug) {
-                Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                Log.i(WeakCacheStreamFactory::class.java.simpleName,
                         "remove old reference:${oldReference} ${_sizeLog}")
             }
         }
 
         _mapReference[reference] = param.classStream
         if (_isDebug) {
-            Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+            Log.i(WeakCacheStreamFactory::class.java.simpleName,
                     "+++++ setCache for class:${param.classStream.name} stream:${stream} reference:${reference} ${_sizeLog}")
         }
     }
@@ -58,7 +58,7 @@ class WeakCacheDefaultStreamFactory : CacheableDefaultStreamFactory() {
             if (clazz == null) {
                 // 如果为null，说明这个引用已经被手动从map中移除
                 if (_isDebug) {
-                    Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                    Log.i(WeakCacheStreamFactory::class.java.simpleName,
                             "releaseReference ghost reference was found:$reference")
                 }
                 continue
@@ -69,7 +69,7 @@ class WeakCacheDefaultStreamFactory : CacheableDefaultStreamFactory() {
                 count++
             } else {
                 if (_isDebug) {
-                    Log.e(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                    Log.e(WeakCacheStreamFactory::class.java.simpleName,
                             "releaseReference  class:${clazz.name} reference:${reference} streamReference:${streamReference}")
                 }
             }
@@ -77,7 +77,7 @@ class WeakCacheDefaultStreamFactory : CacheableDefaultStreamFactory() {
 
         if (count > 0) {
             if (_isDebug) {
-                Log.i(WeakCacheDefaultStreamFactory::class.java.simpleName,
+                Log.i(WeakCacheStreamFactory::class.java.simpleName,
                         "releaseReference count:${count} ${_sizeLog}")
             }
         }

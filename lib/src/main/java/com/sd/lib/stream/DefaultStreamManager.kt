@@ -2,7 +2,7 @@ package com.sd.lib.stream
 
 import com.sd.lib.stream.factory.DefaultStreamFactory
 import com.sd.lib.stream.factory.DefaultStreamFactory.CreateParam
-import com.sd.lib.stream.factory.WeakCacheDefaultStreamFactory
+import com.sd.lib.stream.factory.WeakCacheStreamFactory
 import com.sd.lib.stream.utils.LibUtils
 import java.util.concurrent.ConcurrentHashMap
 
@@ -52,7 +52,7 @@ object DefaultStreamManager {
         val defaultClass = _mapDefaultStreamClass[clazz] ?: return null
 
         if (_defaultStreamFactory == null) {
-            _defaultStreamFactory = WeakCacheDefaultStreamFactory()
+            _defaultStreamFactory = WeakCacheStreamFactory()
         }
         return _defaultStreamFactory!!.create(CreateParam(clazz, defaultClass))
     }
