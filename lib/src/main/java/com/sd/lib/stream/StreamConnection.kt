@@ -44,22 +44,16 @@ abstract class StreamConnection {
      */
     @JvmOverloads
     fun setPriority(priority: Int, clazz: Class<out FStream>? = null) {
-        synchronized(_manager) {
-            /**
-             * 由于[StreamHolder.sort]方法中锁住[FStreamManager]对象后根据优先级排序，
-             * 所以这边更改优先级的时候也要锁住[FStreamManager]对象
-             */
-            if (clazz == null) {
+        if (clazz == null) {
+            synchronized(_mapItem) {
                 for (item in _mapItem.values) {
                     item.setPriority(priority)
                 }
-            } else {
-                checkClassInterface(clazz)
-                checkClassAssignable(clazz)
-
-                val item = _mapItem[clazz]
-                item?.setPriority(priority)
             }
+        } else {
+            checkClassInterface(clazz)
+            checkClassAssignable(clazz)
+            _mapItem[clazz]?.setPriority(priority)
         }
     }
 
@@ -69,8 +63,7 @@ abstract class StreamConnection {
     fun breakDispatch(clazz: Class<out FStream>) {
         checkClassInterface(clazz)
         checkClassAssignable(clazz)
-        val item = _mapItem[clazz]
-        item?.breakDispatch()
+        _mapItem[clazz]?.breakDispatch()
     }
 
     internal fun getItem(clazz: Class<out FStream>): ConnectionItem? {
@@ -112,6 +105,7 @@ internal abstract class ConnectionItem {
     /**
      * 设置优先级
      */
+    @Synchronized
     fun setPriority(priority: Int) {
         if (iPriority != priority) {
             iPriority = priority
