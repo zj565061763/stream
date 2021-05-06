@@ -99,7 +99,7 @@ internal class StreamHolder {
 
         if (_manager.isDebug) {
             Log.i(FStream::class.java.simpleName,
-                    "onPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size}  stream:${stream}")
+                    "notifyPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size}  stream:${stream}")
         }
     }
 
