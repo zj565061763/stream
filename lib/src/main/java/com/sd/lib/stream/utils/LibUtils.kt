@@ -29,7 +29,7 @@ internal object LibUtils {
                 }
             }
 
-            tClass = tClass.superclass
+            tClass = tClass.superclass as Class<*>
         }
         return set
     }
