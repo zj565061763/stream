@@ -9,7 +9,7 @@ import java.lang.ref.WeakReference
 /**
  * 将流对象和Activity绑定，在[Window.getDecorView]对象被移除的时候取消注册流对象
  */
-class ActivityStreamBinder : StreamBinder<Activity> {
+internal class ActivityStreamBinder : StreamBinder<Activity> {
     private val _decorView: WeakReference<View>
 
     constructor(stream: FStream, target: Activity) : super(stream, target) {

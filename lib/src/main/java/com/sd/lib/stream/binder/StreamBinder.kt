@@ -5,7 +5,7 @@ import com.sd.lib.stream.FStream
 import com.sd.lib.stream.FStreamManager
 import java.lang.ref.WeakReference
 
-abstract class StreamBinder<T> {
+internal abstract class StreamBinder<T> {
     private val _stream: WeakReference<FStream>
     private val _target: WeakReference<T>
 

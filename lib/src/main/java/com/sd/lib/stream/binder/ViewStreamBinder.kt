@@ -9,7 +9,7 @@ import com.sd.lib.stream.FStream
 /**
  * 监听[View.OnAttachStateChangeListener]自动注册和取消注册流对象
  */
-class ViewStreamBinder : StreamBinder<View> {
+internal class ViewStreamBinder : StreamBinder<View> {
     constructor(stream: FStream, target: View) : super(stream, target)
 
     override fun bind(): Boolean {
