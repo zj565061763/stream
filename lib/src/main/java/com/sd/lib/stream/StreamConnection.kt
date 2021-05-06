@@ -13,7 +13,11 @@ abstract class StreamConnection {
 
         for (item in classes) {
             checkClassInterface(item)
-            _mapItem[item] = ConnectionItem(item)
+            _mapItem[item] = object : ConnectionItem(item) {
+                override fun onPriorityChanged(priority: Int, clazz: Class<out FStream>) {
+                    this@StreamConnection.onPriorityChanged(priority, _stream, clazz)
+                }
+            }
         }
     }
 
@@ -65,28 +69,13 @@ abstract class StreamConnection {
     fun breakDispatch(clazz: Class<out FStream>) {
         checkClassInterface(clazz)
         checkClassAssignable(clazz)
-        synchronized(clazz) {
-            val item = _mapItem[clazz]
-            item?.breakDispatch()
-        }
+        val item = _mapItem[clazz]
+        item?.breakDispatch()
     }
 
-    /**
-     * 是否需要停止分发
-     */
-    internal fun shouldBreakDispatch(clazz: Class<out FStream>): Boolean {
+    internal fun getItem(clazz: Class<out FStream>): ConnectionItem? {
         checkClassInterface(clazz)
-        val item = _mapItem[clazz]
-        return item?.iShouldBreakDispatch ?: false
-    }
-
-    /**
-     * 重置停止分发标志
-     */
-    internal fun resetBreakDispatch(clazz: Class<out FStream>) {
-        checkClassInterface(clazz)
-        val item = _mapItem[clazz]
-        item?.resetBreakDispatch()
+        return _mapItem[clazz]
     }
 
     private fun checkClassAssignable(clazz: Class<out FStream>) {
@@ -97,52 +86,56 @@ abstract class StreamConnection {
         require(clazz.isInterface) { "class must be an interface class:${clazz.name}" }
     }
 
-    private inner class ConnectionItem {
-        private val _iClass: Class<out FStream>
+    /**
+     * 优先级变化回调
+     */
+    protected abstract fun onPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>)
+}
 
-        /** 优先级  */
-        @Volatile
-        var iPriority = 0
-            private set
+internal abstract class ConnectionItem {
+    private val _iClass: Class<out FStream>
 
-        /** 是否停止分发  */
-        @Volatile
-        var iShouldBreakDispatch = false
-            private set
+    /** 优先级  */
+    @Volatile
+    var iPriority = 0
+        private set
 
-        constructor(clazz: Class<out FStream>) {
-            _iClass = clazz
+    /** 是否停止分发  */
+    @Volatile
+    var iShouldBreakDispatch = false
+        private set
+
+    constructor(clazz: Class<out FStream>) {
+        _iClass = clazz
+    }
+
+    /**
+     * 设置优先级
+     */
+    fun setPriority(priority: Int) {
+        if (iPriority != priority) {
+            iPriority = priority
+            onPriorityChanged(priority, _iClass)
         }
+    }
 
-        /**
-         * 设置优先级
-         *
-         * @param priority
-         */
-        fun setPriority(priority: Int) {
-            if (iPriority != priority) {
-                iPriority = priority
-                onPriorityChanged(priority, _stream, _iClass)
-            }
-        }
+    /**
+     * 设置停止分发
+     */
+    @Synchronized
+    fun breakDispatch() {
+        iShouldBreakDispatch = true
+    }
 
-        /**
-         * 设置停止分发
-         */
-        fun breakDispatch() {
-            iShouldBreakDispatch = true
-        }
-
-        /**
-         * 重置停止分发标志
-         */
-        fun resetBreakDispatch() {
-            iShouldBreakDispatch = false
-        }
+    /**
+     * 重置停止分发标志
+     */
+    fun resetBreakDispatch() {
+        iShouldBreakDispatch = false
     }
 
     /**
      * 优先级变化回调
      */
-    protected abstract fun onPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>)
+    protected abstract fun onPriorityChanged(priority: Int, clazz: Class<out FStream>)
 }

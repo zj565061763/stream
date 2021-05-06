@@ -43,8 +43,9 @@ internal class ProxyInvocationHandler : InvocationHandler {
         val parameterTypes = method.parameterTypes
 
         if ("getTagForStream" == method.name &&
-                parameterTypes.size == 1 &&
-                parameterTypes[0] == Class::class.java) {
+            parameterTypes.size == 1 &&
+            parameterTypes[0] == Class::class.java
+        ) {
             return _tag
         }
 
@@ -64,8 +65,10 @@ internal class ProxyInvocationHandler : InvocationHandler {
             }
 
             if (_manager.isDebug) {
-                Log.i(FStream::class.java.simpleName,
-                        "return type:${returnType} but method result is null, so set to ${result} uuid:${uuid}")
+                Log.i(
+                    FStream::class.java.simpleName,
+                    "return type:${returnType} but method result is null, so set to ${result} uuid:${uuid}"
+                )
             }
         }
 
@@ -85,11 +88,12 @@ internal class ProxyInvocationHandler : InvocationHandler {
         val holderSize = holder?.size ?: 0
 
         if (_manager.isDebug) {
-            Log.i(FStream::class.java.simpleName, "notify -----> ${method}"
-                    + " arg:${(if (args == null) "" else Arrays.toString(args))}"
-                    + " tag:${_tag}"
-                    + " count:${holderSize}"
-                    + " uuid:${uuid}"
+            Log.i(
+                FStream::class.java.simpleName, "notify -----> ${method}"
+                        + " arg:${(if (args == null) "" else Arrays.toString(args))}"
+                        + " tag:${_tag}"
+                        + " count:${holderSize}"
+                        + " uuid:${uuid}"
             )
         }
 
@@ -149,8 +153,9 @@ internal class ProxyInvocationHandler : InvocationHandler {
                     method.invoke(item)
                 }
             } else {
-                synchronized(_streamClass) {
-                    connection!!.resetBreakDispatch(_streamClass)
+                val connectionItem = connection!!.getItem(_streamClass)!!
+                synchronized(connectionItem) {
+                    connectionItem.resetBreakDispatch()
 
                     // 调用流对象方法
                     itemResult = if (args != null) {
@@ -159,18 +164,19 @@ internal class ProxyInvocationHandler : InvocationHandler {
                         method.invoke(item)
                     }
 
-                    shouldBreakDispatch = connection.shouldBreakDispatch(_streamClass)
-                    connection.resetBreakDispatch(_streamClass)
+                    shouldBreakDispatch = connectionItem.iShouldBreakDispatch
+                    connectionItem.resetBreakDispatch()
                 }
             }
 
             if (_manager.isDebug) {
-                Log.i(FStream::class.java.simpleName, "notify"
-                        + " index:${index}"
-                        + " return:${if (isVoid) "" else itemResult}"
-                        + " stream:$${item}"
-                        + " shouldBreakDispatch:${shouldBreakDispatch}"
-                        + " uuid:${uuid}"
+                Log.i(
+                    FStream::class.java.simpleName, "notify"
+                            + " index:${index}"
+                            + " return:${if (isVoid) "" else itemResult}"
+                            + " stream:$${item}"
+                            + " shouldBreakDispatch:${shouldBreakDispatch}"
+                            + " uuid:${uuid}"
                 )
             }
 
