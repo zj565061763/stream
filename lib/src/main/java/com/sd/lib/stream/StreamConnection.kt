@@ -105,10 +105,17 @@ internal abstract class ConnectionItem {
     /**
      * 设置优先级
      */
-    @Synchronized
     fun setPriority(priority: Int) {
-        if (iPriority != priority) {
-            iPriority = priority
+        val isChanged: Boolean = synchronized(this@ConnectionItem) {
+            if (iPriority != priority) {
+                iPriority = priority
+                true
+            } else {
+                false
+            }
+        }
+
+        if (isChanged) {
             onPriorityChanged(priority, _iClass)
         }
     }
@@ -116,9 +123,10 @@ internal abstract class ConnectionItem {
     /**
      * 设置停止分发
      */
-    @Synchronized
     fun breakDispatch() {
-        iShouldBreakDispatch = true
+        synchronized(this@ConnectionItem) {
+            iShouldBreakDispatch = true
+        }
     }
 
     /**
