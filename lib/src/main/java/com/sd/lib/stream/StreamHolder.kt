@@ -10,10 +10,10 @@ internal class StreamHolder {
     /** 流接口 */
     private val _class: Class<out FStream>
 
-    /** 流接口对象 */
+    /** 流对象 */
     private val _streamHolder = LinkedHashSet<FStream>()
 
-    /** 保存设置了优先级的流对象  */
+    /** 设置了优先级的流对象  */
     private val _priorityStreamHolder = ConcurrentHashMap<FStream, Int>()
 
     /** 是否需要排序  */
