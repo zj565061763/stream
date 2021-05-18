@@ -19,11 +19,11 @@ object DefaultStreamManager {
      * 注册默认的流接口实现类
      */
     @Synchronized
-    fun register(clazz: Class<out FStream>) {
-        val set = LibUtils.findAllStreamClass(clazz)
-        require(set.isNotEmpty()) { "stream class was not found in $clazz" }
+    fun register(defaultClass: Class<out FStream>) {
+        val set = LibUtils.findAllStreamClass(defaultClass)
+        require(set.isNotEmpty()) { "stream class was not found in $defaultClass" }
         for (item in set) {
-            _mapDefaultStreamClass[item] = clazz
+            _mapDefaultStreamClass[item] = defaultClass
         }
     }
 
@@ -31,8 +31,8 @@ object DefaultStreamManager {
      * 取消注册默认的流接口实现类
      */
     @Synchronized
-    fun unregister(clazz: Class<out FStream?>) {
-        val set = LibUtils.findAllStreamClass(clazz)
+    fun unregister(defaultClass: Class<out FStream?>) {
+        val set = LibUtils.findAllStreamClass(defaultClass)
         for (item in set) {
             _mapDefaultStreamClass.remove(item)
         }
