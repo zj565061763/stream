@@ -13,23 +13,23 @@ internal object LibUtils {
         require(!Proxy.isProxyClass(clazz)) { "proxy class is not supported" }
 
         val set = HashSet<Class<out FStream>>()
-        var tClass = clazz
-        while (tClass != null) {
-            if (!FStream::class.java.isAssignableFrom(tClass)) {
+        var current = clazz
+        while (current != null) {
+            if (!FStream::class.java.isAssignableFrom(current)) {
                 break
             }
 
-            if (tClass.isInterface) {
+            if (current.isInterface) {
                 throw RuntimeException("class must not be an interface")
             }
 
-            for (item in tClass.interfaces) {
+            for (item in current.interfaces) {
                 if (FStream::class.java.isAssignableFrom(item)) {
                     set.add(item as Class<out FStream>)
                 }
             }
 
-            tClass = tClass.superclass as Class<*>
+            current = current.superclass
         }
         return set
     }
