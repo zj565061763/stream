@@ -4,15 +4,16 @@ plugins {
     id 'maven-publish'
 }
 
+def libGroupId = "com.sd.lib.android"
 def libArtifactId = "stream"
 def libVersionCode = 20210427
 def libVersionName = "1.3.0-beta12"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode libVersionCode
         versionName libVersionName
     }
@@ -24,6 +25,15 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        kotlinOptions.freeCompilerArgs += ['-module-name', "$libGroupId.$libArtifactId"]
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
@@ -31,8 +41,8 @@ android {
 }
 
 dependencies {
-    implementation "androidx.core:core-ktx:1.3.2"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.core:core-ktx:1.3.2"
 }
 
 task generateSourcesJar(type: Jar) {
@@ -46,7 +56,7 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.release
 
-                groupId = "com.sd.lib.android"
+                groupId = libGroupId
                 artifactId = libArtifactId
                 version = libVersionName
 
