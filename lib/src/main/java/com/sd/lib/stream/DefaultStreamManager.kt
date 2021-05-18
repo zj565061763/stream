@@ -11,7 +11,9 @@ import java.util.concurrent.ConcurrentHashMap
  */
 object DefaultStreamManager {
     private val _mapDefaultStreamClass: MutableMap<Class<out FStream>, Class<out FStream>> = ConcurrentHashMap()
-    private var _defaultStreamFactory: DefaultStreamFactory? = null
+
+    /** 默认流接口对象工厂 */
+    var streamFactory: DefaultStreamFactory = WeakCacheStreamFactory()
 
     /**
      * 注册默认的流接口实现类
@@ -37,23 +39,11 @@ object DefaultStreamManager {
     }
 
     /**
-     * 设置[DefaultStreamFactory]
-     */
-    @Synchronized
-    fun setStreamFactory(factory: DefaultStreamFactory?) {
-        _defaultStreamFactory = factory
-    }
-
-    /**
      * 返回默认的流对象
      */
     @Synchronized
     internal fun getStream(clazz: Class<out FStream>): FStream? {
         val defaultClass = _mapDefaultStreamClass[clazz] ?: return null
-
-        if (_defaultStreamFactory == null) {
-            _defaultStreamFactory = WeakCacheStreamFactory()
-        }
-        return _defaultStreamFactory!!.create(CreateParam(clazz, defaultClass))
+        return streamFactory.create(CreateParam(clazz, defaultClass))
     }
 }
