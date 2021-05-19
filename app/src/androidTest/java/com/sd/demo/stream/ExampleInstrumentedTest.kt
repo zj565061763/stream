@@ -100,5 +100,7 @@ class ExampleInstrumentedTest {
         Assert.assertEquals("default@http", result)
 
         DefaultStreamManager.unregister(TestDefaultStream::class.java)
+
+        Assert.assertEquals(null, proxy.getContent("http"))
     }
 }
