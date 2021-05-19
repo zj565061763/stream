@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import com.sd.lib.stream.binder.ActivityStreamBinder;
 import com.sd.lib.stream.binder.StreamBinder;
 import com.sd.lib.stream.binder.ViewStreamBinder;
-import com.sd.lib.stream.factory.DefaultStreamFactory;
 import com.sd.lib.stream.utils.LibUtils;
 
 import java.util.Map;
@@ -284,37 +283,5 @@ public class FStreamManager {
     @Deprecated
     public void registerDefaultStream(@NonNull Class<? extends FStream> clazz) {
         DefaultStreamManager.INSTANCE.register(clazz);
-    }
-
-    /**
-     * {@link DefaultStreamManager#unregister(Class)}
-     */
-    @Deprecated
-    public void unregisterDefaultStream(@NonNull Class<? extends FStream> clazz) {
-        DefaultStreamManager.INSTANCE.unregister(clazz);
-    }
-
-    /**
-     * {@link DefaultStreamManager#setStreamFactory(DefaultStreamFactory)}
-     */
-    @Deprecated
-    public void setDefaultStreamFactory(@Nullable DefaultStreamFactory factory) {
-        DefaultStreamManager.INSTANCE.setStreamFactory(factory);
-    }
-
-    /**
-     * {@link #bindStream(FStream, Activity)}
-     */
-    @Deprecated
-    public void bindActivity(@NonNull FStream stream, @NonNull Activity target) {
-        bindStream(stream, target);
-    }
-
-    /**
-     * {@link #bindStream(FStream, View)}
-     */
-    @Deprecated
-    public void bindView(@NonNull FStream stream, @NonNull View target) {
-        bindStream(stream, target);
     }
 }
