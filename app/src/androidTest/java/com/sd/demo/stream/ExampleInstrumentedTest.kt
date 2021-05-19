@@ -22,6 +22,17 @@ class ExampleInstrumentedTest {
     fun testNormal() {
         DefaultStreamManager.register(TestDefaultStream::class.java)
 
+        val stream0 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "0"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return "hello tag"
+            }
+        }
+
         val stream1 = object : TestStream {
             override fun getContent(url: String): String {
                 Assert.assertEquals("http", url)
@@ -56,11 +67,13 @@ class ExampleInstrumentedTest {
         }
 
         FStreamManager.getInstance().run {
+            this.register(stream0)
             this.register(stream1).setPriority(-1)
             this.register(stream2)
             this.register(stream3).setPriority(1)
         }
 
+        Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream0)!!.getPriority(TestStream::class.java))
         Assert.assertEquals(-1, FStreamManager.getInstance().getConnection(stream1)!!.getPriority(TestStream::class.java))
         Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream2)!!.getPriority(TestStream::class.java))
         Assert.assertEquals(1, FStreamManager.getInstance().getConnection(stream3)!!.getPriority(TestStream::class.java))
@@ -104,12 +117,14 @@ class ExampleInstrumentedTest {
 
         DefaultStreamManager.unregister(TestDefaultStream::class.java)
         FStreamManager.getInstance().run {
+            this.unregister(stream0)
             this.unregister(stream1)
             this.unregister(stream2)
             this.unregister(stream3)
             this.unregister(stream4)
         }
 
+        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream0))
         Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream1))
         Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream2))
         Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream3))
