@@ -1,7 +1,9 @@
 package com.sd.demo.stream
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.sd.demo.stream.utils.TestDefaultStream
 import com.sd.demo.stream.utils.TestStream
+import com.sd.lib.stream.DefaultStreamManager
 import com.sd.lib.stream.FStream
 import com.sd.lib.stream.FStreamManager
 import org.junit.Assert
@@ -18,6 +20,8 @@ import java.lang.reflect.Method
 class ExampleInstrumentedTest {
     @Test
     fun testNormal() {
+        DefaultStreamManager.register(TestDefaultStream::class.java)
+
         val stream1 = object : TestStream {
             override fun getContent(url: String): String {
                 FStreamManager.getInstance().unregister(this)
@@ -83,5 +87,18 @@ class ExampleInstrumentedTest {
         Assert.assertEquals("3", listResult[0])
         Assert.assertEquals("2", listResult[1])
         Assert.assertEquals("1", listResult[2])
+
+        DefaultStreamManager.unregister(TestDefaultStream::class.java)
+    }
+
+    @Test
+    fun testDefaultStream() {
+        DefaultStreamManager.register(TestDefaultStream::class.java)
+
+        val proxy = FStream.ProxyBuilder().build(TestStream::class.java)
+        val result = proxy.getContent("http")
+        Assert.assertEquals("default@http", result)
+
+        DefaultStreamManager.unregister(TestDefaultStream::class.java)
     }
 }
