@@ -31,10 +31,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
 
     private fun checkTag(stream: FStream): Boolean {
         val tag = stream.getTagForStream(_streamClass)
-        if (_tag === tag) {
-            return true
-        }
-        return _tag != null && _tag == tag
+        return _tag == tag
     }
 
     @Throws(Throwable::class)
