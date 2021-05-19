@@ -24,9 +24,7 @@ class ExampleInstrumentedTest {
 
         val stream1 = object : TestStream {
             override fun getContent(url: String): String {
-                FStreamManager.getInstance().unregister(this)
                 Assert.assertEquals("http", url)
-                Assert.assertEquals(null, FStreamManager.getInstance().getConnection(this))
                 return "1"
             }
 
@@ -37,9 +35,7 @@ class ExampleInstrumentedTest {
 
         val stream2 = object : TestStream {
             override fun getContent(url: String): String {
-                FStreamManager.getInstance().unregister(this)
                 Assert.assertEquals("http", url)
-                Assert.assertEquals(null, FStreamManager.getInstance().getConnection(this))
                 return "2"
             }
 
@@ -50,9 +46,7 @@ class ExampleInstrumentedTest {
 
         val stream3 = object : TestStream {
             override fun getContent(url: String): String {
-                FStreamManager.getInstance().unregister(this)
                 Assert.assertEquals("http", url)
-                Assert.assertEquals(null, FStreamManager.getInstance().getConnection(this))
                 return "3"
             }
 
@@ -89,6 +83,15 @@ class ExampleInstrumentedTest {
         Assert.assertEquals("1", listResult[2])
 
         DefaultStreamManager.unregister(TestDefaultStream::class.java)
+        FStreamManager.getInstance().run {
+            this.unregister(stream1)
+            this.unregister(stream2)
+            this.unregister(stream3)
+        }
+
+        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream1))
+        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream2))
+        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream3))
     }
 
     @Test
