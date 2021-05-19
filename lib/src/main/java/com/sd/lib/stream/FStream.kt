@@ -109,7 +109,7 @@ interface FStream {
          * @param method       方法
          * @param methodParams 方法参数
          * @param results      所有流对象的返回值
-         * @return
+         * @return 返回选定的返回值
          */
         fun filter(method: Method, methodParams: Array<Any?>?, results: List<Any?>): Any?
     }
