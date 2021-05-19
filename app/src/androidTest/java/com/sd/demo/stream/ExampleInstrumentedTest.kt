@@ -2,6 +2,7 @@ package com.sd.demo.stream
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.sd.demo.stream.utils.TestDefaultStream
+import com.sd.demo.stream.utils.TestStickyStream
 import com.sd.demo.stream.utils.TestStream
 import com.sd.lib.stream.DefaultStreamManager
 import com.sd.lib.stream.FStream
@@ -342,6 +343,43 @@ class ExampleInstrumentedTest {
             this.unregister(stream1)
             this.unregister(stream2)
             this.unregister(stream3)
+        }
+    }
+
+    @Test
+    fun testSticky() {
+        val stream1 = object : TestStickyStream {
+            override fun notifyContent(content: String) {
+                Assert.assertEquals("http", content)
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        FStreamManager.getInstance().register(stream1)
+
+        val proxy = FStream.ProxyBuilder().setSticky(true).build(TestStickyStream::class.java)
+        proxy.notifyContent("http")
+
+        var stickyContent: String? = null
+        val stream2 = object : TestStickyStream {
+            override fun notifyContent(content: String) {
+                stickyContent = content
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+        FStreamManager.getInstance().register(stream2).stickyInvoke()
+
+        Assert.assertEquals("http", stickyContent)
+
+        FStreamManager.getInstance().run {
+            this.unregister(stream1)
+            this.unregister(stream2)
         }
     }
 }

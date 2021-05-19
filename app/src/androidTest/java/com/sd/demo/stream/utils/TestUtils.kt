@@ -15,3 +15,7 @@ class TestDefaultStream : TestStream {
         return null
     }
 }
+
+interface TestStickyStream : FStream {
+    fun notifyContent(content: String)
+}
