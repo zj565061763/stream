@@ -20,8 +20,8 @@ class ExampleInstrumentedTest {
     fun testNormal() {
         val stream1 = object : TestStream {
             override fun getContent(url: String): String {
-                Assert.assertEquals("http", url)
                 FStreamManager.getInstance().unregister(this)
+                Assert.assertEquals("http", url)
                 Assert.assertEquals(null, FStreamManager.getInstance().getConnection(this))
                 return "1"
             }
@@ -33,8 +33,8 @@ class ExampleInstrumentedTest {
 
         val stream2 = object : TestStream {
             override fun getContent(url: String): String {
-                Assert.assertEquals("http", url)
                 FStreamManager.getInstance().unregister(this)
+                Assert.assertEquals("http", url)
                 Assert.assertEquals(null, FStreamManager.getInstance().getConnection(this))
                 return "2"
             }
@@ -46,8 +46,8 @@ class ExampleInstrumentedTest {
 
         val stream3 = object : TestStream {
             override fun getContent(url: String): String {
-                Assert.assertEquals("http", url)
                 FStreamManager.getInstance().unregister(this)
+                Assert.assertEquals("http", url)
                 Assert.assertEquals(null, FStreamManager.getInstance().getConnection(this))
                 return "3"
             }
@@ -58,12 +58,12 @@ class ExampleInstrumentedTest {
         }
 
         FStreamManager.getInstance().run {
-            this.register(stream1)
+            this.register(stream1).setPriority(-1)
             this.register(stream2)
             this.register(stream3).setPriority(1)
         }
 
-        Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream1)!!.getPriority(TestStream::class.java))
+        Assert.assertEquals(-1, FStreamManager.getInstance().getConnection(stream1)!!.getPriority(TestStream::class.java))
         Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream2)!!.getPriority(TestStream::class.java))
         Assert.assertEquals(1, FStreamManager.getInstance().getConnection(stream3)!!.getPriority(TestStream::class.java))
 
@@ -81,7 +81,7 @@ class ExampleInstrumentedTest {
         Assert.assertEquals("3", result)
         Assert.assertEquals(3, listResult.size)
         Assert.assertEquals("3", listResult[0])
-        Assert.assertEquals("1", listResult[1])
-        Assert.assertEquals("2", listResult[2])
+        Assert.assertEquals("2", listResult[1])
+        Assert.assertEquals("1", listResult[2])
     }
 }
