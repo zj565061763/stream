@@ -56,10 +56,10 @@ internal class StreamHolder {
      * 返回流集合
      */
     fun toCollection(): Collection<FStream> {
-        if (_isNeedSort) {
-            return sort()
+        return if (_isNeedSort) {
+            sort()
         } else {
-            return ArrayList(_streamHolder)
+            ArrayList(_streamHolder)
         }
     }
 
@@ -76,8 +76,10 @@ internal class StreamHolder {
             _isNeedSort = false
 
             if (_manager.isDebug) {
-                Log.i(FStream::class.java.simpleName,
-                        "sort stream for class:" + _class.name)
+                Log.i(
+                    FStream::class.java.simpleName,
+                    "sort stream for class:" + _class.name
+                )
             }
             return listEntry
         }
@@ -98,8 +100,10 @@ internal class StreamHolder {
         _isNeedSort = true
 
         if (_manager.isDebug) {
-            Log.i(FStream::class.java.simpleName,
-                    "notifyPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size}  stream:${stream}")
+            Log.i(
+                FStream::class.java.simpleName,
+                "notifyPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size}  stream:${stream}"
+            )
         }
     }
 
