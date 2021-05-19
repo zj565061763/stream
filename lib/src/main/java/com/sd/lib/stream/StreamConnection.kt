@@ -1,24 +1,27 @@
 package com.sd.lib.stream
 
-import java.util.concurrent.ConcurrentHashMap
+import java.util.*
+import kotlin.collections.HashMap
 
 abstract class StreamConnection {
     private val _manager: FStreamManager
     private val _stream: FStream
-    private val _mapItem = ConcurrentHashMap<Class<out FStream>, ConnectionItem>()
+    private val _mapItem: Map<Class<out FStream>, ConnectionItem>
 
     internal constructor(stream: FStream, classes: Array<Class<out FStream>>, manager: FStreamManager) {
         _stream = stream
         _manager = manager
 
+        val map = HashMap<Class<out FStream>, ConnectionItem>()
         for (item in classes) {
             checkClassInterface(item)
-            _mapItem[item] = object : ConnectionItem(item) {
+            map[item] = object : ConnectionItem(item) {
                 override fun onPriorityChanged(priority: Int, clazz: Class<out FStream>) {
                     this@StreamConnection.onPriorityChanged(priority, _stream, clazz)
                 }
             }
         }
+        _mapItem = Collections.unmodifiableMap(map)
     }
 
     /**
