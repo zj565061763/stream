@@ -48,10 +48,8 @@ abstract class StreamConnection {
     @JvmOverloads
     fun setPriority(priority: Int, clazz: Class<out FStream>? = null) {
         if (clazz == null) {
-            synchronized(_mapItem) {
-                for (item in _mapItem.values) {
-                    item.setPriority(priority)
-                }
+            for (item in _mapItem.values) {
+                item.setPriority(priority)
             }
         } else {
             checkClassInterface(clazz)
