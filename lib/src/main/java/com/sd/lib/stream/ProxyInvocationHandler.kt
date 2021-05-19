@@ -162,7 +162,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
                         method.invoke(item)
                     }
 
-                    shouldBreakDispatch = connectionItem.iShouldBreakDispatch
+                    shouldBreakDispatch = connectionItem.shouldBreakDispatch
                     connectionItem.resetBreakDispatch()
                 }
             }

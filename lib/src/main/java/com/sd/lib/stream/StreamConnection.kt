@@ -36,7 +36,7 @@ abstract class StreamConnection {
     fun getPriority(clazz: Class<out FStream>): Int {
         checkClassInterface(clazz)
         val item = _mapItem[clazz]
-        return item?.iPriority ?: 0
+        return item?.priority ?: 0
     }
 
     /**
@@ -86,20 +86,20 @@ abstract class StreamConnection {
 }
 
 internal abstract class ConnectionItem {
-    private val _iClass: Class<out FStream>
+    private val _class: Class<out FStream>
 
     /** 优先级  */
     @Volatile
-    var iPriority = 0
+    var priority = 0
         private set
 
     /** 是否停止分发  */
     @Volatile
-    var iShouldBreakDispatch = false
+    var shouldBreakDispatch = false
         private set
 
     constructor(clazz: Class<out FStream>) {
-        _iClass = clazz
+        _class = clazz
     }
 
     /**
@@ -107,8 +107,8 @@ internal abstract class ConnectionItem {
      */
     fun setPriority(priority: Int) {
         val isChanged: Boolean = synchronized(this@ConnectionItem) {
-            if (iPriority != priority) {
-                iPriority = priority
+            if (this.priority != priority) {
+                this.priority = priority
                 true
             } else {
                 false
@@ -116,7 +116,7 @@ internal abstract class ConnectionItem {
         }
 
         if (isChanged) {
-            onPriorityChanged(priority, _iClass)
+            onPriorityChanged(priority, _class)
         }
     }
 
@@ -125,7 +125,7 @@ internal abstract class ConnectionItem {
      */
     fun breakDispatch() {
         synchronized(this@ConnectionItem) {
-            iShouldBreakDispatch = true
+            shouldBreakDispatch = true
         }
     }
 
@@ -133,7 +133,7 @@ internal abstract class ConnectionItem {
      * 重置停止分发标志
      */
     fun resetBreakDispatch() {
-        iShouldBreakDispatch = false
+        shouldBreakDispatch = false
     }
 
     /**
