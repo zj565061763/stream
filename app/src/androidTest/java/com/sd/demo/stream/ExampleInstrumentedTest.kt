@@ -279,4 +279,69 @@ class ExampleInstrumentedTest {
             this.unregister(stream3)
         }
     }
+
+    @Test
+    fun testDispatchBreak() {
+        val stream1 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "1"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        val stream2 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                FStreamManager.getInstance().getConnection(this)!!.breakDispatch(TestStream::class.java)
+                return "2"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        val stream3 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "3"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        FStreamManager.getInstance().run {
+            this.register(stream1)
+            this.register(stream2)
+            this.register(stream3)
+        }
+
+        val listResult = mutableListOf<Any?>()
+        val proxy = FStream.ProxyBuilder()
+            .setResultFilter(object : FStream.ResultFilter {
+                override fun filter(method: Method, methodParams: Array<Any?>?, results: List<Any?>): Any? {
+                    listResult.addAll(results)
+                    return results.last()
+                }
+            })
+            .build(TestStream::class.java)
+
+        val result = proxy.getContent("http")
+        Assert.assertEquals("2", result)
+        Assert.assertEquals(2, listResult.size)
+        Assert.assertEquals("1", listResult[0])
+        Assert.assertEquals("2", listResult[1])
+
+        FStreamManager.getInstance().run {
+            this.unregister(stream1)
+            this.unregister(stream2)
+            this.unregister(stream3)
+        }
+    }
 }
