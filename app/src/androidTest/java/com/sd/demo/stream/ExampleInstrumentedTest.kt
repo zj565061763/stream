@@ -63,6 +63,10 @@ class ExampleInstrumentedTest {
             this.register(stream3).setPriority(1)
         }
 
+        Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream1)!!.getPriority(TestStream::class.java))
+        Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream2)!!.getPriority(TestStream::class.java))
+        Assert.assertEquals(1, FStreamManager.getInstance().getConnection(stream3)!!.getPriority(TestStream::class.java))
+
         val listResult = mutableListOf<Any?>()
         val proxy = FStream.ProxyBuilder()
             .setResultFilter(object : FStream.ResultFilter {
