@@ -82,33 +82,34 @@ internal class ProxyInvocationHandler : InvocationHandler {
     @Throws(Throwable::class)
     private fun processMainLogic(isVoid: Boolean, method: Method, args: Array<Any?>?, uuid: String?): Any? {
         val holder = _manager.getStreamHolder(_streamClass)
-        val holderSize = holder?.size ?: 0
+        var isDefaultStream = false
+
+        var listStream = holder?.toCollection()
+        if (listStream == null || listStream.isEmpty()) {
+            // 尝试创建默认流对象
+            val stream = DefaultStreamManager.getStream(_streamClass)
+            if (stream != null) {
+                listStream = listOf(stream)
+                isDefaultStream = true
+
+                if (_manager.isDebug) {
+                    Log.i(FStream::class.java.simpleName, "create default stream:$stream uuid:$uuid")
+                }
+            }
+        }
+
+        if (listStream == null || listStream.isEmpty()) {
+            return null
+        }
 
         if (_manager.isDebug) {
             Log.i(
                 FStream::class.java.simpleName, "notify -----> ${method}"
                         + " arg:${(if (args == null) "" else Arrays.toString(args))}"
                         + " tag:${_tag}"
-                        + " count:${holderSize}"
+                        + " count:${listStream.size}"
                         + " uuid:${uuid}"
             )
-        }
-
-        var listStream: Collection<FStream>? = null
-        var isDefaultStream = false
-
-        if (holderSize > 0) {
-            listStream = holder!!.toCollection()
-        } else {
-            // 尝试创建默认流对象
-            val stream = DefaultStreamManager.getStream(_streamClass) ?: return null
-
-            listStream = listOf(stream)
-            isDefaultStream = true
-
-            if (_manager.isDebug) {
-                Log.i(FStream::class.java.simpleName, "create default stream:$stream uuid:$uuid")
-            }
         }
 
         val filterResult = _resultFilter != null && !isVoid
