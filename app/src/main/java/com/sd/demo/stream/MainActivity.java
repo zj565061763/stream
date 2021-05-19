@@ -1,4 +1,4 @@
-package com.sd.stream;
+package com.sd.demo.stream;
 
 import android.os.Bundle;
 import android.util.Log;
