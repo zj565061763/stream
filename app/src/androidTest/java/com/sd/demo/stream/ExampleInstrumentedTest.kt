@@ -143,4 +143,140 @@ class ExampleInstrumentedTest {
 
         Assert.assertEquals(null, proxy.getContent("http"))
     }
+
+    @Test
+    fun testDispatchCallbackBefore() {
+        val stream1 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "1"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        val stream2 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "2"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        val stream3 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "3"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        FStreamManager.getInstance().run {
+            this.register(stream1)
+            this.register(stream2)
+            this.register(stream3)
+        }
+
+        val proxy = FStream.ProxyBuilder()
+            .setDispatchCallback(object : FStream.DispatchCallback {
+                override fun beforeDispatch(stream: FStream, method: Method, methodParams: Array<Any?>?): Boolean {
+                    return true
+                }
+
+                override fun afterDispatch(stream: FStream, method: Method, methodParams: Array<Any?>?, methodResult: Any?): Boolean {
+                    return false
+                }
+            })
+            .build(TestStream::class.java)
+
+        val result = proxy.getContent("http")
+        Assert.assertEquals(null, result)
+
+        FStreamManager.getInstance().run {
+            this.unregister(stream1)
+            this.unregister(stream2)
+            this.unregister(stream3)
+        }
+    }
+
+    @Test
+    fun testDispatchCallbackAfter() {
+        val stream1 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "1"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        val stream2 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "2"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        val stream3 = object : TestStream {
+            override fun getContent(url: String): String {
+                Assert.assertEquals("http", url)
+                return "3"
+            }
+
+            override fun getTagForStream(clazz: Class<out FStream>): Any? {
+                return null
+            }
+        }
+
+        FStreamManager.getInstance().run {
+            this.register(stream1)
+            this.register(stream2)
+            this.register(stream3)
+        }
+
+        val listResult = mutableListOf<Any?>()
+        val proxy = FStream.ProxyBuilder()
+            .setResultFilter(object : FStream.ResultFilter {
+                override fun filter(method: Method, methodParams: Array<Any?>?, results: List<Any?>): Any? {
+                    listResult.addAll(results)
+                    return results.last()
+                }
+            })
+            .setDispatchCallback(object : FStream.DispatchCallback {
+                override fun beforeDispatch(stream: FStream, method: Method, methodParams: Array<Any?>?): Boolean {
+                    return false
+                }
+
+                override fun afterDispatch(stream: FStream, method: Method, methodParams: Array<Any?>?, methodResult: Any?): Boolean {
+                    return "2" == methodResult
+                }
+            })
+            .build(TestStream::class.java)
+
+        val result = proxy.getContent("http")
+        Assert.assertEquals("2", result)
+        Assert.assertEquals(2, listResult.size)
+        Assert.assertEquals("1", listResult[0])
+        Assert.assertEquals("2", listResult[1])
+
+        FStreamManager.getInstance().run {
+            this.unregister(stream1)
+            this.unregister(stream2)
+            this.unregister(stream3)
+        }
+    }
 }
