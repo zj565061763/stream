@@ -16,8 +16,6 @@ internal object StickyInvokeManager {
 
     /**
      * 代理对象创建触发
-     *
-     * @param clazz
      */
     fun proxyCreated(clazz: Class<out FStream>) {
         synchronized(clazz) {
@@ -36,13 +34,11 @@ internal object StickyInvokeManager {
 
     /**
      * 代理对象销毁触发
-     *
-     * @param clazz
      */
     fun proxyDestroyed(clazz: Class<out FStream>) {
         synchronized(clazz) {
             val count = _mapProxyCount[clazz]
-                    ?: throw RuntimeException("count is null when destroy proxy:" + clazz.name)
+                ?: throw RuntimeException("count is null when destroy proxy:" + clazz.name)
 
             val targetCount = count - 1
             if (targetCount <= 0) {
@@ -60,11 +56,6 @@ internal object StickyInvokeManager {
 
     /**
      * 代理方法调用
-     *
-     * @param clazz
-     * @param streamTag
-     * @param method
-     * @param args
      */
     fun proxyInvoke(clazz: Class<out FStream>, streamTag: Any?, method: Method, args: Array<Any?>?) {
         if (args == null || args.isEmpty()) {
@@ -86,7 +77,7 @@ internal object StickyInvokeManager {
 
             var holder = _mapMethodInfo[clazz]
             if (holder == null) {
-                // holder用HashMap保存，允许key为null
+                // holder用HashMap保存，允许key为null，key为tag
                 holder = HashMap()
                 _mapMethodInfo[clazz] = holder
             }
