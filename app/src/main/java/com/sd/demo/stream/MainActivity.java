@@ -1,7 +1,6 @@
 package com.sd.demo.stream;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.sd.lib.stream.FStream;
 import com.sd.lib.stream.FStreamManager;
-import com.sd.lib.stream.StreamConnection;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -70,31 +68,6 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     };
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        final TestFragment.StickyCallback stickyCallback = new TestFragment.StickyCallback() {
-            @Override
-            public void onContent(String content) {
-                FStreamManager.getInstance().unregister(this);
-                Log.i(TAG, "onContent:" + content);
-            }
-
-            @Nullable
-            @Override
-            public Object getTagForStream(@NonNull Class<? extends FStream> clazz) {
-                return null;
-            }
-        };
-
-        final StreamConnection connection = FStreamManager.getInstance().register(stickyCallback);
-        /**
-         * 粘性触发方法，用最后一次触发的参数触发方法
-         */
-        connection.stickyInvoke();
-    }
 
     @Override
     protected void onDestroy() {
