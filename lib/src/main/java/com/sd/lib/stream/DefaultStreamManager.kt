@@ -4,13 +4,12 @@ import com.sd.lib.stream.factory.DefaultStreamFactory
 import com.sd.lib.stream.factory.DefaultStreamFactory.CreateParam
 import com.sd.lib.stream.factory.WeakCacheStreamFactory
 import com.sd.lib.stream.utils.LibUtils
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 默认流接口管理
  */
 object DefaultStreamManager {
-    private val _mapDefaultStreamClass: MutableMap<Class<out FStream>, Class<out FStream>> = ConcurrentHashMap()
+    private val _mapDefaultStreamClass: MutableMap<Class<out FStream>, Class<out FStream>> = HashMap()
 
     /** 默认流接口对象工厂 */
     var streamFactory: DefaultStreamFactory = WeakCacheStreamFactory()
