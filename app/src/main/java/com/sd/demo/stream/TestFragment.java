@@ -22,7 +22,7 @@ public class TestFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final Button button = new Button(container.getContext());
+        final Button button = new Button(getContext());
         button.setAllCaps(false);
         button.setText("click");
         button.setOnClickListener(new View.OnClickListener() {
