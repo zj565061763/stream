@@ -73,7 +73,7 @@ interface FStream {
 
             this.streamClass = clazz
 
-            val handler = ProxyInvocationHandler(this, FStreamManager.instance)
+            val handler = ProxyInvocationHandler(this, FStreamManager)
             val proxy = Proxy.newProxyInstance(clazz.classLoader, arrayOf<Class<*>>(clazz), handler)
             return proxy as T
         }

@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
  * 流管理类
  */
 object FStreamManager {
+    @Deprecated("")
     @JvmStatic
     val instance by lazy { FStreamManager }
 

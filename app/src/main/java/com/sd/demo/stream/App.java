@@ -13,7 +13,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         // 打开调试模式
-        FStreamManager.getInstance().setDebug(true);
+        FStreamManager.INSTANCE.setDebug(true);
 
         // 注册默认的Stream
         DefaultStreamManager.INSTANCE.register(DefaultFragmentCallback.class);

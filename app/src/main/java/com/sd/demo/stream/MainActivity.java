@@ -21,13 +21,13 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().add(R.id.framelayout, new TestFragment()).commit();
 
         // 注册流对象
-        FStreamManager.getInstance().register(mCallback1);
+        FStreamManager.INSTANCE.register(mCallback1);
 
         // 注册流对象，并设置优先级，数值越大越先被通知，默认优先级：0
-        FStreamManager.getInstance().register(mCallback2).setPriority(-1);
+        FStreamManager.INSTANCE.register(mCallback2).setPriority(-1);
 
         // 绑定流对象，绑定之后会自动取消注册
-        FStreamManager.getInstance().bindStream(mCallback3, this);
+        FStreamManager.INSTANCE.bindStream(mCallback3, this);
     }
 
     private final TestFragment.FragmentCallback mCallback1 = new TestFragment.FragmentCallback() {
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
         // 要取消注册，否者流对象会一直被持有。
-        FStreamManager.getInstance().unregister(mCallback1);
-        FStreamManager.getInstance().unregister(mCallback2);
+        FStreamManager.INSTANCE.unregister(mCallback1);
+        FStreamManager.INSTANCE.unregister(mCallback2);
     }
 }
