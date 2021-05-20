@@ -146,26 +146,9 @@ public class FStreamManager {
 
     /**
      * 注册流对象
-     *
-     * @param stream
-     * @return null-注册失败
      */
     @NonNull
     public synchronized StreamConnection register(@NonNull FStream stream) {
-        return registerInternal(stream);
-    }
-
-    /**
-     * 取消注册流对象
-     *
-     * @param stream
-     */
-    public synchronized void unregister(@NonNull FStream stream) {
-        unregisterInternal(stream);
-    }
-
-    @NonNull
-    private StreamConnection registerInternal(@NonNull FStream stream) {
         if (stream == null) {
             throw new IllegalArgumentException("null argument");
         }
@@ -199,7 +182,10 @@ public class FStreamManager {
         return streamConnection;
     }
 
-    private void unregisterInternal(@NonNull FStream stream) {
+    /**
+     * 取消注册流对象
+     */
+    public synchronized void unregister(@NonNull FStream stream) {
         if (stream == null) {
             throw new IllegalArgumentException("null argument");
         }
