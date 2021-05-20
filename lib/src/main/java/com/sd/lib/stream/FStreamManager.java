@@ -12,8 +12,8 @@ import com.sd.lib.stream.binder.StreamBinder;
 import com.sd.lib.stream.binder.ViewStreamBinder;
 import com.sd.lib.stream.utils.LibUtils;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -255,12 +255,12 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final Set<Class<? extends FStream>> set = LibUtils.findStreamClass(stream.getClass());
-        if (set.isEmpty()) {
+        final Collection<Class<? extends FStream>> classes = LibUtils.findStreamClass(stream.getClass());
+        if (classes.isEmpty()) {
             throw new RuntimeException("stream class was not found in stream:" + stream);
         }
 
-        return set.toArray(new Class[set.size()]);
+        return classes.toArray(new Class[classes.size()]);
     }
 
     /**

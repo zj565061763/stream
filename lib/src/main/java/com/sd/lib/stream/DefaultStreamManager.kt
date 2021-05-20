@@ -19,9 +19,9 @@ object DefaultStreamManager {
      */
     @Synchronized
     fun register(defaultClass: Class<out FStream>) {
-        val set = LibUtils.findStreamClass(defaultClass)
-        require(set.isNotEmpty()) { "stream class was not found in $defaultClass" }
-        for (item in set) {
+        val classes = LibUtils.findStreamClass(defaultClass)
+        require(classes.isNotEmpty()) { "stream class was not found in $defaultClass" }
+        for (item in classes) {
             _mapDefaultStreamClass[item] = defaultClass
         }
     }
@@ -31,8 +31,8 @@ object DefaultStreamManager {
      */
     @Synchronized
     fun unregister(defaultClass: Class<out FStream?>) {
-        val set = LibUtils.findStreamClass(defaultClass)
-        for (item in set) {
+        val classes = LibUtils.findStreamClass(defaultClass)
+        for (item in classes) {
             _mapDefaultStreamClass.remove(item)
         }
     }
