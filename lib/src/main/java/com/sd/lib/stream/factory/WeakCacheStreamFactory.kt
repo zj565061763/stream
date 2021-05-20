@@ -18,7 +18,7 @@ class WeakCacheStreamFactory : CacheableStreamFactory() {
     private val _mapReference = HashMap<WeakReference<FStream>, Class<out FStream>>()
 
     private val _isDebug: Boolean
-        private get() = FStreamManager.getInstance().isDebug
+        private get() = FStreamManager.instance.isDebug
 
     override fun getCache(param: CreateParam): FStream? {
         val reference = _mapStream[param.classStream]

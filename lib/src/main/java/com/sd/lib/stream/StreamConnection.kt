@@ -3,21 +3,22 @@ package com.sd.lib.stream
 import java.util.*
 import kotlin.collections.HashMap
 
-abstract class StreamConnection {
+class StreamConnection {
     private val _manager: FStreamManager
     private val _stream: FStream
     private val _mapItem: Map<Class<out FStream>, ConnectionItem>
 
-    internal constructor(stream: FStream, classes: Array<Class<out FStream>>, manager: FStreamManager) {
+    internal constructor(stream: FStream, classes: Collection<Class<out FStream>>, manager: FStreamManager) {
         _stream = stream
         _manager = manager
 
         val map = HashMap<Class<out FStream>, ConnectionItem>()
         for (item in classes) {
-            checkClassInterface(item)
+            checkStreamClass(item)
             map[item] = object : ConnectionItem(item) {
                 override fun onPriorityChanged(priority: Int, clazz: Class<out FStream>) {
-                    this@StreamConnection.onPriorityChanged(priority, _stream, clazz)
+                    val holder = _manager.getStreamHolder(clazz)
+                    holder?.notifyPriorityChanged(priority, stream, clazz)
                 }
             }
         }
@@ -37,7 +38,7 @@ abstract class StreamConnection {
      * 返回优先级
      */
     fun getPriority(clazz: Class<out FStream>): Int {
-        checkClassInterface(clazz)
+        checkStreamClass(clazz)
         val item = _mapItem[clazz]
         return item?.priority ?: 0
     }
@@ -52,7 +53,7 @@ abstract class StreamConnection {
                 item.setPriority(priority)
             }
         } else {
-            checkClassInterface(clazz)
+            checkStreamClass(clazz)
             checkClassAssignable(clazz)
             _mapItem[clazz]?.setPriority(priority)
         }
@@ -62,13 +63,13 @@ abstract class StreamConnection {
      * 停止分发
      */
     fun breakDispatch(clazz: Class<out FStream>) {
-        checkClassInterface(clazz)
+        checkStreamClass(clazz)
         checkClassAssignable(clazz)
         _mapItem[clazz]?.breakDispatch()
     }
 
     internal fun getItem(clazz: Class<out FStream>): ConnectionItem? {
-        checkClassInterface(clazz)
+        checkStreamClass(clazz)
         return _mapItem[clazz]
     }
 
@@ -76,14 +77,9 @@ abstract class StreamConnection {
         require(clazz.isAssignableFrom(_stream.javaClass)) { "class is not assignable from ${_stream.javaClass.name} class:${clazz.name}" }
     }
 
-    private fun checkClassInterface(clazz: Class<out FStream>) {
+    private fun checkStreamClass(clazz: Class<out FStream>) {
         require(clazz.isInterface) { "class must be an interface class:${clazz.name}" }
     }
-
-    /**
-     * 优先级变化回调
-     */
-    protected abstract fun onPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>)
 }
 
 internal abstract class ConnectionItem {

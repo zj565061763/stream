@@ -140,5 +140,5 @@ internal object StickyInvokeManager {
     }
 
     private val _isDebug: Boolean
-        private get() = FStreamManager.getInstance().isDebug
+        private get() = FStreamManager.instance.isDebug
 }

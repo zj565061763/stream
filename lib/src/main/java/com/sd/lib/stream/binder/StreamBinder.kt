@@ -29,7 +29,7 @@ internal abstract class StreamBinder<T> {
      */
     protected fun registerStream(): Boolean {
         val stream = _stream.get() ?: return false
-        FStreamManager.getInstance().register(stream)
+        FStreamManager.instance.register(stream)
         return true
     }
 
@@ -38,7 +38,7 @@ internal abstract class StreamBinder<T> {
      */
     protected fun unregisterStream() {
         val stream = _stream.get() ?: return
-        FStreamManager.getInstance().unregister(stream)
+        FStreamManager.instance.unregister(stream)
     }
 
     /**

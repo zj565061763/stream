@@ -67,17 +67,17 @@ class ExampleInstrumentedTest {
             }
         }
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.register(stream0)
             this.register(stream1).setPriority(-1)
             this.register(stream2)
             this.register(stream3).setPriority(1)
         }
 
-        Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream0)!!.getPriority(TestStream::class.java))
-        Assert.assertEquals(-1, FStreamManager.getInstance().getConnection(stream1)!!.getPriority(TestStream::class.java))
-        Assert.assertEquals(0, FStreamManager.getInstance().getConnection(stream2)!!.getPriority(TestStream::class.java))
-        Assert.assertEquals(1, FStreamManager.getInstance().getConnection(stream3)!!.getPriority(TestStream::class.java))
+        Assert.assertEquals(0, FStreamManager.instance.getConnection(stream0)!!.getPriority(TestStream::class.java))
+        Assert.assertEquals(-1, FStreamManager.instance.getConnection(stream1)!!.getPriority(TestStream::class.java))
+        Assert.assertEquals(0, FStreamManager.instance.getConnection(stream2)!!.getPriority(TestStream::class.java))
+        Assert.assertEquals(1, FStreamManager.instance.getConnection(stream3)!!.getPriority(TestStream::class.java))
 
         val listResult = mutableListOf<Any?>()
         val proxy = FStream.ProxyBuilder()
@@ -106,7 +106,7 @@ class ExampleInstrumentedTest {
                 return null
             }
         }
-        FStreamManager.getInstance().register(stream4)
+        FStreamManager.instance.register(stream4)
 
         listResult.clear()
         Assert.assertEquals("1", proxy.getContent("http"))
@@ -117,7 +117,7 @@ class ExampleInstrumentedTest {
         Assert.assertEquals("1", listResult[3])
 
         DefaultStreamManager.unregister(TestDefaultStream::class.java)
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.unregister(stream0)
             this.unregister(stream1)
             this.unregister(stream2)
@@ -125,11 +125,11 @@ class ExampleInstrumentedTest {
             this.unregister(stream4)
         }
 
-        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream0))
-        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream1))
-        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream2))
-        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream3))
-        Assert.assertEquals(null, FStreamManager.getInstance().getConnection(stream4))
+        Assert.assertEquals(null, FStreamManager.instance.getConnection(stream0))
+        Assert.assertEquals(null, FStreamManager.instance.getConnection(stream1))
+        Assert.assertEquals(null, FStreamManager.instance.getConnection(stream2))
+        Assert.assertEquals(null, FStreamManager.instance.getConnection(stream3))
+        Assert.assertEquals(null, FStreamManager.instance.getConnection(stream4))
     }
 
     @Test
@@ -180,7 +180,7 @@ class ExampleInstrumentedTest {
             }
         }
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.register(stream1)
             this.register(stream2)
             this.register(stream3)
@@ -201,7 +201,7 @@ class ExampleInstrumentedTest {
         val result = proxy.getContent("http")
         Assert.assertEquals(null, result)
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.unregister(stream1)
             this.unregister(stream2)
             this.unregister(stream3)
@@ -243,7 +243,7 @@ class ExampleInstrumentedTest {
             }
         }
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.register(stream1)
             this.register(stream2)
             this.register(stream3)
@@ -274,7 +274,7 @@ class ExampleInstrumentedTest {
         Assert.assertEquals("1", listResult[0])
         Assert.assertEquals("2", listResult[1])
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.unregister(stream1)
             this.unregister(stream2)
             this.unregister(stream3)
@@ -297,7 +297,7 @@ class ExampleInstrumentedTest {
         val stream2 = object : TestStream {
             override fun getContent(url: String): String {
                 Assert.assertEquals("http", url)
-                FStreamManager.getInstance().getConnection(this)!!.breakDispatch(TestStream::class.java)
+                FStreamManager.instance.getConnection(this)!!.breakDispatch(TestStream::class.java)
                 return "2"
             }
 
@@ -317,7 +317,7 @@ class ExampleInstrumentedTest {
             }
         }
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.register(stream1)
             this.register(stream2)
             this.register(stream3)
@@ -339,7 +339,7 @@ class ExampleInstrumentedTest {
         Assert.assertEquals("1", listResult[0])
         Assert.assertEquals("2", listResult[1])
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.unregister(stream1)
             this.unregister(stream2)
             this.unregister(stream3)
@@ -358,7 +358,7 @@ class ExampleInstrumentedTest {
             }
         }
 
-        FStreamManager.getInstance().register(stream1)
+        FStreamManager.instance.register(stream1)
 
         val proxy = FStream.ProxyBuilder().setSticky(true).build(TestStickyStream::class.java)
         proxy.notifyContent("http")
@@ -373,11 +373,11 @@ class ExampleInstrumentedTest {
                 return null
             }
         }
-        FStreamManager.getInstance().register(stream2).stickyInvoke()
+        FStreamManager.instance.register(stream2).stickyInvoke()
 
         Assert.assertEquals("http", stickyContent)
 
-        FStreamManager.getInstance().run {
+        FStreamManager.instance.run {
             this.unregister(stream1)
             this.unregister(stream2)
         }

@@ -1,273 +1,169 @@
-package com.sd.lib.stream;
+package com.sd.lib.stream
 
-import android.app.Activity;
-import android.util.Log;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.sd.lib.stream.binder.ActivityStreamBinder;
-import com.sd.lib.stream.binder.StreamBinder;
-import com.sd.lib.stream.binder.ViewStreamBinder;
-import com.sd.lib.stream.utils.LibUtils;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
+import android.app.Activity
+import android.util.Log
+import android.view.View
+import com.sd.lib.stream.binder.ActivityStreamBinder
+import com.sd.lib.stream.binder.StreamBinder
+import com.sd.lib.stream.binder.ViewStreamBinder
+import com.sd.lib.stream.utils.LibUtils
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 流管理类
  */
-public class FStreamManager {
-    private static final FStreamManager INSTANCE = new FStreamManager();
+object FStreamManager {
+    @JvmStatic
+    val instance by lazy { FStreamManager }
 
-    private FStreamManager() {
-    }
+    private val _mapStream: MutableMap<Class<out FStream>, StreamHolder> = ConcurrentHashMap()
+    private val _mapStreamConnection: MutableMap<FStream, StreamConnection> = ConcurrentHashMap()
+    private val _mapStreamBinder: MutableMap<FStream, StreamBinder<*>> = WeakHashMap()
 
-    public static FStreamManager getInstance() {
-        return INSTANCE;
-    }
-
-    private final Map<Class<? extends FStream>, StreamHolder> _mapStream = new ConcurrentHashMap<>();
-    private final Map<FStream, StreamBinder> _mapStreamBinder = new WeakHashMap<>();
-    private final Map<FStream, InternalStreamConnection> _mapStreamConnection = new ConcurrentHashMap<>();
-
-    private boolean isDebug;
-
-    public boolean isDebug() {
-        return isDebug;
-    }
-
-    public void setDebug(boolean debug) {
-        isDebug = debug;
-    }
+    var isDebug = false
 
     /**
-     * {@link ActivityStreamBinder}
-     *
-     * @param stream
-     * @param target
-     * @return true-绑定成功或者已绑定；false-绑定失败
+     * 返回[stream]的连接对象
      */
-    public synchronized boolean bindStream(@NonNull FStream stream, @NonNull Activity target) {
-        if (stream == null || target == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        final StreamBinder oldBinder = _mapStreamBinder.get(stream);
-        if (oldBinder != null) {
-            if (oldBinder.getTarget() == target) {
-                //  已经绑定过了
-                return true;
-            } else {
-                // target发生变化，先取消绑定
-                unbindStream(stream);
-            }
-        }
-
-        final ActivityStreamBinder binder = new ActivityStreamBinder(stream, target);
-        if (binder.bind()) {
-            _mapStreamBinder.put(stream, binder);
-            if (isDebug) {
-                Log.i(FStream.class.getSimpleName(), "bind activity"
-                        + " stream:" + stream
-                        + " target:" + target
-                        + " size:" + _mapStreamBinder.size());
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@link ViewStreamBinder}
-     *
-     * @param stream
-     * @param target
-     * @return true-绑定成功或者已绑定；false-绑定失败
-     */
-    public synchronized boolean bindStream(@NonNull FStream stream, @NonNull View target) {
-        if (stream == null || target == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        final StreamBinder oldBinder = _mapStreamBinder.get(stream);
-        if (oldBinder != null) {
-            if (oldBinder.getTarget() == target) {
-                //  已经绑定过了
-                return true;
-            } else {
-                // target发生变化，先取消绑定
-                unbindStream(stream);
-            }
-        }
-
-        final ViewStreamBinder binder = new ViewStreamBinder(stream, target);
-        if (binder.bind()) {
-            _mapStreamBinder.put(stream, binder);
-            if (isDebug) {
-                Log.i(FStream.class.getSimpleName(), "bind view"
-                        + " stream:" + stream
-                        + " target:" + target
-                        + " size:" + _mapStreamBinder.size());
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 解绑并取消注册
-     *
-     * @param stream
-     * @return
-     */
-    public synchronized boolean unbindStream(@NonNull FStream stream) {
-        if (stream == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-
-        final StreamBinder binder = _mapStreamBinder.remove(stream);
-        if (binder == null) {
-            return false;
-        }
-
-        binder.destroy();
-        if (isDebug) {
-            Log.i(FStream.class.getSimpleName(), "unbind"
-                    + " stream:" + stream
-                    + " target:" + binder.getTarget()
-                    + " size:" + _mapStreamBinder.size());
-        }
-        return true;
+    fun getConnection(stream: FStream): StreamConnection? {
+        return _mapStreamConnection[stream]
     }
 
     /**
      * 注册流对象
      */
-    @NonNull
-    public synchronized StreamConnection register(@NonNull FStream stream) {
-        if (stream == null) {
-            throw new IllegalArgumentException("null argument");
+    @Synchronized
+    fun register(stream: FStream): StreamConnection {
+        val connection = _mapStreamConnection[stream]
+        if (connection != null) {
+            return connection
         }
 
-        InternalStreamConnection streamConnection = _mapStreamConnection.get(stream);
-        if (streamConnection != null) {
-            // 已经注册过了
-            return streamConnection;
-        }
-
-        final Class<? extends FStream>[] classes = getStreamClass(stream);
-        for (Class<? extends FStream> item : classes) {
-            StreamHolder holder = _mapStream.get(item);
+        val classes = LibUtils.findStreamClass(stream.javaClass)
+        for (clazz in classes) {
+            var holder = _mapStream[clazz]
             if (holder == null) {
-                holder = new StreamHolder(item, FStreamManager.this);
-                _mapStream.put(item, holder);
+                holder = StreamHolder(clazz, this@FStreamManager)
+                _mapStream[clazz] = holder
             }
 
             if (holder.add(stream)) {
                 if (isDebug) {
-                    Log.i(FStream.class.getSimpleName(), "+++++ register"
-                            + " class:" + item.getName()
-                            + " stream:" + stream
-                            + " count:" + (holder.getSize()));
+                    Log.i(
+                        FStream::class.java.simpleName,
+                        "+++++ register class:${clazz.name} stream:${stream} size:${holder.size}"
+                    )
                 }
             }
         }
 
-        streamConnection = new InternalStreamConnection(stream, classes);
-        _mapStreamConnection.put(stream, streamConnection);
-        return streamConnection;
+        return StreamConnection(stream, classes, this@FStreamManager).also {
+            _mapStreamConnection[stream] = it
+        }
     }
 
     /**
      * 取消注册流对象
      */
-    public synchronized void unregister(@NonNull FStream stream) {
-        if (stream == null) {
-            throw new IllegalArgumentException("null argument");
-        }
+    @Synchronized
+    fun unregister(stream: FStream) {
+        _mapStreamConnection.remove(stream) ?: return
 
-        final StreamConnection streamConnection = _mapStreamConnection.remove(stream);
-        if (streamConnection == null) {
-            return;
-        }
-
-        final Class<? extends FStream>[] classes = getStreamClass(stream);
-        for (Class<? extends FStream> item : classes) {
-            final StreamHolder holder = _mapStream.get(item);
-            if (holder == null) {
-                continue;
-            }
-
+        val classes = LibUtils.findStreamClass(stream.javaClass)
+        for (clazz in classes) {
+            val holder = _mapStream[clazz] ?: continue
             if (holder.remove(stream)) {
-                if (holder.getSize() <= 0) {
-                    _mapStream.remove(item);
+                if (holder.size <= 0) {
+                    _mapStream.remove(clazz)
                 }
 
                 if (isDebug) {
-                    Log.i(FStream.class.getSimpleName(), "----- unregister"
-                            + " class:" + item.getName()
-                            + " stream:" + stream
-                            + " count:" + (holder.getSize()));
+                    Log.i(
+                        FStream::class.java.simpleName,
+                        "----- unregister class:${clazz.name} stream:${stream} size:${holder.size}"
+                    )
                 }
             }
         }
     }
 
-    StreamHolder getStreamHolder(@NonNull Class<? extends FStream> clazz) {
-        return _mapStream.get(clazz);
+    /**
+     * 把[stream]和[target]绑定，[target]销毁之后自动取消注册
+     * [ActivityStreamBinder]
+     *
+     * @return true-绑定成功或者已绑定  false-绑定失败
+     */
+    fun bindStream(stream: FStream, target: Activity): Boolean {
+        return bindStreamInternal(stream, target) { ActivityStreamBinder(stream, target) }
     }
 
     /**
-     * 返回流对象连接对象
+     * 将[stream]和[target]绑定，自动注册和取消注册
+     * [ViewStreamBinder]
      *
-     * @param stream
-     * @return
+     * @return true-绑定成功或者已绑定  false-绑定失败
      */
-    @Nullable
-    public StreamConnection getConnection(@NonNull FStream stream) {
-        if (stream == null) {
-            throw new IllegalArgumentException("null argument");
-        }
-        return _mapStreamConnection.get(stream);
+    fun bindStream(stream: FStream, target: View): Boolean {
+        return bindStreamInternal(stream, target) { ViewStreamBinder(stream, target) }
     }
 
-    private final class InternalStreamConnection extends StreamConnection {
-        InternalStreamConnection(@NonNull FStream stream, @NonNull Class<? extends FStream>[] classes) {
-            super(stream, classes, FStreamManager.this);
-        }
-
-        @Override
-        protected void onPriorityChanged(int priority, @NonNull FStream stream, @NonNull Class<? extends FStream> clazz) {
-            final StreamHolder holder = _mapStream.get(clazz);
-            if (holder != null) {
-                holder.notifyPriorityChanged(priority, stream, clazz);
+    @Synchronized
+    private fun <T> bindStreamInternal(stream: FStream, target: T, factory: () -> StreamBinder<T>): Boolean {
+        val oldBinder = _mapStreamBinder[stream]
+        if (oldBinder != null) {
+            if (oldBinder.target === target) {
+                // 已经绑定过了
+                return true
+            } else {
+                // target发生变化，先取消绑定
+                unbindStream(stream)
             }
         }
-    }
 
-    @NonNull
-    private static Class<? extends FStream>[] getStreamClass(@NonNull FStream stream) {
-        if (stream == null) {
-            throw new IllegalArgumentException("null argument");
+        val binder = factory()
+        if (!binder.bind()) {
+            // 绑定失败
+            return false
         }
 
-        final Collection<Class<? extends FStream>> classes = LibUtils.findStreamClass(stream.getClass());
-        if (classes.isEmpty()) {
-            throw new RuntimeException("stream class was not found in stream:" + stream);
+        _mapStreamBinder[stream] = binder
+        if (isDebug) {
+            Log.i(
+                FStream::class.java.simpleName,
+                "bind stream:${stream} target:${target} size:${_mapStreamBinder.size}"
+            )
         }
-
-        return classes.toArray(new Class[classes.size()]);
+        return true
     }
 
     /**
-     * {@link DefaultStreamManager#register(Class)}
+     * 解绑并取消注册
+     *
+     * @return true-解绑成功  false-未绑定过
      */
-    @Deprecated
-    public void registerDefaultStream(@NonNull Class<? extends FStream> clazz) {
-        DefaultStreamManager.INSTANCE.register(clazz);
+    @Synchronized
+    fun unbindStream(stream: FStream): Boolean {
+        val binder = _mapStreamBinder.remove(stream) ?: return false
+        binder.destroy()
+        if (isDebug) {
+            Log.i(
+                FStream::class.java.simpleName,
+                "unbind stream:${stream} target:${binder.target} size:${_mapStreamBinder.size}"
+            )
+        }
+        return true
+    }
+
+    internal fun getStreamHolder(clazz: Class<out FStream>): StreamHolder? {
+        return _mapStream[clazz]
+    }
+
+    /**
+     * [DefaultStreamManager.register]
+     */
+    @Deprecated("")
+    fun registerDefaultStream(clazz: Class<out FStream?>) {
+        DefaultStreamManager.register(clazz)
     }
 }
