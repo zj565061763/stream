@@ -12,7 +12,7 @@ internal object StickyInvokeManager {
     /** 保存方法调用信息  */
     private val _mapMethodInfo: MutableMap<Class<out FStream>, MutableMap<Any?, MethodInfo>> = ConcurrentHashMap()
 
-    private val _isDebug: Boolean get() = FStreamManager.isDebug
+    private val _isDebug get() = FStreamManager.isDebug
 
     /**
      * 代理对象创建触发
