@@ -9,7 +9,7 @@ internal object LibUtils {
      * 查找[clazz]的所有流接口
      */
     @JvmStatic
-    fun findAllStreamClass(clazz: Class<*>): Set<Class<out FStream>> {
+    fun findStreamClass(clazz: Class<*>): Set<Class<out FStream>> {
         require(!Proxy.isProxyClass(clazz)) { "proxy class is not supported" }
 
         val set = HashSet<Class<out FStream>>()

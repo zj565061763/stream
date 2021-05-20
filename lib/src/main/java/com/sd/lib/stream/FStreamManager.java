@@ -255,7 +255,7 @@ public class FStreamManager {
             throw new IllegalArgumentException("null argument");
         }
 
-        final Set<Class<? extends FStream>> set = LibUtils.findAllStreamClass(stream.getClass());
+        final Set<Class<? extends FStream>> set = LibUtils.findStreamClass(stream.getClass());
         if (set.isEmpty()) {
             throw new RuntimeException("stream class was not found in stream:" + stream);
         }
