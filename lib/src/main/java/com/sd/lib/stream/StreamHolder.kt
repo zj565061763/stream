@@ -70,9 +70,10 @@ internal class StreamHolder {
         synchronized(_manager) {
             val array = _streamHolder.toTypedArray()
             if (array.size > 1) {
-                // 数量大于1，才排序
+                // 排序
                 array.sortWith(InternalStreamComparator())
 
+                // 把排序后的对象保存到容器
                 _streamHolder.clear()
                 _streamHolder.addAll(array)
             }
