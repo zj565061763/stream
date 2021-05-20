@@ -45,7 +45,7 @@ object FStreamManager {
         for (clazz in classes) {
             var holder = _mapStream[clazz]
             if (holder == null) {
-                holder = StreamHolder(clazz, this@FStreamManager)
+                holder = StreamHolder(clazz)
                 _mapStream[clazz] = holder
             }
 

@@ -5,8 +5,6 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 internal class StreamHolder {
-    private val _manager: FStreamManager
-
     /** 流接口 */
     private val _class: Class<out FStream>
 
@@ -23,9 +21,8 @@ internal class StreamHolder {
     /** 流对象数量 */
     val size get() = _streamHolder.size
 
-    constructor(clazz: Class<out FStream>, manager: FStreamManager) {
+    constructor(clazz: Class<out FStream>) {
         _class = clazz
-        _manager = manager
     }
 
     /**
@@ -66,24 +63,22 @@ internal class StreamHolder {
      * 排序
      */
     private fun sort(): Array<FStream> {
-        synchronized(_manager) {
-            val array = _streamHolder.toTypedArray()
-            if (array.size > 1) {
-                // 排序
-                array.sortWith(InternalStreamComparator())
+        val array = _streamHolder.toTypedArray()
+        if (array.size > 1) {
+            // 排序
+            array.sortWith(InternalStreamComparator())
 
-                // 把排序后的对象保存到容器
-                _streamHolder.clear()
-                _streamHolder.addAll(array)
-            }
-
-            _isNeedSort = false
-
-            if (_manager.isDebug) {
-                Log.i(FStream::class.java.simpleName, "sort stream for class:${_class.name}")
-            }
-            return array
+            // 把排序后的对象保存到容器
+            _streamHolder.clear()
+            _streamHolder.addAll(array)
         }
+
+        _isNeedSort = false
+
+        if (FStreamManager.isDebug) {
+            Log.i(FStream::class.java.simpleName, "sort stream for class:${_class.name}")
+        }
+        return array
     }
 
     /**
@@ -100,7 +95,7 @@ internal class StreamHolder {
 
         _isNeedSort = true
 
-        if (_manager.isDebug) {
+        if (FStreamManager.isDebug) {
             Log.i(
                 FStream::class.java.simpleName,
                 "notifyPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size} stream:${stream}"
@@ -110,8 +105,8 @@ internal class StreamHolder {
 
     private inner class InternalStreamComparator : Comparator<FStream> {
         override fun compare(o1: FStream, o2: FStream): Int {
-            val o1Connection = _manager.getConnection(o1)
-            val o2Connection = _manager.getConnection(o2)
+            val o1Connection = FStreamManager.getConnection(o1)
+            val o2Connection = FStreamManager.getConnection(o2)
 
             return if (o1Connection != null && o2Connection != null) {
                 o2Connection.getPriority(_class) - o1Connection.getPriority(_class)
