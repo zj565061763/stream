@@ -12,8 +12,6 @@ internal object StickyInvokeManager {
     /** 保存方法调用信息  */
     private val _mapMethodInfo: MutableMap<Class<out FStream>, MutableMap<Any?, MethodInfo>> = ConcurrentHashMap()
 
-    private val _isDebug get() = FStreamManager.isDebug
-
     /**
      * 代理对象创建触发
      */
@@ -26,7 +24,7 @@ internal object StickyInvokeManager {
                 _mapProxyCount[clazz] = count + 1
             }
 
-            if (_isDebug) {
+            if (FStreamManager.isDebug) {
                 Log.i(
                     StickyInvokeManager::class.java.simpleName,
                     "+++++ proxyCreated class:${clazz.name}  count:${_mapProxyCount[clazz]}"
@@ -51,7 +49,7 @@ internal object StickyInvokeManager {
                 _mapProxyCount[clazz] = targetCount
             }
 
-            if (_isDebug) {
+            if (FStreamManager.isDebug) {
                 Log.i(
                     StickyInvokeManager::class.java.simpleName,
                     "----- proxyDestroyed class:${clazz.name}  count:${_mapProxyCount[clazz]}"
@@ -96,7 +94,7 @@ internal object StickyInvokeManager {
 
             methodInfo.save(method, args)
 
-            if (_isDebug) {
+            if (FStreamManager.isDebug) {
                 Log.i(
                     StickyInvokeManager::class.java.simpleName,
                     "proxyInvoke class:${clazz.name} tag:${streamTag} method:${method} args:${args.contentToString()}"
@@ -116,14 +114,14 @@ internal object StickyInvokeManager {
             val streamTag = stream.getTagForStream(clazz)
             val methodInfo = holder[streamTag] ?: return false
 
-            if (_isDebug) {
+            if (FStreamManager.isDebug) {
                 Log.i(
                     StickyInvokeManager::class.java.simpleName,
                     "stickyInvoke class:${clazz.name} stream:${stream} tag:${streamTag}"
                 )
             }
 
-            methodInfo.invoke(stream, clazz, _isDebug)
+            methodInfo.invoke(stream, clazz)
             return true
         }
     }
@@ -142,9 +140,9 @@ private class MethodInfo {
     /**
      * 用保存的方法信息触发流对象的方法
      */
-    fun invoke(stream: FStream, clazz: Class<out FStream>, debug: Boolean) {
+    fun invoke(stream: FStream, clazz: Class<out FStream>) {
         for ((method, args) in _methodInfo) {
-            if (debug) {
+            if (FStreamManager.isDebug) {
                 Log.i(
                     StickyInvokeManager::class.java.simpleName,
                     "invoke class:${clazz.name} method:${method} args:${args.contentToString()} stream:${stream}"
