@@ -20,11 +20,6 @@ public class TestFragment extends Fragment {
             .setTag(null)
             .build(FragmentCallback.class);
 
-    /** 创建接口代理对象 */
-    private final StickyCallback mStickyCallback = new FStream.ProxyBuilder()
-            .setSticky(true) // 设置支持粘性触发
-            .build(StickyCallback.class);
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final Button button = new Button(container.getContext());
@@ -36,8 +31,6 @@ public class TestFragment extends Fragment {
                 // 获取显示内容
                 final String content = mCallback.getDisplayContent();
                 button.setText(content);
-
-                mStickyCallback.onContent("hello sticky");
             }
         });
 
@@ -46,9 +39,5 @@ public class TestFragment extends Fragment {
 
     public interface FragmentCallback extends FStream {
         String getDisplayContent();
-    }
-
-    public interface StickyCallback extends FStream {
-        void onContent(String content);
     }
 }
