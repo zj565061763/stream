@@ -63,7 +63,7 @@ class WeakCacheStreamFactory : CacheableStreamFactory() {
                 if (_isDebug) {
                     Log.i(
                         WeakCacheStreamFactory::class.java.simpleName,
-                        "releaseReference ghost reference was found:$reference"
+                        "releaseReference ghost reference was found:${reference}"
                     )
                 }
                 continue
@@ -76,7 +76,7 @@ class WeakCacheStreamFactory : CacheableStreamFactory() {
                 if (_isDebug) {
                     Log.e(
                         WeakCacheStreamFactory::class.java.simpleName,
-                        "releaseReference  class:${clazz.name} reference:${reference} streamReference:${streamReference}"
+                        "releaseReference class:${clazz.name} reference:${reference} streamReference:${streamReference}"
                     )
                 }
             }
