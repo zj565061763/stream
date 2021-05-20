@@ -30,10 +30,7 @@ class WeakCacheStreamFactory : CacheableStreamFactory() {
         val reference = WeakReference(stream, _referenceQueue)
         val oldReference = _mapStream.put(param.classStream, reference)
         if (oldReference != null) {
-            /**
-             * 由于被回收的引用不一定会被及时的添加到ReferenceQueue中，
-             * 所以这边判断一下旧的引用不为null的话，要移除掉
-             */
+            // 移除旧的引用
             _mapReference.remove(oldReference)
             if (_isDebug) {
                 Log.i(
