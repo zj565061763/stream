@@ -4,20 +4,18 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class StreamConnection {
-    private val _manager: FStreamManager
     private val _stream: FStream
     private val _mapItem: Map<Class<out FStream>, ConnectionItem>
 
-    internal constructor(stream: FStream, classes: Collection<Class<out FStream>>, manager: FStreamManager) {
+    internal constructor(stream: FStream, classes: Collection<Class<out FStream>>) {
         _stream = stream
-        _manager = manager
 
         val map = HashMap<Class<out FStream>, ConnectionItem>()
         for (item in classes) {
             checkStreamClass(item)
             map[item] = object : ConnectionItem(item) {
                 override fun onPriorityChanged(priority: Int, clazz: Class<out FStream>) {
-                    val holder = _manager.getStreamHolder(clazz)
+                    val holder = FStreamManager.getStreamHolder(clazz)
                     holder?.notifyPriorityChanged(priority, stream, clazz)
                 }
             }

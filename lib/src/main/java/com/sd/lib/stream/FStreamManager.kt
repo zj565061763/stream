@@ -59,7 +59,7 @@ object FStreamManager {
             }
         }
 
-        return StreamConnection(stream, classes, this@FStreamManager).also {
+        return StreamConnection(stream, classes).also {
             _mapStreamConnection[stream] = it
         }
     }
