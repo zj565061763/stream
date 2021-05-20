@@ -11,18 +11,17 @@ internal class StreamHolder {
     private val _class: Class<out FStream>
 
     /** 流对象 */
-    private val _streamHolder = mutableSetOf<FStream>()
+    private val _streamHolder: MutableSet<FStream> = LinkedHashSet()
 
     /** 设置了优先级的流对象  */
-    private val _priorityStreamHolder = ConcurrentHashMap<FStream, Int>()
+    private val _priorityStreamHolder: MutableMap<FStream, Int> = ConcurrentHashMap()
 
     /** 是否需要排序  */
     @Volatile
     private var _isNeedSort = false
 
     /** 流对象数量 */
-    val size: Int
-        get() = _streamHolder.size
+    val size get() = _streamHolder.size
 
     constructor(clazz: Class<out FStream>, manager: FStreamManager) {
         _class = clazz
@@ -36,7 +35,7 @@ internal class StreamHolder {
         val result = _streamHolder.add(stream)
         if (result) {
             if (_priorityStreamHolder.isNotEmpty()) {
-                // 如果之前已经有流对象设置了优先级，则添加新流对象的时候标记为需要重新排序
+                // 如果有流对象设置了优先级，则添加新流对象的时候标记为需要重新排序
                 _isNeedSort = true
             }
         }
