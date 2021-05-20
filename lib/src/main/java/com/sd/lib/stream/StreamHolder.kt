@@ -28,6 +28,7 @@ internal class StreamHolder {
     /**
      * 添加流对象
      */
+    @Synchronized
     fun add(stream: FStream): Boolean {
         val result = _streamHolder.add(stream)
         if (result) {
@@ -42,6 +43,7 @@ internal class StreamHolder {
     /**
      * 移除流对象
      */
+    @Synchronized
     fun remove(stream: FStream): Boolean {
         val result = _streamHolder.remove(stream)
         _priorityStreamHolder.remove(stream)
@@ -51,6 +53,7 @@ internal class StreamHolder {
     /**
      * 返回流集合
      */
+    @Synchronized
     fun toCollection(): Array<FStream> {
         return if (_isNeedSort) {
             sort()
