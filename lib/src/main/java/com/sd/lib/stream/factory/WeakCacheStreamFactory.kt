@@ -14,11 +14,10 @@ import java.util.*
 class WeakCacheStreamFactory : CacheableStreamFactory() {
     private val _referenceQueue = ReferenceQueue<FStream>()
 
-    private val _mapStream = HashMap<Class<out FStream>, WeakReference<FStream>>()
-    private val _mapReference = HashMap<WeakReference<FStream>, Class<out FStream>>()
+    private val _mapStream: MutableMap<Class<out FStream>, WeakReference<FStream>> = HashMap()
+    private val _mapReference: MutableMap<WeakReference<FStream>, Class<out FStream>> = HashMap()
 
-    private val _isDebug: Boolean
-        private get() = FStreamManager.isDebug
+    private val _isDebug get() = FStreamManager.isDebug
 
     override fun getCache(param: CreateParam): FStream? {
         val reference = _mapStream[param.classStream]
