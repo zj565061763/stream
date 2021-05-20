@@ -7,10 +7,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 internal object StickyInvokeManager {
     /** 代理对象数量  */
-    private val _mapProxyCount = ConcurrentHashMap<Class<out FStream>, Int>()
+    private val _mapProxyCount: MutableMap<Class<out FStream>, Int> = ConcurrentHashMap()
 
     /** 保存方法调用信息  */
-    private val _mapMethodInfo = ConcurrentHashMap<Class<out FStream>, MutableMap<Any?, MethodInfo>>()
+    private val _mapMethodInfo: MutableMap<Class<out FStream>, MutableMap<Any?, MethodInfo>> = ConcurrentHashMap()
 
     private val _isDebug: Boolean get() = FStreamManager.isDebug
 
