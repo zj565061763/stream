@@ -1,15 +1,14 @@
-package com.sd.demo.stream;
+package com.sd.demo.stream
 
-import com.sd.lib.stream.FStream;
+import com.sd.demo.stream.TestFragment.FragmentCallback
+import com.sd.lib.stream.FStream
 
-public class DefaultFragmentCallback implements TestFragment.FragmentCallback {
-    @Override
-    public String getDisplayContent() {
-        return "default stream value";
+class DefaultFragmentCallback : FragmentCallback {
+    override fun getDisplayContent(): String {
+        return "default stream value"
     }
 
-    @Override
-    public Object getTagForStream(Class<? extends FStream> clazz) {
-        return null;
+    override fun getTagForStream(clazz: Class<out FStream?>): Any? {
+        return null
     }
 }
