@@ -55,16 +55,16 @@ internal class ProxyInvocationHandler : InvocationHandler {
         if (isVoid) {
             result = null
         } else if (returnType.isPrimitive && result == null) {
-            if (Boolean::class.javaPrimitiveType == returnType) {
-                result = false
+            result = if (Boolean::class.javaPrimitiveType == returnType) {
+                false
             } else {
-                result = 0
+                0
             }
 
             if (_manager.isDebug) {
                 Log.i(
                     FStream::class.java.simpleName,
-                    "return type:${returnType} but method result is null, so set to ${result} uuid:${uuid}"
+                    "return type:$returnType but method result is null, so set to $result uuid:${uuid}"
                 )
             }
         }
@@ -82,29 +82,26 @@ internal class ProxyInvocationHandler : InvocationHandler {
     @Throws(Throwable::class)
     private fun processMainLogic(isVoid: Boolean, method: Method, args: Array<Any?>?, uuid: String?): Any? {
         val holder = _manager.getStreamHolder(_streamClass)
-        var isDefaultStream = false
-
-        var listStream = holder?.toCollection()
+        val listStream = holder?.toCollection()
         if (listStream == null || listStream.isEmpty()) {
             // 尝试创建默认流对象
-            val stream = DefaultStreamManager.getStream(_streamClass)
-            if (stream != null) {
-                listStream = arrayOf(stream)
-                isDefaultStream = true
-
-                if (_manager.isDebug) {
-                    Log.i(FStream::class.java.simpleName, "create default stream:$stream uuid:$uuid")
-                }
+            val defaultStream = DefaultStreamManager.getStream(_streamClass) ?: return null
+            val result = if (args != null) {
+                method.invoke(defaultStream, *args)
+            } else {
+                method.invoke(defaultStream)
             }
-        }
 
-        if (listStream == null || listStream.isEmpty()) {
-            return null
+            if (_manager.isDebug) {
+                val returnLog = if (isVoid) "" else result
+                Log.i(FStream::class.java.simpleName, "notify default stream:${defaultStream} return:${returnLog} uuid:${uuid}")
+            }
+            return result
         }
 
         if (_manager.isDebug) {
             Log.i(
-                FStream::class.java.simpleName, "notify -----> ${method}"
+                FStream::class.java.simpleName, "notify -----> $method"
                         + " arg:${(if (args == null) "" else Arrays.toString(args))}"
                         + " tag:${_tag}"
                         + " count:${listStream.size}"
@@ -119,15 +116,11 @@ internal class ProxyInvocationHandler : InvocationHandler {
         var index = 0
         for (item in listStream) {
             val connection = _manager.getConnection(item)
-            if (isDefaultStream) {
-                // 不判断
-            } else {
-                if (connection == null) {
-                    if (_manager.isDebug) {
-                        Log.e(FStream::class.java.simpleName, "${StreamConnection::class.java.simpleName} is null uuid:${uuid}")
-                    }
-                    continue
+            if (connection == null) {
+                if (_manager.isDebug) {
+                    Log.e(FStream::class.java.simpleName, "${StreamConnection::class.java.simpleName} is null uuid:${uuid}")
                 }
+                continue
             }
 
             if (!checkTag(item)) {
@@ -141,30 +134,22 @@ internal class ProxyInvocationHandler : InvocationHandler {
                 break
             }
 
-            var itemResult: Any? = null
-            var shouldBreakDispatch = false
+            var itemResult: Any?
+            var shouldBreakDispatch: Boolean
 
-            if (isDefaultStream) {
+            val connectionItem = connection.getItem(_streamClass)!!
+            synchronized(connectionItem) {
+                connectionItem.resetBreakDispatch()
+
+                // 调用流对象方法
                 itemResult = if (args != null) {
                     method.invoke(item, *args)
                 } else {
                     method.invoke(item)
                 }
-            } else {
-                val connectionItem = connection!!.getItem(_streamClass)!!
-                synchronized(connectionItem) {
-                    connectionItem.resetBreakDispatch()
 
-                    // 调用流对象方法
-                    itemResult = if (args != null) {
-                        method.invoke(item, *args)
-                    } else {
-                        method.invoke(item)
-                    }
-
-                    shouldBreakDispatch = connectionItem.shouldBreakDispatch
-                    connectionItem.resetBreakDispatch()
-                }
+                shouldBreakDispatch = connectionItem.shouldBreakDispatch
+                connectionItem.resetBreakDispatch()
             }
 
             if (_manager.isDebug) {
