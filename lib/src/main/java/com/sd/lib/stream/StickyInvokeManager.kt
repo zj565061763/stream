@@ -6,13 +6,13 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 internal object StickyInvokeManager {
-    private val TAG = StickyInvokeManager::class.java.simpleName
-
     /** 代理对象数量  */
     private val _mapProxyCount = ConcurrentHashMap<Class<out FStream>, Int>()
 
     /** 保存方法调用信息  */
     private val _mapMethodInfo = ConcurrentHashMap<Class<out FStream>, MutableMap<Any?, MethodInfo>>()
+
+    private val _isDebug: Boolean get() = FStreamManager.isDebug
 
     /**
      * 代理对象创建触发
@@ -27,7 +27,10 @@ internal object StickyInvokeManager {
             }
 
             if (_isDebug) {
-                Log.i(TAG, "+++++ proxyCreated class:${clazz.name}  count:${_mapProxyCount[clazz]}")
+                Log.i(
+                    StickyInvokeManager::class.java.simpleName,
+                    "+++++ proxyCreated class:${clazz.name}  count:${_mapProxyCount[clazz]}"
+                )
             }
         }
     }
@@ -49,7 +52,10 @@ internal object StickyInvokeManager {
             }
 
             if (_isDebug) {
-                Log.i(TAG, "----- proxyDestroyed class:${clazz.name}  count:${_mapProxyCount[clazz]}")
+                Log.i(
+                    StickyInvokeManager::class.java.simpleName,
+                    "----- proxyDestroyed class:${clazz.name}  count:${_mapProxyCount[clazz]}"
+                )
             }
         }
     }
@@ -91,7 +97,10 @@ internal object StickyInvokeManager {
             methodInfo.save(method, args)
 
             if (_isDebug) {
-                Log.i(TAG, "proxyInvoke class:${clazz.name} tag:${streamTag} method:${method} args:${Arrays.toString(args)}")
+                Log.i(
+                    StickyInvokeManager::class.java.simpleName,
+                    "proxyInvoke class:${clazz.name} tag:${streamTag} method:${method} args:${args.contentToString()}"
+                )
             }
         }
     }
@@ -108,37 +117,40 @@ internal object StickyInvokeManager {
             val methodInfo = holder[streamTag] ?: return false
 
             if (_isDebug) {
-                Log.i(TAG, "stickyInvoke class:${clazz.name} stream:${stream} tag:${streamTag}")
+                Log.i(
+                    StickyInvokeManager::class.java.simpleName,
+                    "stickyInvoke class:${clazz.name} stream:${stream} tag:${streamTag}"
+                )
             }
 
-            methodInfo.invoke(stream, clazz)
+            methodInfo.invoke(stream, clazz, _isDebug)
             return true
         }
     }
+}
 
-    private class MethodInfo {
-        private val _iMethodInfo = ConcurrentHashMap<Method, Array<Any?>>()
+private class MethodInfo {
+    private val _methodInfo: MutableMap<Method, Array<Any?>> = ConcurrentHashMap()
 
-        /**
-         * 保存方法调用信息
-         */
-        fun save(method: Method, args: Array<Any?>) {
-            _iMethodInfo[method] = args
-        }
-
-        /**
-         * 用保存的方法信息触发流对象的方法
-         */
-        fun invoke(stream: FStream, clazz: Class<out FStream>) {
-            for ((method, args) in _iMethodInfo) {
-                if (_isDebug) {
-                    Log.i(TAG, "invoke class:${clazz.name} method:${method} args:${Arrays.toString(args)} stream:${stream}")
-                }
-                method.invoke(stream, *args)
-            }
-        }
+    /**
+     * 保存方法调用信息
+     */
+    fun save(method: Method, args: Array<Any?>) {
+        _methodInfo[method] = args
     }
 
-    private val _isDebug: Boolean
-        private get() = FStreamManager.isDebug
+    /**
+     * 用保存的方法信息触发流对象的方法
+     */
+    fun invoke(stream: FStream, clazz: Class<out FStream>, debug: Boolean) {
+        for ((method, args) in _methodInfo) {
+            if (debug) {
+                Log.i(
+                    StickyInvokeManager::class.java.simpleName,
+                    "invoke class:${clazz.name} method:${method} args:${args.contentToString()} stream:${stream}"
+                )
+            }
+            method.invoke(stream, *args)
+        }
+    }
 }
