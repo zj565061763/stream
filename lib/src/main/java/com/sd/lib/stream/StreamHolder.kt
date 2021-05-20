@@ -11,7 +11,7 @@ internal class StreamHolder {
     private val _class: Class<out FStream>
 
     /** 流对象 */
-    private val _streamHolder = LinkedHashSet<FStream>()
+    private val _streamHolder = mutableSetOf<FStream>()
 
     /** 设置了优先级的流对象  */
     private val _priorityStreamHolder = ConcurrentHashMap<FStream, Int>()
@@ -55,33 +55,34 @@ internal class StreamHolder {
     /**
      * 返回流集合
      */
-    fun toCollection(): Collection<FStream> {
+    fun toCollection(): Array<FStream> {
         return if (_isNeedSort) {
             sort()
         } else {
-            ArrayList(_streamHolder)
+            _streamHolder.toTypedArray()
         }
     }
 
     /**
      * 排序
      */
-    private fun sort(): Collection<FStream> {
+    private fun sort(): Array<FStream> {
         synchronized(_manager) {
-            val listEntry = ArrayList(_streamHolder)
-            Collections.sort(listEntry, InternalStreamComparator())
+            val array = _streamHolder.toTypedArray()
+            if (array.size > 1) {
+                // 数量大于1，才排序
+                array.sortWith(InternalStreamComparator())
 
-            _streamHolder.clear()
-            _streamHolder.addAll(listEntry)
+                _streamHolder.clear()
+                _streamHolder.addAll(array)
+            }
+
             _isNeedSort = false
 
             if (_manager.isDebug) {
-                Log.i(
-                    FStream::class.java.simpleName,
-                    "sort stream for class:" + _class.name
-                )
+                Log.i(FStream::class.java.simpleName, "sort stream for class:" + _class.name)
             }
-            return listEntry
+            return array
         }
     }
 

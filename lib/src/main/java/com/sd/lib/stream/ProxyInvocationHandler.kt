@@ -89,7 +89,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
             // 尝试创建默认流对象
             val stream = DefaultStreamManager.getStream(_streamClass)
             if (stream != null) {
-                listStream = listOf(stream)
+                listStream = arrayOf(stream)
                 isDefaultStream = true
 
                 if (_manager.isDebug) {
