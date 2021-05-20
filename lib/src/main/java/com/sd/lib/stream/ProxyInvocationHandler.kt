@@ -83,6 +83,17 @@ internal class ProxyInvocationHandler : InvocationHandler {
     private fun processMainLogic(isVoid: Boolean, method: Method, args: Array<Any?>?, uuid: String?): Any? {
         val holder = _manager.getStreamHolder(_streamClass)
         val listStream = holder?.toCollection()
+
+        if (_manager.isDebug) {
+            Log.i(
+                FStream::class.java.simpleName, "notify -----> $method"
+                        + " arg:${(if (args == null) "" else Arrays.toString(args))}"
+                        + " tag:${_tag}"
+                        + " count:${listStream?.size ?: 0}"
+                        + " uuid:${uuid}"
+            )
+        }
+
         if (listStream == null || listStream.isEmpty()) {
             // 尝试创建默认流对象
             val defaultStream = DefaultStreamManager.getStream(_streamClass) ?: return null
@@ -97,16 +108,6 @@ internal class ProxyInvocationHandler : InvocationHandler {
                 Log.i(FStream::class.java.simpleName, "notify default stream:${defaultStream} return:${returnLog} uuid:${uuid}")
             }
             return result
-        }
-
-        if (_manager.isDebug) {
-            Log.i(
-                FStream::class.java.simpleName, "notify -----> $method"
-                        + " arg:${(if (args == null) "" else Arrays.toString(args))}"
-                        + " tag:${_tag}"
-                        + " count:${listStream.size}"
-                        + " uuid:${uuid}"
-            )
         }
 
         val filterResult = _resultFilter != null && !isVoid
