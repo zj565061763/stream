@@ -100,7 +100,7 @@ object FStreamManager {
     }
 
     /**
-     * 将[stream]和[target]绑定，自动注册和取消注册
+     * 把[stream]和[target]绑定，自动注册和取消注册
      * [ViewStreamBinder]
      *
      * @return true-绑定成功或者已绑定  false-绑定失败
