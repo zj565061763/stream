@@ -64,13 +64,13 @@ internal class ProxyInvocationHandler : InvocationHandler {
             if (_manager.isDebug) {
                 Log.i(
                     FStream::class.java.simpleName,
-                    "return type:$returnType but method result is null, so set to $result uuid:${uuid}"
+                    "return type:${returnType} but method result is null, so set to ${result} uuid:${uuid}"
                 )
             }
         }
 
         if (_manager.isDebug) {
-            Log.i(FStream::class.java.simpleName, "notify finish return:$result uuid:$uuid")
+            Log.i(FStream::class.java.simpleName, "notify finish return:${result} uuid:${uuid}")
         }
 
         if (_isSticky) {
@@ -130,7 +130,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
 
             if (_dispatchCallback != null && _dispatchCallback.beforeDispatch(item, method, args)) {
                 if (_manager.isDebug) {
-                    Log.i(FStream::class.java.simpleName, "proxy broken dispatch before uuid:$uuid")
+                    Log.i(FStream::class.java.simpleName, "proxy broken dispatch before uuid:${uuid}")
                 }
                 break
             }
@@ -171,7 +171,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
 
             if (_dispatchCallback != null && _dispatchCallback.afterDispatch(item, method, args, itemResult)) {
                 if (_manager.isDebug) {
-                    Log.i(FStream::class.java.simpleName, "proxy broken dispatch after uuid:$uuid")
+                    Log.i(FStream::class.java.simpleName, "proxy broken dispatch after uuid:${uuid}")
                 }
                 break
             }
@@ -186,7 +186,7 @@ internal class ProxyInvocationHandler : InvocationHandler {
         if (filterResult && listResult!!.isNotEmpty()) {
             result = _resultFilter!!.filter(method, args, listResult)
             if (_manager.isDebug) {
-                Log.i(FStream::class.java.simpleName, "proxy filter result: $result uuid:$uuid")
+                Log.i(FStream::class.java.simpleName, "proxy filter result:${result} uuid:${uuid}")
             }
         }
         return result
