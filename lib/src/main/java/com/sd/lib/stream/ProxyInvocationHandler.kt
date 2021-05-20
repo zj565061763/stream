@@ -34,7 +34,6 @@ internal class ProxyInvocationHandler : InvocationHandler {
         return _tag == tag
     }
 
-    @Throws(Throwable::class)
     override fun invoke(proxy: Any, method: Method, args: Array<Any?>?): Any? {
         val returnType = method.returnType
         val parameterTypes = method.parameterTypes
@@ -79,7 +78,6 @@ internal class ProxyInvocationHandler : InvocationHandler {
         return result
     }
 
-    @Throws(Throwable::class)
     private fun processMainLogic(isVoid: Boolean, method: Method, args: Array<Any?>?, uuid: String?): Any? {
         val holder = _manager.getStreamHolder(_streamClass)
         val listStream = holder?.toCollection()
