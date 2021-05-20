@@ -80,7 +80,7 @@ internal class StreamHolder {
             _isNeedSort = false
 
             if (_manager.isDebug) {
-                Log.i(FStream::class.java.simpleName, "sort stream for class:" + _class.name)
+                Log.i(FStream::class.java.simpleName, "sort stream for class:${_class.name}")
             }
             return array
         }
@@ -103,7 +103,7 @@ internal class StreamHolder {
         if (_manager.isDebug) {
             Log.i(
                 FStream::class.java.simpleName,
-                "notifyPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size}  stream:${stream}"
+                "notifyPriorityChanged priority:${priority} clazz:${clazz.name} priorityStreamHolder size:${_priorityStreamHolder.size} stream:${stream}"
             )
         }
     }
@@ -113,10 +113,10 @@ internal class StreamHolder {
             val o1Connection = _manager.getConnection(o1)
             val o2Connection = _manager.getConnection(o2)
 
-            if (o1Connection != null && o2Connection != null) {
-                return o2Connection.getPriority(_class) - o1Connection.getPriority(_class)
+            return if (o1Connection != null && o2Connection != null) {
+                o2Connection.getPriority(_class) - o1Connection.getPriority(_class)
             } else {
-                return 0
+                0
             }
         }
     }
