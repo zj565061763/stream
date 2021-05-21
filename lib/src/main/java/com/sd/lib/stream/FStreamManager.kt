@@ -38,6 +38,7 @@ object FStreamManager {
     fun register(stream: FStream): StreamConnection {
         val connection = _mapStreamConnection[stream]
         if (connection != null) {
+            // 该对象已经注册过了
             return connection
         }
 
