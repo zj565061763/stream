@@ -20,13 +20,19 @@ internal class ViewStreamBinder : StreamBinder<View> {
             return false
         }
 
-        target.removeOnAttachStateChangeListener(_onAttachStateChangeListener)
-        target.addOnAttachStateChangeListener(_onAttachStateChangeListener)
-
-        if (isAttached(target)) {
-            return registerStream()
+        val listenerTask = Runnable {
+            target.removeOnAttachStateChangeListener(_onAttachStateChangeListener)
+            target.addOnAttachStateChangeListener(_onAttachStateChangeListener)
         }
-        return true
+
+        return if (isAttached(target)) {
+            registerStream().also {
+                if (it) listenerTask.run()
+            }
+        } else {
+            listenerTask.run()
+            true
+        }
     }
 
     private val _onAttachStateChangeListener: OnAttachStateChangeListener = object : OnAttachStateChangeListener {
