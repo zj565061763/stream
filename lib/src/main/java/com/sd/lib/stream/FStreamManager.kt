@@ -18,7 +18,7 @@ object FStreamManager {
     @JvmStatic
     val instance by lazy { FStreamManager }
 
-    private val _mapStream: MutableMap<Class<out FStream>, StreamHolder> = ConcurrentHashMap()
+    private val _mapStreamHolder: MutableMap<Class<out FStream>, StreamHolder> = ConcurrentHashMap()
     private val _mapStreamConnection: MutableMap<FStream, StreamConnection> = ConcurrentHashMap()
     private val _mapStreamBinder: MutableMap<FStream, StreamBinder<*>> = WeakHashMap()
 
@@ -44,10 +44,10 @@ object FStreamManager {
 
         val classes = LibUtils.findStreamClass(stream.javaClass)
         for (clazz in classes) {
-            var holder = _mapStream[clazz]
+            var holder = _mapStreamHolder[clazz]
             if (holder == null) {
                 holder = StreamHolder(clazz)
-                _mapStream[clazz] = holder
+                _mapStreamHolder[clazz] = holder
             }
 
             if (holder.add(stream)) {
@@ -74,10 +74,10 @@ object FStreamManager {
 
         val classes = LibUtils.findStreamClass(stream.javaClass)
         for (clazz in classes) {
-            val holder = _mapStream[clazz] ?: continue
+            val holder = _mapStreamHolder[clazz] ?: continue
             if (holder.remove(stream)) {
                 if (holder.size <= 0) {
-                    _mapStream.remove(clazz)
+                    _mapStreamHolder.remove(clazz)
                 }
 
                 if (isDebug) {
@@ -158,7 +158,7 @@ object FStreamManager {
     }
 
     internal fun getStreamHolder(clazz: Class<out FStream>): StreamHolder? {
-        return _mapStream[clazz]
+        return _mapStreamHolder[clazz]
     }
 
     /**
