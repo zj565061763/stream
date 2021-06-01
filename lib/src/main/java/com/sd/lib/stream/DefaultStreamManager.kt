@@ -29,7 +29,7 @@ object DefaultStreamManager {
      * 取消注册默认的流接口实现类
      */
     @Synchronized
-    fun unregister(defaultClass: Class<out FStream?>) {
+    fun unregister(defaultClass: Class<out FStream>) {
         val classes = LibUtils.findStreamClass(defaultClass)
         for (item in classes) {
             _mapDefaultStreamClass.remove(item)
