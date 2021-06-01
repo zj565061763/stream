@@ -166,7 +166,7 @@ object FStreamManager {
      * [DefaultStreamManager.register]
      */
     @Deprecated("")
-    fun registerDefaultStream(clazz: Class<out FStream?>) {
+    fun registerDefaultStream(clazz: Class<out FStream>) {
         DefaultStreamManager.register(clazz)
     }
 }
