@@ -71,9 +71,9 @@ object FStreamManager {
      */
     @Synchronized
     fun unregister(stream: FStream) {
-        _mapStreamConnection.remove(stream) ?: return
+        val connection = _mapStreamConnection.remove(stream) ?: return
 
-        val classes = LibUtils.findStreamClass(stream.javaClass)
+        val classes = connection.streamClasses
         for (clazz in classes) {
             val holder = _mapStreamHolder[clazz] ?: continue
             if (holder.remove(stream)) {

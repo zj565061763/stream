@@ -24,6 +24,12 @@ class StreamConnection {
     }
 
     /**
+     * 当前连接的所有流接口
+     */
+    val streamClasses: Collection<Class<out FStream>>
+        get() = _mapItem.keys
+
+    /**
      * 粘性触发方法
      */
     fun stickyInvoke() {
