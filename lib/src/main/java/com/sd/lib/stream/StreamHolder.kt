@@ -92,6 +92,7 @@ internal class StreamHolder {
      */
     fun notifyPriorityChanged(priority: Int, stream: FStream, clazz: Class<out FStream>) {
         require(clazz == _class) { "expect class:${_class} but class:${clazz}" }
+        require(clazz.isAssignableFrom(stream.javaClass)) { "class:${clazz} is not assignable from ${stream.javaClass}" }
 
         if (priority == 0) {
             _priorityStreamHolder.remove(stream)
