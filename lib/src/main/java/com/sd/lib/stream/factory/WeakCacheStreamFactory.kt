@@ -88,7 +88,7 @@ class WeakCacheStreamFactory : CacheableStreamFactory() {
     }
 
     private val _sizeLog: String
-        private get() = """
+        get() = """
             size:${_mapStream.size},${_mapReference.size}
         """.trimIndent()
 }
