@@ -4,6 +4,9 @@ import android.util.Log
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * 流对象持有者，保存流接口映射的流对象列表
+ */
 internal class StreamHolder {
     /** 流接口 */
     private val _class: Class<out FStream>
