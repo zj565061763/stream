@@ -28,7 +28,9 @@ internal object LibUtils {
             current = current.superclass ?: break
         }
 
-        if (collection.isEmpty()) throw RuntimeException("stream class was not found in ${clazz}")
+        if (collection.isEmpty()) {
+            throw RuntimeException("stream class was not found in ${clazz}")
+        }
         return collection
     }
 }
