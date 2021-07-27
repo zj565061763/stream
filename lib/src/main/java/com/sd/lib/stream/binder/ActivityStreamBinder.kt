@@ -3,6 +3,7 @@ package com.sd.lib.stream.binder
 import android.app.Activity
 import android.view.View
 import android.view.View.OnAttachStateChangeListener
+import android.view.Window
 import com.sd.lib.stream.FStream
 import java.lang.ref.WeakReference
 
@@ -14,9 +15,9 @@ internal class ActivityStreamBinder : StreamBinder<Activity> {
 
     constructor(stream: FStream, target: Activity) : super(stream, target) {
         val window = target.window
-                ?: throw RuntimeException("Bind stream failed because activity's window is null")
+            ?: throw RuntimeException("Bind stream failed because activity's window is null")
         val decorView = window.decorView
-                ?: throw RuntimeException("Bind stream failed because activity's window DecorView is null")
+            ?: throw RuntimeException("Bind stream failed because activity's window DecorView is null")
 
         _decorView = WeakReference(decorView)
     }
