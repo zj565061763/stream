@@ -101,7 +101,7 @@ internal class StreamHolder {
             _priorityStreamHolder[stream] = priority
         }
 
-        _isNeedSort = true
+        _isNeedSort = _priorityStreamHolder.isNotEmpty()
 
         if (FStreamManager.isDebug) {
             Log.i(
