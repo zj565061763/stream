@@ -72,7 +72,7 @@ internal class StreamHolder {
         val array = _streamHolder.toTypedArray()
         if (array.size > 1) {
             // 排序
-            array.sortWith(InternalStreamComparator())
+            array.sortWith(StreamPriorityComparatorDesc())
 
             // 把排序后的对象保存到容器
             _streamHolder.clear()
@@ -111,7 +111,7 @@ internal class StreamHolder {
         }
     }
 
-    private inner class InternalStreamComparator : Comparator<FStream> {
+    private inner class StreamPriorityComparatorDesc : Comparator<FStream> {
         override fun compare(o1: FStream, o2: FStream): Int {
             val o1Connection = FStreamManager.getConnection(o1)
             val o2Connection = FStreamManager.getConnection(o2)
