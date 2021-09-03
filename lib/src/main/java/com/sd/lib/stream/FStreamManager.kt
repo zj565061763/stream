@@ -97,7 +97,7 @@ object FStreamManager {
      *
      * @return true-绑定成功或者已绑定  false-绑定失败
      */
-    fun bindStream(stream: FStream, target: Activity): Boolean {
+    fun bindActivity(stream: FStream, target: Activity): Boolean {
         return bindStreamInternal(stream, target) { ActivityStreamBinder(stream, target) }
     }
 
@@ -107,7 +107,7 @@ object FStreamManager {
      *
      * @return true-绑定成功或者已绑定  false-绑定失败
      */
-    fun bindStream(stream: FStream, target: View): Boolean {
+    fun bindView(stream: FStream, target: View): Boolean {
         return bindStreamInternal(stream, target) { ViewStreamBinder(stream, target) }
     }
 
@@ -168,5 +168,21 @@ object FStreamManager {
     @Deprecated("")
     fun registerDefaultStream(clazz: Class<out FStream>) {
         DefaultStreamManager.register(clazz)
+    }
+
+    /**
+     * 用[bindActivity]替代
+     */
+    @Deprecated("")
+    fun bindStream(stream: FStream, target: Activity): Boolean {
+        return bindActivity(stream, target)
+    }
+
+    /**
+     * 用[bindView]替代
+     */
+    @Deprecated("")
+    fun bindStream(stream: FStream, target: View): Boolean {
+        return bindView(stream, target)
     }
 }
