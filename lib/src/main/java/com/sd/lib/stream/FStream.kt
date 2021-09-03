@@ -113,4 +113,17 @@ interface FStream {
          */
         fun filter(method: Method, methodParams: Array<Any?>?, results: List<Any?>): Any?
     }
+
+    companion object {
+        /**
+         * 创建代理对象
+         */
+        @JvmOverloads
+        @JvmStatic
+        fun <T : FStream> buildProxy(clazz: Class<T>, block: (ProxyBuilder.() -> Unit)? = null): T {
+            val builder = ProxyBuilder()
+            block?.invoke(builder)
+            return builder.build(clazz)
+        }
+    }
 }
