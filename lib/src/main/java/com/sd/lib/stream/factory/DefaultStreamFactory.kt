@@ -11,16 +11,10 @@ interface DefaultStreamFactory {
      */
     fun create(param: CreateParam): FStream
 
-    class CreateParam {
+    class CreateParam(
         /** 流接口 */
-        val classStream: Class<out FStream>
-
+        val classStream: Class<out FStream>,
         /** 流接口实现类 */
         val classStreamDefault: Class<out FStream>
-
-        constructor(classStream: Class<out FStream>, classStreamDefault: Class<out FStream>) {
-            this.classStream = classStream
-            this.classStreamDefault = classStreamDefault
-        }
-    }
+    )
 }
